@@ -1,18 +1,18 @@
 import * as React from 'react';
 
 import { StyleSheet, View, Text } from 'react-native';
-import { multiply } from 'epubjs-react-native';
+import { Reader } from 'epubjs-react-native';
 
 export default function App() {
   const [result, setResult] = React.useState<number | undefined>();
 
-  React.useEffect(() => {
+  /*React.useEffect(() => {
     multiply(3, 7).then(setResult);
-  }, []);
+  }, []);*/
 
   return (
     <View style={styles.container}>
-      <Text>Result: {result}</Text>
+      <Reader />
     </View>
   );
 }
