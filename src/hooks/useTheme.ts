@@ -1,4 +1,4 @@
-import type { Theme } from 'lib/typescript';
+import type { Theme } from 'src/types';
 import useSetState from './useSetState';
 
 export const defaultTheme: Theme = {
