@@ -1,10 +1,10 @@
 import React from 'react';
-import type { ContextProps, FontSize, Theme } from 'lib/typescript';
 import { createContext, useEffect, useRef, useState } from 'react';
 import type WebView from 'react-native-webview';
 import { defaultTheme, useTheme } from './hooks/useTheme';
+import type { FontSize, ReaderContextProps, Theme } from './types';
 
-export const BookContext = createContext<ContextProps>({
+export const BookContext = createContext<ReaderContextProps>({
   registerBook: () => {},
   changeFontSize: () => {},
   goToLocation: () => {},
@@ -36,7 +36,7 @@ export const BookContext = createContext<ContextProps>({
       date: new Date(),
     };
   },
-} as ContextProps);
+} as ReaderContextProps);
 
 export function BookProvider({ children }: { children: React.ReactNode }) {
   const book = useRef<WebView | null>(null);
@@ -50,12 +50,10 @@ export function BookProvider({ children }: { children: React.ReactNode }) {
 
   const [theme, changeTheme] = useTheme();
 
-  // Works
   function registerBook(bookRef: WebView) {
     book.current = bookRef;
   }
 
-  // Works
   function changeFontSize(size: FontSize) {
     const themeWithNewFontSize = {
       ...theme,
