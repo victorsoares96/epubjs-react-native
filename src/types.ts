@@ -297,7 +297,7 @@ export interface ReaderProps {
   onSwipeRight?: () => void;
   /**
    * Render when the book is loading
-   * @returns {React.ReactNode} void
+   * @returns {React.ReactNode} React.ReactNode
    */
   renderLoadingComponent?: () => React.ReactNode;
 }
