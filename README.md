@@ -8,11 +8,15 @@ ePub.js Reader for React Native
 npm install epubjs-react-native
 ```
 
+#### Installing dependencies into a bare React Native project
+
+In your project, run:
+
 ```sh
-yarn add epubjs-react-native
+npm install react-native-webview react-native-gesture-handler
 ```
 
-##### If you develop for iOS use this command for install CocoaPods deps (if you use Expo you dont need this)
+##### If you develop for iOS use this command for install CocoaPods deps (if you use Expo you don't need this)
 
 ```sh
 cd ios
@@ -27,7 +31,7 @@ npx pod install
 ```tsx
 import * as React from 'react';
 
-import { View, SafeAreaView, useWindowDimensions, Text } from 'react-native';
+import { SafeAreaView, useWindowDimensions } from 'react-native';
 import { Reader, BookProvider } from 'epubjs-react-native';
 
 // ...

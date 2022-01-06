@@ -62,8 +62,11 @@ export function Reader({
     window.THEME = ${JSON.stringify(theme)};
   `;
 
-  if (currentLocation)
+  if (initialLocation) {
+    injectedJS = `${injectedJS}window.BOOK_LOCATION = "${initialLocation}"; true`;
+  } else if (currentLocation) {
     injectedJS = `${injectedJS}window.BOOK_LOCATION = "${currentLocation}"; true`;
+  }
 
   function onMessage(event: WebViewMessageEvent) {
     let parsedEvent = JSON.parse(event.nativeEvent.data);
@@ -168,13 +171,13 @@ export function Reader({
   const swipeAction = () => <View style={{ width: 0.5 }} />;
 
   useEffect(() => {
-    if (initialLocation) goToLocation(initialLocation);
     if (book.current) registerBook(book.current);
-  }, [goToLocation, registerBook, initialLocation]);
+  }, [registerBook]);
 
   useEffect(() => {
-    if (initialLocation) setCurrentLocation(initialLocation);
-  }, [initialLocation, setCurrentLocation]);
+    if (initialLocation) goToLocation(initialLocation);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
