@@ -147,9 +147,5 @@
         }
       ]
     ]
-  },
-  "dependencies": {
-    "react-native-gesture-handler": "^2.1.0",
-    "react-native-webview": "^11.15.1"
   }
 }
