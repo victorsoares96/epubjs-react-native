@@ -110,6 +110,26 @@ const { changeFontSize, goToLocation, ... } = useBook();
 * `progress`: The progress of the book.
 * `isLoading`: Indicates if the book is loading.
 
+## Running Example
+
+```bash
+git clone https://github.com/victorsoares96/epubjs-react-native.git
+
+yarn install
+```
+
+### Android
+
+```bash
+yarn example android
+```
+
+### iOS
+
+```bash
+yarn example ios
+```
+
 ## Contributing
 
 See the [contributing guide](CONTRIBUTING.md) to learn how to contribute to the repository and the development workflow.
