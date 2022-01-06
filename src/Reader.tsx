@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { View } from 'react-native';
+import { Platform, View } from 'react-native';
 import {
   GestureHandlerRootView,
   HandlerStateChangeEvent,
@@ -57,7 +57,7 @@ export function Reader({
   let injectedJS = `
     window.BOOK_PATH = "${src}";
     window.LOCATIONS = ${locations};
-    window.HEIGHT = ${height} + 'px';
+    window.HEIGHT = ${height * 0.9} + 'px';
     window.WIDTH = ${width} + 'px';
     window.THEME = ${JSON.stringify(theme)};
   `;
@@ -207,15 +207,17 @@ export function Reader({
             numberOfTaps={2}
           >
             <View style={{ flex: 1, position: 'relative' }}>
-              <View
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  position: 'absolute',
-                  top: 0,
-                  zIndex: 2,
-                }}
-              />
+              {Platform.OS === 'ios' && (
+                <View
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    position: 'absolute',
+                    top: 0,
+                    zIndex: 2,
+                  }}
+                />
+              )}
 
               {isLoading && (
                 <View

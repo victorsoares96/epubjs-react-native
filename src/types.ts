@@ -270,12 +270,12 @@ export interface ReaderProps {
    * width of the ePub Rendition
    * @param {number} width
    */
-  width: number | string;
+  width: number;
   /**
    * height of the ePub Rendition
    * @param {number} height
    */
-  height: number | string;
+  height: number;
   /**
    * Can be an ePubCfi or chapter url
    */

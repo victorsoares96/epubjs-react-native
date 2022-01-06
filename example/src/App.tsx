@@ -12,6 +12,8 @@ export default function App() {
           src="https://s3.amazonaws.com/moby-dick/OPS/package.opf"
           width={width}
           height={height}
+          onPress={() => console.log('onPress')}
+          onDoublePress={() => console.log('onDoublePress')}
           renderLoadingComponent={() => (
             <View>
               <Text>Loading</Text>
