@@ -72,8 +72,6 @@ export function Reader({
   function onMessage(event: WebViewMessageEvent) {
     let parsedEvent = JSON.parse(event.nativeEvent.data);
 
-    console.log(parsedEvent);
-
     let { type } = parsedEvent;
 
     delete parsedEvent.type;
