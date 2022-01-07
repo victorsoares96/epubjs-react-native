@@ -1,7 +1,7 @@
 import React from 'react';
 import { createContext, useEffect, useRef, useState } from 'react';
 import type WebView from 'react-native-webview';
-import { defaultTheme, useTheme } from './hooks/useTheme';
+import { defaultTheme as initialTheme, useTheme } from './hooks/useTheme';
 import type { FontSize, ReaderContextProps, Theme } from './types';
 
 export const BookContext = createContext<ReaderContextProps>({
@@ -14,7 +14,7 @@ export const BookContext = createContext<ReaderContextProps>({
   goToNote: () => {},
   savePage: () => {},
   search: () => {},
-  theme: defaultTheme,
+  theme: initialTheme,
   changeTheme: () => {},
   currentLocation: null,
   setCurrentLocation: () => {},
@@ -38,7 +38,13 @@ export const BookContext = createContext<ReaderContextProps>({
   },
 } as ReaderContextProps);
 
-export function BookProvider({ children }: { children: React.ReactNode }) {
+export function BookProvider({
+  children,
+  defaultTheme = initialTheme,
+}: {
+  children: React.ReactNode;
+  defaultTheme?: Theme;
+}) {
   const book = useRef<WebView | null>(null);
 
   const [currentLocation, setCurrentLocation] = useState<string | null>(null);
@@ -48,7 +54,7 @@ export function BookProvider({ children }: { children: React.ReactNode }) {
   const [progress, setProgress] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
 
-  const [theme, changeTheme] = useTheme();
+  const [theme, changeTheme] = useTheme(defaultTheme);
 
   function registerBook(bookRef: WebView) {
     book.current = bookRef;

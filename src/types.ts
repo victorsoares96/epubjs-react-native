@@ -300,4 +300,8 @@ export interface ReaderProps {
    * @returns {React.ReactNode} React.ReactNode
    */
   renderLoadingComponent?: () => React.ReactNode;
+  /**
+   * Set the default theme of the book
+   */
+  defaultTheme?: Theme;
 }

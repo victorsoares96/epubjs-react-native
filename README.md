@@ -16,6 +16,14 @@ In your project, run:
 npm install react-native-webview react-native-gesture-handler
 ```
 
+#### If you use Expo
+
+In your project, run:
+
+```sh
+expo install react-native-webview
+```
+
 ##### If you develop for iOS use this command for install CocoaPods deps (if you use Expo you don't need this)
 
 ```sh
@@ -113,6 +121,62 @@ const { changeFontSize, goToLocation, ... } = useBook();
 * `totalPages`: The total number of pages
 * `progress`: The progress of the book.
 * `isLoading`: Indicates if the book is loading.
+
+#### Setting a default theme
+
+If you want, you can set the default theme like this:
+
+```tsx
+import * as React from 'react';
+
+import { SafeAreaView, useWindowDimensions } from 'react-native';
+import { Reader, BookProvider } from 'epubjs-react-native';
+
+// ...
+
+const defaultTheme = {
+  'fontSize': '100%',
+  'body': {
+    'background': '#fff',
+    'font-size': '100%',
+  },
+  'p': {
+    'color': '#000 !important',
+    'font-size': '100%',
+  },
+  'li': {
+    'color': '#000 !important',
+    'font-size': '100%',
+  },
+  'h1': {
+    color: '#000 !important',
+  },
+  'a': {
+    'color': '#000 !important',
+    'pointer-events': 'none',
+    'cursor': 'default',
+  },
+  '::selection': {
+    background: 'lightskyblue',
+  },
+};
+
+export default function App() {
+  const { width, height } = useWindowDimensions();
+  return (
+    <SafeAreaView style={{ flex: 1 }}>
+      <BookProvider defaultTheme={defaultTheme}>
+        <Reader
+          src="https://s3.amazonaws.com/moby-dick/OPS/package.opf"
+          width={width}
+          height={height}
+        />
+      </BookProvider>
+    </SafeAreaView>
+  );
+}
+```
+```
 
 ## Contributing
 
