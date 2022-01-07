@@ -22,21 +22,26 @@ export type CurrentLocation = {
 export type Theme = {
   'fontSize': FontSize;
   'body': {
+    'font-family': string;
     'background': string;
     'font-size': FontSize;
   };
   'p': {
+    'font-family': string;
     'color': string;
     'font-size': FontSize;
   };
   'li': {
+    'font-family': string;
     'color': string;
     'font-size': FontSize;
   };
   'h1': {
-    color: string;
+    'font-family': string;
+    'color': string;
   };
   'a': {
+    'font-family': string;
     'color': string;
     'pointer-events': string;
     'cursor': string;
@@ -73,6 +78,13 @@ export interface ReaderContextProps {
    * @param {FontSize} size {@link FontSize}
    */
   changeFontSize: (size: FontSize) => void;
+
+  /**
+   * Change font size of all elements in the book
+   * @param font
+   * @see https://www.w3schools.com/cssref/css_websafe_fonts.asp
+   */
+  changeFontFamily: (font: string) => void;
 
   /**
    * Go to specific location in the book
@@ -164,6 +176,10 @@ export interface ReaderContextProps {
    * @param {Date} date {@link Date}
    */
   getCurrentLocation: () => CurrentLocation;
+  /**
+   * Set the default theme of the book
+   */
+  defaultTheme?: Theme;
 }
 
 export interface ReaderProps {
@@ -301,7 +317,9 @@ export interface ReaderProps {
    */
   renderLoadingComponent?: () => React.ReactNode;
   /**
-   * Set the default theme of the book
+   * Enable text selection feature on the book
+   * @default false
+   * @description Recommend using this with `enableSwipe` disabled
    */
-  defaultTheme?: Theme;
+  enableSelection?: boolean;
 }

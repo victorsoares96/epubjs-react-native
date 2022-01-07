@@ -34,6 +34,7 @@ export function Reader({
   onSwipeLeft = () => {},
   onSwipeRight = () => {},
   renderLoadingComponent = () => null,
+  enableSelection = false,
 }: ReaderProps) {
   const {
     theme,
@@ -70,6 +71,8 @@ export function Reader({
 
   function onMessage(event: WebViewMessageEvent) {
     let parsedEvent = JSON.parse(event.nativeEvent.data);
+
+    console.log(parsedEvent);
 
     let { type } = parsedEvent;
 
@@ -210,17 +213,18 @@ export function Reader({
             numberOfTaps={2}
           >
             <View style={{ flex: 1, position: 'relative' }}>
-              {Platform.OS === 'ios' && (
-                <View
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    position: 'absolute',
-                    top: 0,
-                    zIndex: 2,
-                  }}
-                />
-              )}
+              {Platform.OS === 'ios' ||
+                (!enableSelection && (
+                  <View
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      position: 'absolute',
+                      top: 0,
+                      zIndex: 2,
+                    }}
+                  />
+                ))}
 
               {isLoading && (
                 <View

@@ -7,6 +7,7 @@ import type { FontSize, ReaderContextProps, Theme } from './types';
 export const BookContext = createContext<ReaderContextProps>({
   registerBook: () => {},
   changeFontSize: () => {},
+  changeFontFamily: () => {},
   goToLocation: () => {},
   goToPage: () => {},
   goPrevious: () => {},
@@ -58,6 +59,29 @@ export function BookProvider({
 
   function registerBook(bookRef: WebView) {
     book.current = bookRef;
+  }
+
+  function changeFontFamily(fontFamily: string) {
+    const themeWithNewFontFamily = {
+      ...theme,
+      body: {
+        ...theme.body,
+        'font-family': fontFamily,
+      },
+      p: {
+        ...theme.p,
+        'font-family': fontFamily,
+      },
+      li: {
+        ...theme.li,
+        'font-family': fontFamily,
+      },
+      h1: {
+        ...theme.h1,
+        'font-family': fontFamily,
+      },
+    };
+    changeTheme(themeWithNewFontFamily);
   }
 
   function changeFontSize(size: FontSize) {
@@ -161,6 +185,7 @@ export function BookProvider({
       value={{
         registerBook,
         changeFontSize,
+        changeFontFamily,
         goToLocation,
         goToPage,
         goPrevious,
