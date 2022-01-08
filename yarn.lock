@@ -7754,6 +7754,11 @@ react-native-gesture-handler@^2.1.0:
     lodash "^4.17.21"
     prop-types "^15.7.2"
 
+react-native-swipe-detect@^1.0.10:
+  version "1.0.10"
+  resolved "https://registry.yarnpkg.com/react-native-swipe-detect/-/react-native-swipe-detect-1.0.10.tgz#f196ca14757a11ad4d35110f2ff4e217742d6ef6"
+  integrity sha512-EuXZE3rKVh2MxkfQNZOI1b//fAMqi0ocuWc4fsXKjS0IM+LsiuJzTkE6wCZarmmtUMuhmFr8rAPLLFsxRp2Fsg==
+
 react-native-webview@^11.15.1:
   version "11.15.1"
   resolved "https://registry.yarnpkg.com/react-native-webview/-/react-native-webview-11.15.1.tgz#6add96751542a85016f46b60db582b9f31b682e2"

@@ -1,13 +1,6 @@
 import React, { useEffect, useRef } from 'react';
-import { Platform, View } from 'react-native';
-import {
-  GestureHandlerRootView,
-  HandlerStateChangeEvent,
-  State,
-  Swipeable,
-  TapGestureHandler,
-  TapGestureHandlerEventPayload,
-} from 'react-native-gesture-handler';
+import { View, TouchableWithoutFeedback } from 'react-native';
+import GestureRecognizer from 'react-native-swipe-detect';
 import { WebView, WebViewMessageEvent } from 'react-native-webview';
 import { useBook } from './hooks/useBook';
 import template from './template';
@@ -53,14 +46,12 @@ export function Reader({
     goNext,
   } = useBook();
   const book = useRef<WebView>(null);
-  const doubleTapRef = useRef(null);
 
   let injectedJS = `
     window.BOOK_PATH = "${src}";
     window.LOCATIONS = ${locations};
-    window.HEIGHT = ${height * 0.9} + 'px';
-    window.WIDTH = ${width} + 'px';
     window.THEME = ${JSON.stringify(theme)};
+    window.ENABLE_SELECTION = ${enableSelection};
   `;
 
   if (initialLocation) {
@@ -153,24 +144,6 @@ export function Reader({
     }
   }
 
-  const onSingleTapEvent = (
-    event: HandlerStateChangeEvent<TapGestureHandlerEventPayload>
-  ) => {
-    if (event.nativeEvent.state === State.ACTIVE) {
-      onPress();
-    }
-  };
-
-  const onDoubleTapEvent = (
-    event: HandlerStateChangeEvent<TapGestureHandlerEventPayload>
-  ) => {
-    if (event.nativeEvent.state === State.ACTIVE) {
-      onDoublePress();
-    }
-  };
-
-  const swipeAction = () => <View style={{ width: 0.5 }} />;
-
   useEffect(() => {
     if (book.current) registerBook(book.current);
   }, [registerBook]);
@@ -180,86 +153,80 @@ export function Reader({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  let lastTap: number | null = null;
+  let timer: NodeJS.Timeout;
+
+  const handleDoublePress = () => {
+    if (lastTap) {
+      onDoublePress();
+      clearTimeout(timer);
+      lastTap = null;
+    } else {
+      lastTap = Date.now();
+      timer = setTimeout(() => {
+        onPress();
+        lastTap = null;
+        clearTimeout(timer);
+      }, 300);
+    }
+  };
+
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <Swipeable
-        useNativeAnimations
-        // @ts-ignore
-        renderLeftActions={enableSwipe && swipeAction}
-        // @ts-ignore
-        renderRightActions={enableSwipe && swipeAction}
-        onSwipeableLeftWillOpen={() => {
-          goPrevious();
-          onSwipeLeft();
-        }}
-        onSwipeableRightWillOpen={() => {
-          goNext();
-          onSwipeRight();
-        }}
-        overshootLeft={false}
-        overshootRight={false}
-        childrenContainerStyle={{ flex: 1 }}
-        containerStyle={{ flex: 1 }}
-      >
-        <TapGestureHandler
-          onHandlerStateChange={onSingleTapEvent}
-          waitFor={doubleTapRef}
+    <GestureRecognizer
+      onSwipeLeft={() => {
+        goNext();
+        onSwipeLeft();
+      }}
+      onSwipeRight={() => {
+        goPrevious();
+        onSwipeRight();
+      }}
+      config={{
+        velocityThreshold: 0.1,
+        directionalOffsetThreshold: 80,
+        enableSwipeLeft: enableSwipe,
+        enableSwipeRight: enableSwipe,
+      }}
+      style={{
+        width,
+        height,
+        position: 'relative',
+      }}
+    >
+      {isLoading && (
+        <View
+          style={{
+            width: '100%',
+            height: '100%',
+            position: 'absolute',
+            top: 0,
+            zIndex: 2,
+          }}
         >
-          <TapGestureHandler
-            ref={doubleTapRef}
-            onHandlerStateChange={onDoubleTapEvent}
-            numberOfTaps={2}
-          >
-            <View style={{ flex: 1, position: 'relative' }}>
-              {Platform.OS === 'ios' ||
-                (!enableSelection && (
-                  <View
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      position: 'absolute',
-                      top: 0,
-                      zIndex: 2,
-                    }}
-                  />
-                ))}
+          {renderLoadingComponent()}
+        </View>
+      )}
 
-              {isLoading && (
-                <View
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    position: 'absolute',
-                    top: 0,
-                    zIndex: 2,
-                  }}
-                >
-                  {renderLoadingComponent()}
-                </View>
-              )}
-
-              <WebView
-                ref={book}
-                source={{ html: template }}
-                showsVerticalScrollIndicator={false}
-                injectedJavaScriptBeforeContentLoaded={injectedJS}
-                originWhitelist={['*']}
-                scrollEnabled={false}
-                mixedContentMode="compatibility"
-                onMessage={onMessage}
-                allowUniversalAccessFromFileURLs={true}
-                allowFileAccessFromFileURLs={true}
-                allowFileAccess
-                style={{
-                  flex: 1,
-                  backgroundColor: theme.body.background,
-                  height: isLoading ? 0 : '100%',
-                }}
-              />
-            </View>
-          </TapGestureHandler>
-        </TapGestureHandler>
-      </Swipeable>
-    </GestureHandlerRootView>
+      <TouchableWithoutFeedback onPress={handleDoublePress}>
+        <WebView
+          ref={book}
+          source={{ html: template }}
+          showsVerticalScrollIndicator={false}
+          injectedJavaScriptBeforeContentLoaded={injectedJS}
+          originWhitelist={['*']}
+          scrollEnabled={false}
+          mixedContentMode="compatibility"
+          onMessage={onMessage}
+          allowUniversalAccessFromFileURLs={true}
+          allowFileAccessFromFileURLs={true}
+          allowFileAccess
+          style={{
+            width,
+            backgroundColor: theme.body.background,
+            height: isLoading ? 0 : height,
+          }}
+        />
+      </TouchableWithoutFeedback>
+    </GestureRecognizer>
   );
 }
