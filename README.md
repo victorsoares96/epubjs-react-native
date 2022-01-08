@@ -13,7 +13,7 @@ npm install epubjs-react-native
 In your project, run:
 
 ```sh
-npm install react-native-webview react-native-gesture-handler
+npm install react-native-webview
 ```
 
 #### If you use Expo
@@ -42,12 +42,10 @@ import * as React from 'react';
 import { SafeAreaView, useWindowDimensions } from 'react-native';
 import { Reader, BookProvider } from 'epubjs-react-native';
 
-// ...
-
 export default function App() {
   const { width, height } = useWindowDimensions();
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView>
       <BookProvider>
         <Reader
           src="https://s3.amazonaws.com/moby-dick/OPS/package.opf"
@@ -170,7 +168,7 @@ const defaultTheme = {
 export default function App() {
   const { width, height } = useWindowDimensions();
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView>
       <BookProvider defaultTheme={defaultTheme}>
         <Reader
           src="https://s3.amazonaws.com/moby-dick/OPS/package.opf"
@@ -181,7 +179,6 @@ export default function App() {
     </SafeAreaView>
   );
 }
-```
 ```
 
 ## Contributing
