@@ -28,10 +28,19 @@ export default `
     <div id="viewer"></div>
 
     <script>
-      var book = ePub(window.BOOK_PATH);
+      var book;
+
+      if (window.BOOK_BASE64) {
+        book = ePub(window.BOOK_BASE64, { encoding: "base64" });
+      }
+
+      if (window.BOOK_URI) {
+        book = ePub(window.BOOK_URI);
+      }
+
       var rendition = book.renderTo("viewer", {
         width: "100%",
-        height: "100%"
+        height: "100%",
       });
 
       var displayed = rendition.display();
@@ -105,38 +114,6 @@ export default `
           type: 'orientation',
           orientation: orientation
         }));
-      });
-      rendition.on("selected", function(cfiRange, contents) {
-        if (window.ENABLE_SELECTION) {
-          book.getRange(cfiRange).then(function (range) {
-            window.ReactNativeWebView.postMessage(JSON.stringify({
-              type: 'selected',
-              cfi: cfiRange,
-              text: range.toString(),
-              totalPages: window.book.locations.length(),
-              progress: window.book.locations.percentageFromCfi(cfiRange),
-              location: window.book.locations.locationFromCfi(cfiRange),
-              currentDate: new Date()
-            }));
-          });
-          contents.window.getSelection().removeAllRanges();
-        }
-      });
-
-      rendition.on("markClicked", function (cfiRange, data, contents) {
-        window.book.getRange(cfiRange).then((range) => {
-          window.ReactNativeWebView.postMessage(
-            JSON.stringify({
-              type: 'markClicked',
-              cfi: cfiRange,
-              text: range.toString(),
-              totalPages: window.book.locations.length(),
-              progress: window.book.locations.percentageFromCfi(cfiRange),
-              location: window.book.locations.locationFromCfi(cfiRange),
-              currentDate: new Date()
-            })
-          );
-        });
       });
     </script>
   </body>

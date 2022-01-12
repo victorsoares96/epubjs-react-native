@@ -48,7 +48,7 @@ export default function App() {
     <SafeAreaView>
       <BookProvider>
         <Reader
-          src="https://s3.amazonaws.com/moby-dick/OPS/package.opf"
+          src={{ uri: "https://s3.amazonaws.com/moby-dick/OPS/package.opf" }}
           width={width}
           height={height}
         />
@@ -62,14 +62,14 @@ export default function App() {
 
 | Param                    | Type            | Description                                                                 |
 | ------------------------ | --------------- | --------------------------------------------------------------------------- |
-| `src`                    | `string`        | The url of your ePub to render. Required.                                   |
+| `src`                    | `string`        | The source of your ePub. Can be a base64 string or a URL. Required.         |
 | `width`                  | `number`        | The width of the ePub Rendition. Required.                                  |
 | `height`                 | `number`        | The height of the ePub Rendition. Required.                                 |
 | `initialLocation`        | `ePubCfi`       | Can be an ePubCfi or chapter url. Optional.                                 |
 | `enableSwipe`            | `boolean`       | Enable swipe actions. Default is `true`.                                    |
 | `onSwipeLeft`            | `function`      | Called when swipe left gesture is detected. Optional.                       |
 | `onSwipeRight`           | `function`      | Called when swipe right gesture is detected. Optional.                      |
-| `renderLoadingComponent` | `ReactNode`     | Render when the book is loading. Optional.                                 |
+| `renderLoadingComponent` | `ReactNode`     | Render when the book is loading. Optional.                                  |
 | `onStarted`              | `function`      | Called once the book loads is started. Optional.                            |
 | `onAttached`             | `function`      | Emit that rendering has attached to an element. Optional.                   |
 | `onDisplayed`            | `function`      | Called once book has been displayed. Optional.                              |
@@ -157,7 +157,7 @@ const defaultTheme = {
   'a': {
     'font-family': '"Helvetica Neue", Helvetica, Arial, sans-serif',
     'color': '#000 !important',
-    'pointer-events': 'none',
+    'pointer-events': 'auto',
     'cursor': 'default',
   },
   '::selection': {
@@ -171,7 +171,7 @@ export default function App() {
     <SafeAreaView>
       <BookProvider defaultTheme={defaultTheme}>
         <Reader
-          src="https://s3.amazonaws.com/moby-dick/OPS/package.opf"
+          src={{ uri: "https://s3.amazonaws.com/moby-dick/OPS/package.opf" }}
           width={width}
           height={height}
         />

@@ -48,11 +48,24 @@ export function Reader({
   const book = useRef<WebView>(null);
 
   let injectedJS = `
-    window.BOOK_PATH = "${src}";
     window.LOCATIONS = ${locations};
     window.THEME = ${JSON.stringify(theme)};
     window.ENABLE_SELECTION = ${enableSelection};
   `;
+
+  if (src.base64) {
+    injectedJS = `
+      window.BOOK_BASE64 = ${JSON.stringify(src.base64)};
+      ${injectedJS}
+    `;
+  } else if (src.uri) {
+    injectedJS = `
+      window.BOOK_URI = ${JSON.stringify(src.uri)};
+      ${injectedJS}
+    `;
+  } else {
+    throw new Error('src must be a base64 or uri');
+  }
 
   if (initialLocation) {
     injectedJS = `${injectedJS}window.BOOK_LOCATION = "${initialLocation}"; true`;

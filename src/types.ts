@@ -184,10 +184,37 @@ export interface ReaderContextProps {
 
 export interface ReaderProps {
   /**
-   * The url of your ePub to render
-   * @param {string} src
+   * The source of your ePub. Can be a base64 string or a URL
+   * @param {object} src
    */
-  src: string;
+  src: {
+    /**
+     * The base64 string of the ePub
+     * @param {string} base64
+     * @example
+     * ```
+     * <Reader
+     *    src={{
+     *    base64: 'base64 string'
+     *  }}
+     * />
+     * ```
+     */
+    base64?: string;
+    /**
+     * The url of the ePub
+     * @param {string} uri
+     * @example
+     * ```
+     * <Reader
+     *  src={{
+     *    uri: 'https://example.com/epub.epub'
+     *  }}
+     * />
+     * ```
+     */
+    uri?: string;
+  };
   /**
    * Called once the book loads is started
    * @returns {void} void

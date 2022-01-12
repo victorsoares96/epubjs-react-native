@@ -25,8 +25,8 @@ export const defaultTheme: Theme = {
   'a': {
     'font-family': '"Helvetica Neue", Helvetica, Arial, sans-serif',
     'color': '#000 !important',
-    'pointer-events': 'none',
-    'cursor': 'default',
+    'pointer-events': 'auto',
+    'cursor': 'pointer',
   },
   '::selection': {
     background: 'lightskyblue',

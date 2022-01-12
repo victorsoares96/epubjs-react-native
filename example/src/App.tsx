@@ -9,7 +9,7 @@ export default function App() {
     <SafeAreaView>
       <BookProvider>
         <Reader
-          src="https://s3.amazonaws.com/moby-dick/OPS/package.opf"
+          src={{ uri: 'https://s3.amazonaws.com/moby-dick/OPS/package.opf' }}
           width={width}
           height={height}
         />
