@@ -1,14 +1,6 @@
 import type { WebView } from 'react-native-webview';
 
-export type FontSize =
-  | '25%'
-  | '50%'
-  | '75%'
-  | '125%'
-  | '100%'
-  | '150%'
-  | '175%'
-  | '200%';
+export type FontSize = string;
 
 export type ePubCfi = string;
 
@@ -24,6 +16,11 @@ export type Theme = {
   'body': {
     'font-family': string;
     'background': string;
+    'font-size': FontSize;
+  };
+  'span': {
+    'font-family': string;
+    'color': string;
     'font-size': FontSize;
   };
   'p': {

@@ -68,6 +68,10 @@ export function BookProvider({
         ...theme.body,
         'font-family': fontFamily,
       },
+      span: {
+        ...theme.span,
+        'font-family': fontFamily,
+      },
       p: {
         ...theme.p,
         'font-family': fontFamily,
@@ -90,6 +94,10 @@ export function BookProvider({
       fontSize: size,
       body: {
         ...theme.body,
+        'font-size': size,
+      },
+      span: {
+        ...theme.span,
         'font-size': size,
       },
       p: {

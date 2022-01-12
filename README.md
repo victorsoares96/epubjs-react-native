@@ -103,7 +103,7 @@ const { changeFontSize, goToLocation, ... } = useBook();
 
 | Method                   | Receives        | Description                                                                 |
 | ------------------------ | --------------- | --------------------------------------------------------------------------- |
-| `changeFontSize`         | `size`          | Change font size of all elements in the book                                |
+| `changeFontSize`         | `size`          | Change font size of all elements in the book. Can be a px, pt or percent.   |
 | `changeFontFamily`       | `font`          | Change font family of all elements in the book                              |
 | `goToLocation`           | `target`, `highlightColor` (optional)| Go to specific location in the book                    |
 | `goToPage`               | `page`          | Go to specific page in the book                                             |
@@ -134,21 +134,21 @@ import { Reader, BookProvider } from 'epubjs-react-native';
 // ...
 
 const defaultTheme = {
-  'fontSize': '100%',
+  'fontSize': '12pt',
   'body': {
     'font-family': '"Helvetica Neue", Helvetica, Arial, sans-serif',
     'background': '#fff',
-    'font-size': '100%',
+    'font-size': '12pt',
   },
   'p': {
     'font-family': '"Helvetica Neue", Helvetica, Arial, sans-serif',
     'color': '#000 !important',
-    'font-size': '100%',
+    'font-size': '12pt',
   },
   'li': {
     'font-family': '"Helvetica Neue", Helvetica, Arial, sans-serif',
     'color': '#000 !important',
-    'font-size': '100%',
+    'font-size': '12pt',
   },
   'h1': {
     'font-family': '"Helvetica Neue", Helvetica, Arial, sans-serif',
