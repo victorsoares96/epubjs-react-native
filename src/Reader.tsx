@@ -35,6 +35,7 @@ export function Reader({
     setCurrentPage,
     setTotalPages,
     setProgress,
+    progress,
     isLoading,
     setIsLoading,
     currentLocation,
@@ -78,82 +79,122 @@ export function Reader({
 
     let { type } = parsedEvent;
 
+    console.log(parsedEvent);
+
     delete parsedEvent.type;
 
-    if (type === 'started') {
+    if (type === 'onStarted') {
       onStarted();
       setIsLoading(true);
     }
 
-    if (type === 'attached') {
-      onAttached();
-    }
-
-    if (
-      type === 'displayed' ||
-      type === 'displayError' ||
-      type === 'rendered'
-    ) {
+    if (type === 'onReady') {
+      const { totalLocations, currentLocation, progress } = parsedEvent;
       setIsLoading(false);
+      onReady({
+        totalLocations,
+        currentLocation,
+        progress,
+      });
     }
 
-    if (type === 'displayed') {
-      onDisplayed();
-    }
-
-    if (type === 'displayError') {
-      onDisplayError(parsedEvent.section);
-    }
-
-    if (type === 'rendered') {
-      onRendered(parsedEvent.section, parsedEvent.view);
-    }
-
-    if (type === 'search') {
-      const results = parsedEvent.results;
-
-      return onSearch(results);
-    }
-
-    if (type === 'relocated') {
-      setCurrentPage(parsedEvent.currentPage);
-      setTotalPages(parsedEvent.totalPages);
-      setProgress(parsedEvent.progress);
-      setCurrentLocation(parsedEvent.cfi);
-    }
-
-    if (type === 'locations') {
+    if (type === 'onLocationsReady') {
+      const { epubKey, locations } = parsedEvent;
       if (isLoading) {
         setIsLoading(parsedEvent.isLoading);
         setTotalPages(parsedEvent.totalPages);
         setLocations(parsedEvent.locations);
       }
-
-      return onLocationsReady(parsedEvent.locations);
+      onLocationsReady({
+        epubKey,
+        locations,
+      });
     }
 
-    if (type === 'selected') {
-      const { cfi, text } = parsedEvent as SelectedText;
+    if (type === 'onLocationChange') {
+      const { totalLocations, currentLocation, progress } = parsedEvent;
+      setCurrentPage(parsedEvent.currentPage);
+      setTotalPages(parsedEvent.totalPages);
+      setProgress(parsedEvent.progress);
+      setCurrentLocation(parsedEvent.cfi);
 
-      book.current?.injectJavaScript(`
-        window.rendition.annotations.remove("${cfi}", "highlight");
-        window.rendition.annotations.add("highlight", "${cfi}", {data: "${text}"}, (e) => {}, "", { "fill": "${theme['::selection'].background}" });
-        true
-      `);
-
-      return onSelected(parsedEvent);
+      onLocationChange({
+        totalLocations,
+        currentLocation,
+        progress,
+      });
     }
 
-    if (type === 'markClicked') {
-      return onMarkPressed(parsedEvent);
+    if (type === 'onBeginning') {
+      onBeginning();
     }
 
-    if (type === 'isLoading') {
-      return setIsLoading(parsedEvent.isLoading);
+    if (type === 'onFinish') {
+      onFinish();
     }
 
-    if (type === 'orientation') {
-      return onOrientationChange(parsedEvent.orientation);
+    if (type === 'onRendered') {
+      const { section, currentSection } = parsedEvent;
+      onRendered({
+        section,
+        currentSection,
+      });
+    }
+
+    if (type === 'onLayout') {
+      const { layout } = parsedEvent;
+      onLayout({
+        layout,
+      });
+    }
+
+    if (type === 'onSelected') {
+      const { cfiRange, text } = parsedEvent;
+      onSelected({
+        cfiRange,
+        text,
+      });
+    }
+
+    if (type === 'onMarkPressed') {
+      const { cfiRange, text } = parsedEvent;
+      onMarkPressed({
+        cfiRange,
+        text,
+      });
+    }
+
+    if (type === 'onResized') {
+      const { layout } = parsedEvent;
+      onResized({
+        layout,
+      });
+    }
+
+    if (type === 'onNavigationLoaded') {
+      const { toc } = parsedEvent;
+      onNavigationLoaded({
+        toc,
+      });
+    }
+
+    if (type === 'onDisplayError') {
+      const { reason } = parsedEvent;
+      setIsLoading(false);
+      onDisplayError({
+        reason,
+      });
+    }
+
+    if (type === 'onSearch') {
+      const { results } = parsedEvent;
+
+      return onSearch(results);
+    }
+
+    if (type === 'onOrientationChange') {
+      const { orientation } = parsedEvent;
+      return onOrientationChange(orientation);
     }
   }
 
@@ -164,7 +205,9 @@ export function Reader({
   useEffect(() => {
     if (initialLocation) goToLocation(initialLocation);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [locations]);
+
+  console.log('locations: ', locations);
 
   let lastTap: number | null = null;
   let timer: NodeJS.Timeout;
@@ -206,7 +249,7 @@ export function Reader({
         position: 'relative',
       }}
     >
-      {isLoading && (
+      {!isLoading && (
         <View
           style={{
             width: '100%',

@@ -1,5 +1,34 @@
 import type { WebView } from 'react-native-webview';
 
+export type Location = {
+  atStart?: boolean;
+  atEnd?: boolean;
+  end: {
+    cfi: ePubCfi;
+    displayed: {
+      page: number;
+      total: number;
+    };
+    href: string;
+    index: number;
+    location: number;
+    percentage: number;
+  };
+  start: {
+    cfi: ePubCfi;
+    displayed: {
+      page: number;
+      total: number;
+    };
+    href: string;
+    index: number;
+    location: number;
+    percentage: number;
+  };
+};
+
+export type Annotation = 'highlight' | 'underline';
+
 export type FontSize = string;
 
 export type ePubCfi = string;
@@ -12,6 +41,11 @@ export type CurrentLocation = {
 };
 
 export type Theme = {
+  [key: string]: {
+    [key: string]: string;
+  };
+};
+/*export type Theme = {
   'fontSize': FontSize;
   'body': {
     'font-family': string;
@@ -46,7 +80,7 @@ export type Theme = {
   '::selection': {
     background: string;
   };
-};
+};*/
 
 export type SearchResult = {
   cfi: string;

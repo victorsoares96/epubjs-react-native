@@ -2,7 +2,14 @@ import React from 'react';
 import { createContext, useEffect, useRef, useState } from 'react';
 import type WebView from 'react-native-webview';
 import { defaultTheme as initialTheme, useTheme } from './hooks/useTheme';
-import type { FontSize, ReaderContextProps, Theme } from './types';
+import type {
+  Annotation,
+  ePubCfi,
+  FontSize,
+  Location,
+  ReaderContextProps,
+  Theme,
+} from './types';
 
 export const BookContext = createContext<ReaderContextProps>({
   registerBook: () => {},
@@ -62,78 +69,71 @@ export function BookProvider({
   }
 
   function changeFontFamily(fontFamily: string) {
-    const themeWithNewFontFamily = {
-      ...theme,
-      body: {
-        ...theme.body,
-        'font-family': fontFamily,
-      },
-      span: {
-        ...theme.span,
-        'font-family': fontFamily,
-      },
-      p: {
-        ...theme.p,
-        'font-family': fontFamily,
-      },
-      li: {
-        ...theme.li,
-        'font-family': fontFamily,
-      },
-      h1: {
-        ...theme.h1,
-        'font-family': fontFamily,
-      },
-    };
-    changeTheme(themeWithNewFontFamily);
+    book.current?.injectJavaScript(`
+      rendition.themes.font(${fontFamily});
+    `);
   }
 
   function changeFontSize(size: FontSize) {
-    const themeWithNewFontSize = {
-      ...theme,
-      fontSize: size,
-      body: {
-        ...theme.body,
-        'font-size': size,
-      },
-      span: {
-        ...theme.span,
-        'font-size': size,
-      },
-      p: {
-        ...theme.p,
-        'font-size': size,
-      },
-      li: {
-        ...theme.li,
-        'font-size': size,
-      },
-      h1: {
-        ...theme.h1,
-      },
-    };
-    changeTheme(themeWithNewFontSize);
-  }
-
-  function updateTheme(newTheme: Theme) {
     book.current?.injectJavaScript(`
-      window.rendition.themes.register({ theme: ${JSON.stringify(newTheme)} });
-      window.rendition.themes.select("theme");
+      rendition.themes.fontSize(${size});
     `);
   }
 
-  useEffect(() => {
+  function registerTheme(name: string, theme: Theme) {
+    book.current?.injectJavaScript(`
+      rendition.themes.register(${name}, ${theme});
+    `);
+  }
+
+  function selectTheme(name: string) {
+    book.current?.injectJavaScript(`
+      rendition.themes.select(${name});
+    `);
+  }
+
+  function updateTheme(theme: Theme) {
+    book.current?.injectJavaScript(`
+      rendition.themes.update(${theme});
+    `);
+  }
+
+  function addAnnotation(
+    type: Annotation,
+    cfiRange: string,
+    data: any,
+    callback?: () => void,
+    className?: string,
+    styles?: any
+  ) {
+    const defaultStyles = { fill: 'yellow' };
+
+    book.current?.injectJavaScript(`
+      rendition.annotations.add(
+        ${type},
+        ${cfiRange},
+        { data: "${data}" },
+        (e) => ${callback && callback()},
+        ${className},
+        ${styles || defaultStyles}
+      );
+    `);
+  }
+
+  function removeAnnotation(cfiRange: string, type: Annotation) {
+    book.current?.injectJavaScript(`
+      rendition.annotations.remove(${cfiRange}, ${type});
+    `);
+  }
+
+  /*useEffect(() => {
     updateTheme(theme);
-  }, [theme]);
+  }, [theme]);*/
 
-  function goToLocation(cfi: string, highlightColor = 'yellow') {
-    book.current?.injectJavaScript(`
-      window.LOCATIONS=${locations};
-      window.rendition.display('${cfi}');
-      window.rendition.annotations.remove("${cfi}", "highlight");
-      window.rendition.annotations.highlight("${cfi}", {}, (e) => {}, "", {"fill": "${highlightColor}"});
-      true
-    `);
+  function goToLocation(target: ePubCfi | string) {
+    book.current?.injectJavaScript(
+      `window.rendition.display('${target}'); true`
+    );
   }
 
   function goPrevious() {
@@ -142,15 +142,6 @@ export function BookProvider({
 
   function goNext() {
     book.current?.injectJavaScript(`window.rendition.next(); true`);
-  }
-
-  function goToNote(cfi: any, page: number = 0) {
-    book.current?.injectJavaScript(`
-      window.LOCATIONS=${locations};
-      window.rendition.display('${cfi}');
-      true
-    `);
-    setCurrentPage(page);
   }
 
   function getCurrentLocation() {
@@ -169,25 +160,11 @@ export function BookProvider({
         })
       ).then((results) =>
         window.ReactNativeWebView.postMessage(
-          JSON.stringify({ type: 'search', results: [].concat.apply([], results) })
+          JSON.stringify({ type: 'onSearch', results: [].concat.apply([], results) })
         )
       ); true
     `);
   }
-
-  function goToPage(page: number) {
-    if (!locations) return Error('No locations');
-
-    const nextPage = Math.round(page);
-    const locs = JSON.parse(locations);
-
-    return book.current?.injectJavaScript(`
-      window.LOCATIONS=${locations};
-      window.rendition.display('${locs[nextPage - 1]}');
-      true
-    `);
-  }
-
   return (
     <BookContext.Provider
       value={{
@@ -195,10 +172,8 @@ export function BookProvider({
         changeFontSize,
         changeFontFamily,
         goToLocation,
-        goToPage,
         goPrevious,
         goNext,
-        goToNote,
         search,
         theme,
         changeTheme,
