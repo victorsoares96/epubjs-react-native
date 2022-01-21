@@ -1,7 +1,7 @@
 import React from 'react';
-import { createContext, useEffect, useRef, useState } from 'react';
+import { createContext, useRef, useState } from 'react';
 import type WebView from 'react-native-webview';
-import { defaultTheme as initialTheme, useTheme } from './hooks/useTheme';
+import { defaultTheme } from './hooks/useTheme';
 import type {
   Annotation,
   Location,
@@ -9,6 +9,7 @@ import type {
   FontSize,
   ReaderContextProps,
   Theme,
+  Themes,
 } from './types';
 
 export const BookContext = createContext<ReaderContextProps>({
@@ -16,15 +17,17 @@ export const BookContext = createContext<ReaderContextProps>({
   changeFontSize: () => {},
   changeFontFamily: () => {},
   registerTheme: () => {},
+  registerThemes: () => {},
   selectTheme: () => {},
   updateTheme: () => {},
+  activeTheme: 'default',
+  changeActiveTheme: () => {},
+  themes: { defaultTheme },
   goToLocation: () => {},
   goPrevious: () => {},
   goNext: () => {},
   getLocations: () => [] as ePubCfi[],
   search: () => {},
-  theme: initialTheme,
-  // changeTheme: () => {},
   currentLocation: null,
   setCurrentLocation: () => {},
   progress: 0,
@@ -67,13 +70,7 @@ export const BookContext = createContext<ReaderContextProps>({
   setAtEnd: () => {},
 } as ReaderContextProps);
 
-export function BookProvider({
-  children,
-  defaultTheme = initialTheme,
-}: {
-  children: React.ReactNode;
-  defaultTheme?: Theme;
-}) {
+export function BookProvider({ children }: { children: React.ReactNode }) {
   const book = useRef<WebView | null>(null);
 
   const [atStart, setAtStart] = useState(false);
@@ -85,53 +82,49 @@ export function BookProvider({
   const [isLoading, setIsLoading] = useState(true);
 
   const [theme, changeTheme] = useTheme(defaultTheme);
-
-  /*useEffect(() => {
-    console.log(`
-    rendition.themes.register("myTheme", ${JSON.stringify(defaultTheme)});
-    rendition.themes.select("myTheme"); true
-  `);
-  }, [defaultTheme]);
-  */
+  const [themes, changeThemes] = useState<Themes>({ defaultTheme });
+  const [activeTheme, changeActiveTheme] = useState('default');
 
   function registerBook(bookRef: WebView) {
     book.current = bookRef;
   }
 
+  function registerTheme(theme: Theme) {
+    book.current?.injectJavaScript(`
+      rendition.themes.register('${theme}'); true
+    `);
+  }
+
+  function registerThemes(themes: Themes) {
+    changeThemes({ ...themes });
+    book.current?.injectJavaScript(`
+      rendition.themes.register('${themes}'); true
+    `);
+  }
+
   function changeFontFamily(fontFamily: string) {
     book.current?.injectJavaScript(`
-      window.rendition.themes.font('${fontFamily}');
+      rendition.themes.font('${fontFamily}');
     `);
   }
 
   function changeFontSize(size: FontSize) {
     book.current?.injectJavaScript(`
-      window.rendition.themes.fontSize('${size}'); true
-    `);
-  }
-
-  function registerTheme(name: string, theme: Theme) {
-    book.current?.injectJavaScript(`
-      rendition.themes.register(${name}, ${theme});
+      rendition.themes.fontSize('${size}'); true
     `);
   }
 
   function selectTheme(name: string) {
+    changeActiveTheme(name);
     book.current?.injectJavaScript(`
-      rendition.themes.select(${name});
+      rendition.themes.select('${name}'); true
     `);
   }
 
   function updateTheme(name: string) {
     book.current?.injectJavaScript(`
-      window.rendition.themes.register("myTheme", ${JSON.stringify(
-        defaultTheme
-      )});
-      window.rendition.themes.select("myTheme"); true
-    `);
-    /*book.current?.injectJavaScript(`
       window.rendition.themes.update(${name}); true
-    `);*/
+    `);
   }
 
   function addAnnotation(
@@ -161,10 +154,6 @@ export function BookProvider({
       rendition.annotations.remove(${cfiRange}, ${type});
     `);
   }
-
-  /*useEffect(() => {
-    changeTheme(defaultTheme);
-  }, [defaultTheme]);*/
 
   function goToLocation(target: ePubCfi | string) {
     book.current?.injectJavaScript(
@@ -212,6 +201,7 @@ export function BookProvider({
         changeFontSize,
         changeFontFamily,
         registerTheme,
+        registerThemes,
         selectTheme,
         updateTheme,
         goToLocation,
@@ -219,7 +209,8 @@ export function BookProvider({
         goNext,
         getLocations,
         search,
-        theme,
+        activeTheme,
+        themes,
         currentLocation,
         setCurrentLocation,
         progress,

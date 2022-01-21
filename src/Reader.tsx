@@ -3,6 +3,7 @@ import { View, TouchableWithoutFeedback } from 'react-native';
 import GestureRecognizer from 'react-native-swipe-detect';
 import { WebView, WebViewMessageEvent } from 'react-native-webview';
 import { BookContext } from './context';
+import { defaultTheme } from './hooks/useTheme';
 import template from './template';
 import type { ReaderProps, SelectedText } from './types';
 
@@ -33,6 +34,8 @@ export function Reader({
   onSwipeRight = () => {},
   renderLoadingComponent = () => null,
   enableSelection = false,
+  themes = { defaultTheme },
+  activeTheme = 'default',
 }: ReaderProps) {
   const {
     registerBook,
@@ -49,11 +52,14 @@ export function Reader({
     goToLocation,
     locations,
     theme,
+    registerThemes,
   } = useContext(BookContext);
   const book = useRef<WebView>(null);
 
   let injectedJS = `
-    window.THEME = ${JSON.stringify(theme)};
+    window.THEMES = ${JSON.stringify(themes)};
+    window.ACTIVE_THEME = '${activeTheme}';
+    window.ENABLE_SELECTION = ${enableSelection};
   `;
   /*let injectedJS = `
     window.LOCATIONS = ${locations};
@@ -75,18 +81,11 @@ export function Reader({
     throw new Error('src must be a base64 or uri');
   }
 
-  /*if (initialLocation) {
-    injectedJS = `${injectedJS}window.BOOK_LOCATION = "${initialLocation}"; true`;
-  } else if (currentLocation) {
-    injectedJS = `${injectedJS}window.BOOK_LOCATION = "${currentLocation}"; true`;
-  }*/
-
   function onMessage(event: WebViewMessageEvent) {
     let parsedEvent = JSON.parse(event.nativeEvent.data);
 
     let { type } = parsedEvent;
 
-    console.log(parsedEvent);
     delete parsedEvent.type;
 
     if (type === 'onStarted') {
@@ -201,11 +200,6 @@ export function Reader({
   useEffect(() => {
     if (book.current) registerBook(book.current);
   }, [registerBook]);
-
-  /*useEffect(() => {
-    if (initialLocation) goToLocation(initialLocation);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [locations]);*/
 
   let lastTap: number | null = null;
   let timer: NodeJS.Timeout;

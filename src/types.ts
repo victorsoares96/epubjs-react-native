@@ -39,9 +39,13 @@ export type FontSize = string;
  */
 export type ePubCfi = string;
 
+export type Themes = {
+  [key: string]: Theme;
+};
+
 export type Theme = {
   [key: string]: {
-    [key: string]: string;
+    [key: string]: any;
   };
 };
 
@@ -86,10 +90,19 @@ export interface ReaderContextProps {
    * @param theme {@link Theme}
    * @example
    * ```
-   * registerTheme("light", { "body": { "color": "purple" }});
+   * registerTheme({ dark: { "body": { "background": "#333", "color": "white" } } });
    * ```
    */
-  registerTheme: (name: string, theme: Theme) => void;
+  registerTheme: (theme: Theme) => void;
+
+  /**
+   * @param themes {@link Themes}
+   * @example
+   * ```
+   * registerThemes({ light: { "body": { "color": "black" } } });
+   * ```
+   */
+  registerThemes: (themes: Themes) => void;
 
   /**
    * Select a existing theme
@@ -140,9 +153,11 @@ export interface ReaderContextProps {
   getLocations: () => ePubCfi[];
 
   /**
-   * The theme of the book
+   * The active theme of the book
    */
-  theme: Theme;
+  activeTheme: string;
+
+  themes: Themes;
 
   /**
    * Change the current theme of the book
@@ -190,11 +205,6 @@ export interface ReaderContextProps {
    * @param {Date} date {@link Date}
    */
   getCurrentLocation: () => Location | null;
-
-  /**
-   * Set the default theme of the book
-   */
-  defaultTheme?: Theme;
 
   /**
    * Indicates if you are at the beginning of the book
@@ -393,4 +403,8 @@ export interface ReaderProps {
    * @description Recommend using this with `enableSwipe` disabled
    */
   enableSelection?: boolean;
+
+  themes?: Themes;
+
+  activeTheme?: string;
 }

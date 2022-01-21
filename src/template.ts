@@ -72,94 +72,6 @@ export default `
             locations: book.locations.save(),
           }));
 
-          rendition.on('started', () => {
-            rendition.themes.register({ theme: window.THEME });
-            rendition.themes.select('theme');
-          });
-
-          rendition.on("relocated", function (location) {
-            var percent = book.locations.percentageFromCfi(location.start.cfi);
-            var percentage = Math.floor(percent * 100);
-
-            window.ReactNativeWebView.postMessage(JSON.stringify({
-              type: "onLocationChange",
-              totalLocations: book.locations.total,
-              currentLocation: location,
-              progress: percentage,
-            }));
-
-            if (location.atStart) {
-              window.ReactNativeWebView.postMessage(JSON.stringify({
-                type: "onBeginning",
-              }));
-            }
-
-            if (location.atEnd) {
-              window.ReactNativeWebView.postMessage(JSON.stringify({
-                type: "onFinish",
-              }));
-            }
-          });
-
-          rendition.on("orientationchange", function (orientation) {
-            window.ReactNativeWebView.postMessage(JSON.stringify({
-              type: 'onOrientationChange',
-              orientation: orientation
-            }));
-          });
-
-          rendition.on("rendered", function (section) {
-            window.ReactNativeWebView.postMessage(JSON.stringify({
-              type: 'onRendered',
-              section: section,
-              currentSection: book.navigation.get(section.href),
-            }));
-          });
-
-          rendition.on("layout", function (layout) {
-            window.ReactNativeWebView.postMessage(JSON.stringify({
-              type: 'onLayout',
-              layout: layout,
-            }));
-          });
-
-          rendition.on("selected", function (cfiRange, contents) {
-            rendition.annotations.add("underline", cfiRange, {}, (e) => {
-              console.log("highlight clicked", e.target);
-            });
-            contents.window.getSelection().removeAllRanges();
-
-            book.getRange(cfiRange).then(function (range) {
-              if (range) {
-                window.ReactNativeWebView.postMessage(JSON.stringify({
-                  type: 'onSelected',
-                  cfiRange: cfiRange,
-                  text: range.toString(),
-                }));
-              }
-            });
-          });
-
-          rendition.on("markClicked", function (cfiRange, contents) {
-            rendition.annotations.remove(cfiRange, "underline");
-            book.getRange(cfiRange).then(function (range) {
-              if (range) {
-                window.ReactNativeWebView.postMessage(JSON.stringify({
-                  type: 'onMarkPressed',
-                  cfiRange: cfiRange,
-                  text: range.toString(),
-                }));
-              }
-            });
-          });
-
-          rendition.on("resized", function (layout) {
-            window.ReactNativeWebView.postMessage(JSON.stringify({
-              type: 'onResized',
-              layout: layout,
-            }));
-          });
-
           book.loaded.navigation.then(function (toc) {
             window.ReactNativeWebView.postMessage(JSON.stringify({
               type: 'onNavigationLoaded',
@@ -216,6 +128,94 @@ export default `
           window.ReactNativeWebView.postMessage(JSON.stringify({
             type: "onDisplayError",
             reason: reason
+          }));
+        });
+
+        rendition.on('started', () => {
+          rendition.themes.register(window.THEMES);
+          rendition.themes.select(window.ACTIVE_THEME);
+        });
+
+        rendition.on("relocated", function (location) {
+          var percent = book.locations.percentageFromCfi(location.start.cfi);
+          var percentage = Math.floor(percent * 100);
+
+          window.ReactNativeWebView.postMessage(JSON.stringify({
+            type: "onLocationChange",
+            totalLocations: book.locations.total,
+            currentLocation: location,
+            progress: percentage,
+          }));
+
+          if (location.atStart) {
+            window.ReactNativeWebView.postMessage(JSON.stringify({
+              type: "onBeginning",
+            }));
+          }
+
+          if (location.atEnd) {
+            window.ReactNativeWebView.postMessage(JSON.stringify({
+              type: "onFinish",
+            }));
+          }
+        });
+
+        rendition.on("orientationchange", function (orientation) {
+          window.ReactNativeWebView.postMessage(JSON.stringify({
+            type: 'onOrientationChange',
+            orientation: orientation
+          }));
+        });
+
+        rendition.on("rendered", function (section) {
+          window.ReactNativeWebView.postMessage(JSON.stringify({
+            type: 'onRendered',
+            section: section,
+            currentSection: book.navigation.get(section.href),
+          }));
+        });
+
+        rendition.on("layout", function (layout) {
+          window.ReactNativeWebView.postMessage(JSON.stringify({
+            type: 'onLayout',
+            layout: layout,
+          }));
+        });
+
+        rendition.on("selected", function (cfiRange, contents) {
+          rendition.annotations.add("underline", cfiRange, {}, (e) => {
+            console.log("highlight clicked", e.target);
+          });
+          contents.window.getSelection().removeAllRanges();
+
+          book.getRange(cfiRange).then(function (range) {
+            if (range) {
+              window.ReactNativeWebView.postMessage(JSON.stringify({
+                type: 'onSelected',
+                cfiRange: cfiRange,
+                text: range.toString(),
+              }));
+            }
+          });
+        });
+
+        rendition.on("markClicked", function (cfiRange, contents) {
+          rendition.annotations.remove(cfiRange, "underline");
+          book.getRange(cfiRange).then(function (range) {
+            if (range) {
+              window.ReactNativeWebView.postMessage(JSON.stringify({
+                type: 'onMarkPressed',
+                cfiRange: cfiRange,
+                text: range.toString(),
+              }));
+            }
+          });
+        });
+
+        rendition.on("resized", function (layout) {
+          window.ReactNativeWebView.postMessage(JSON.stringify({
+            type: 'onResized',
+            layout: layout,
           }));
         });
     </script>

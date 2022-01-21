@@ -7,35 +7,8 @@ export default function App() {
   return (
     <SafeAreaView>
       <BookProvider
-        defaultTheme={{
-          'body': {
-            'background': '#333',
-            'font-size': '12pt',
-          },
-          'span': {
-            'color': '#fff !important',
-            'font-size': '12pt',
-          },
-          'p': {
-            'color': '#fff !important',
-            'font-size': '12pt',
-          },
-          'li': {
-            'color': '#fff !important',
-            'font-size': '12pt',
-          },
-          'h1': {
-            color: '#fff !important',
-          },
-          'a': {
-            'color': '#fff !important',
-            'pointer-events': 'auto',
-            'cursor': 'pointer',
-          },
-          '::selection': {
-            background: 'lightskyblue',
-          },
-        }}
+      // themes={}
+      // activeTheme="dark"
       >
         <Book />
       </BookProvider>
@@ -53,10 +26,15 @@ function Book() {
     currentLocation,
     atStart,
     atEnd,
-    updateTheme,
+    selectTheme,
     changeFontSize,
     changeFontFamily,
+    activeTheme,
+    themes,
+    registerTheme,
   } = useBook();
+
+  console.log('availableThemes:', themes);
   return (
     <View>
       <Reader
@@ -66,6 +44,84 @@ function Book() {
         // src={{ uri: 'https://s3.amazonaws.com/moby-dick/OPS/package.opf' }}
         width={width}
         height={height * 0.8}
+        themes={{
+          light: {
+            'body': {
+              background: '#fff',
+            },
+            'span': {
+              color: '#000 !important',
+            },
+            'p': {
+              color: '#000 !important',
+            },
+            'li': {
+              color: '#000 !important',
+            },
+            'h1': {
+              color: '#000 !important',
+            },
+            'a': {
+              'color': '#000 !important',
+              'pointer-events': 'auto',
+              'cursor': 'pointer',
+            },
+            '::selection': {
+              background: 'lightskyblue',
+            },
+          },
+          dark: {
+            'body': {
+              background: '#333',
+            },
+            'span': {
+              color: '#fff !important',
+            },
+            'p': {
+              color: '#fff !important',
+            },
+            'li': {
+              color: '#fff !important',
+            },
+            'h1': {
+              color: '#fff !important',
+            },
+            'a': {
+              'color': '#fff !important',
+              'pointer-events': 'auto',
+              'cursor': 'pointer',
+            },
+            '::selection': {
+              background: 'lightskyblue',
+            },
+          },
+          purple: {
+            'body': {
+              background: '#4c12a1',
+            },
+            'span': {
+              color: '#fff !important',
+            },
+            'p': {
+              color: '#fff !important',
+            },
+            'li': {
+              color: '#fff !important',
+            },
+            'h1': {
+              color: '#fff !important',
+            },
+            'a': {
+              'color': '#fff !important',
+              'pointer-events': 'auto',
+              'cursor': 'pointer',
+            },
+            '::selection': {
+              background: 'lightskyblue',
+            },
+          },
+        }}
+        activeTheme="dark"
         renderLoadingComponent={() => (
           <View
             style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
@@ -82,6 +138,7 @@ function Book() {
           flexDirection: 'row',
           justifyContent: 'space-evenly',
           flexWrap: 'wrap',
+          paddingHorizontal: 10,
         }}
       >
         <Text onPress={() => console.log(getCurrentLocation())}>
@@ -90,12 +147,46 @@ function Book() {
 
         <Text onPress={() => console.log(getLocations())}>getLocations</Text>
 
-        <Text onPress={() => updateTheme('default')}>updateTheme</Text>
+        <Text onPress={() => selectTheme('purple')}>selectTheme</Text>
 
         <Text onPress={() => changeFontSize('24pt')}>changeFontSize</Text>
 
         <Text onPress={() => changeFontFamily('cursive')}>
           changeFontFamily
+        </Text>
+
+        <Text
+          onPress={() =>
+            registerTheme({
+              purple: {
+                'body': {
+                  background: '#4c12a1',
+                },
+                'span': {
+                  color: '#fff !important',
+                },
+                'p': {
+                  color: '#fff !important',
+                },
+                'li': {
+                  color: '#fff !important',
+                },
+                'h1': {
+                  color: '#fff !important',
+                },
+                'a': {
+                  'color': '#fff !important',
+                  'pointer-events': 'auto',
+                  'cursor': 'pointer',
+                },
+                '::selection': {
+                  background: 'lightskyblue',
+                },
+              },
+            })
+          }
+        >
+          registerPurpleTheme
         </Text>
       </View>
 
@@ -125,6 +216,8 @@ function Book() {
         <Text>atStart: {String(atStart)}</Text>
 
         <Text>atEnd: {String(atEnd)}</Text>
+
+        <Text>activeTheme: {String(activeTheme)}</Text>
       </View>
     </View>
   );

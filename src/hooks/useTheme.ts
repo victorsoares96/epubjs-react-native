@@ -1,42 +1,48 @@
-import type { Theme } from 'src/types';
+import type { Theme, Themes } from 'src/types';
 import useSetState from './useSetState';
 
 export const defaultTheme: Theme = {
-  'body': {
-    'font-family': '"Helvetica Neue", Helvetica, Arial, sans-serif',
-    'background': '#fff',
-    'font-size': '12pt',
-  },
-  'span': {
-    'font-family': '"Helvetica Neue", Helvetica, Arial, sans-serif',
-    'color': '#000 !important',
-    'font-size': '12pt',
-  },
-  'p': {
-    'font-family': '"Helvetica Neue", Helvetica, Arial, sans-serif',
-    'color': '#000 !important',
-    'font-size': '12pt',
-  },
-  'li': {
-    'font-family': '"Helvetica Neue", Helvetica, Arial, sans-serif',
-    'color': '#000 !important',
-    'font-size': '12pt',
-  },
-  'h1': {
-    'font-family': '"Helvetica Neue", Helvetica, Arial, sans-serif',
-    'color': '#000 !important',
-  },
-  'a': {
-    'font-family': '"Helvetica Neue", Helvetica, Arial, sans-serif',
-    'color': '#000 !important',
-    'pointer-events': 'auto',
-    'cursor': 'pointer',
-  },
-  '::selection': {
-    background: 'lightskyblue',
+  default: {
+    'body': {
+      background: '#fff',
+    },
+    'span': {
+      color: '#000 !important',
+    },
+    'p': {
+      color: '#000 !important',
+    },
+    'li': {
+      color: '#000 !important',
+    },
+    'h1': {
+      color: '#000 !important',
+    },
+    'a': {
+      'color': '#000 !important',
+      'pointer-events': 'auto',
+      'cursor': 'pointer',
+    },
+    '::selection': {
+      background: 'lightskyblue',
+    },
   },
 };
 
-export function useTheme(theme: Theme = defaultTheme) {
-  return useSetState<Theme>(theme);
+export const themes: Themes = {
+  ...defaultTheme,
+};
+
+interface InitialState {
+  themes: Themes;
+  activeTheme: string;
+}
+
+const initialState = {
+  themes,
+  activeTheme: 'default',
+};
+
+export function useTheme() {
+  return useSetState<InitialState>(initialState);
 }
