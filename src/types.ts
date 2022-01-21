@@ -31,56 +31,19 @@ export type Annotation = 'highlight' | 'underline';
 
 export type FontSize = string;
 
+/**
+ * @example
+ * ````
+ * epubcfi(/6/6!/4/2,/2/2/1:0,/4[q1]/2/14/2/1:14)
+ * ````
+ */
 export type ePubCfi = string;
-
-export type CurrentLocation = {
-  cfi: string | null;
-  currentPage: number;
-  progress: number;
-  date: Date;
-};
 
 export type Theme = {
   [key: string]: {
     [key: string]: string;
   };
 };
-/*export type Theme = {
-  'fontSize': FontSize;
-  'body': {
-    'font-family': string;
-    'background': string;
-    'font-size': FontSize;
-  };
-  'span': {
-    'font-family': string;
-    'color': string;
-    'font-size': FontSize;
-  };
-  'p': {
-    'font-family': string;
-    'color': string;
-    'font-size': FontSize;
-  };
-  'li': {
-    'font-family': string;
-    'color': string;
-    'font-size': FontSize;
-  };
-  'h1': {
-    'font-family': string;
-    'color': string;
-  };
-  'a': {
-    'font-family': string;
-    'color': string;
-    'pointer-events': string;
-    'cursor': string;
-  };
-  '::selection': {
-    background: string;
-  };
-};*/
 
 export type SearchResult = {
   cfi: string;
@@ -118,17 +81,42 @@ export interface ReaderContextProps {
   changeFontFamily: (font: string) => void;
 
   /**
+   * Register a theme
+   * @param {string} name
+   * @param theme {@link Theme}
+   * @example
+   * ```
+   * registerTheme("light", { "body": { "color": "purple" }});
+   * ```
+   */
+  registerTheme: (name: string, theme: Theme) => void;
+
+  /**
+   * Select a existing theme
+   * @param {string} name
+   * @example
+   * ```
+   * selectTheme("light");
+   * ```
+   */
+  selectTheme: (name: string) => void;
+
+  /**
+   * Update a existing theme
+   * @param {string} name
+   * @example
+   * ```
+   * updateTheme("light");
+   * ```
+   */
+  updateTheme: (name: string) => void;
+
+  /**
    * Go to specific location in the book
    * @param {ePubCfi} target {@link ePubCfi}
    * @param highlightColor {@link string} color of the highlight (default: yellow)
    */
   goToLocation: (target: string, highlightColor?: string) => void;
-
-  /**
-   * Go to specific page in the book
-   * @param {number} page {@link number}
-   */
-  goToPage: (page: number) => void;
 
   /**
    * Go to previous page in the book
@@ -140,13 +128,16 @@ export interface ReaderContextProps {
    */
   goNext: () => void;
 
-  goToNote: (cfi: ePubCfi, currentPage?: number) => void;
-
   /**
    * Search for a specific text in the book
    * @param {string} query {@link string} text to search
    */
   search: (query: string) => void;
+
+  /**
+   * Get the total locations of the book
+   */
+  getLocations: () => ePubCfi[];
 
   /**
    * The theme of the book
@@ -157,27 +148,15 @@ export interface ReaderContextProps {
    * Change the current theme of the book
    * @param {Theme} theme {@link Theme}
    */
-  changeTheme: (theme: Theme) => void;
+  // changeTheme: (theme: Theme) => void;
 
   /**
    * The current location of the book
    */
-  currentLocation: string | null;
+  currentLocation: Location | null;
 
-  setCurrentLocation: (currentLocation: string | null) => void;
+  setCurrentLocation: (currentLocation: Location | null) => void;
 
-  /**
-   * The current page
-   * @returns {number} {@link number}
-   */
-  currentPage: number;
-  setCurrentPage: (page: number) => void;
-  /**
-   * The total number of pages
-   * @returns {number} {@link number}
-   */
-  totalPages: number;
-  setTotalPages: (totalPages: number) => void;
   /**
    * The progress of the book
    * @returns {number} {@link number}
@@ -194,9 +173,13 @@ export interface ReaderContextProps {
 
   setIsLoading: (isLoading: boolean) => void;
 
-  locations: string | null;
+  locations: ePubCfi[];
 
-  setLocations: (locations: string | null) => void;
+  setLocations: (locations: ePubCfi[]) => void;
+
+  totalLocations: number;
+
+  setTotalLocations: (totalLocations: number) => void;
 
   /**
    * Returns the current location of the book
@@ -206,11 +189,26 @@ export interface ReaderContextProps {
    * @param {number} progress {@link progress}
    * @param {Date} date {@link Date}
    */
-  getCurrentLocation: () => CurrentLocation;
+  getCurrentLocation: () => Location | null;
+
   /**
    * Set the default theme of the book
    */
   defaultTheme?: Theme;
+
+  /**
+   * Indicates if you are at the beginning of the book
+   * @returns {boolean} {@link boolean}
+   */
+  atStart?: boolean;
+  setAtStart: (atStart: boolean) => void;
+
+  /**
+   * Indicates if you are at the end of the book
+   * @returns {boolean} {@link boolean}
+   */
+  atEnd?: boolean;
+  setAtEnd: (atEnd: boolean) => void;
 }
 
 export interface ReaderProps {
@@ -252,15 +250,17 @@ export interface ReaderProps {
    */
   onStarted?: () => void;
   /**
-   * Emit that rendering has attached to an element
-   * @returns {void} void
-   */
-  onAttached?: () => void;
-  /**
    * Called once book has been displayed
+   * @params {number} totalLocations {@link number}
+   * @params {currentLocation} currentLocation {@link CurrentLocation}
+   * @params {number} progress {@link number}
    * @returns {void} void
    */
-  onDisplayed?: () => void;
+  onReady?: (
+    totalLocations: number,
+    currentLocation: Location,
+    progress: number
+  ) => void;
   /**
    * Called once book has not been displayed
    * @param {string} reason
@@ -268,26 +268,11 @@ export interface ReaderProps {
    */
   onDisplayError?: (reason: string) => void;
   /**
-   * Emit that a section has been rendered
-   * @param {any} section
-   * @param {any} view
-   * @returns {void} void
-   */
-  onRendered?: (section: any, view: any) => void;
-  /**
-   * Emit that a section has been removed
-   * @param {any} section
-   * @param {any} view
-   * @returns {void} void
-   */
-  onRemoved?: (section: any, view: any) => void;
-  /**
    * Emit that the rendition has been resized
-   * @param {number} width
-   * @param {number} height
+   * @param {any} layout
    * @returns {void} void
    */
-  onResized?: (width: number, height: number) => void;
+  onResized?: (layout: any) => void;
   /**
    * Called when occurred a page change
    * @param {string} cfi
@@ -296,9 +281,9 @@ export interface ReaderProps {
    * @returns {void} void
    */
   onLocationChange?: (
-    cfi: string,
-    progress: number,
-    totalPages: number
+    totalLocations: number,
+    currentLocation: number,
+    progress: number
   ) => void;
   /**
    * Called once when the book has been searched
@@ -311,25 +296,53 @@ export interface ReaderProps {
    * @param {string} locations
    * @returns {void} void
    */
-  onLocationsReady?: (locations: string) => void;
+  onLocationsReady?: (epubKey: string, locations: Location[]) => void;
   /**
    * Called once a text selection has occurred
    * @param {SelectedText} selectedText
    * @returns {void} void
    */
-  onSelected?: (selectedText: SelectedText) => void;
+  onSelected?: (selectedText: SelectedText, cfiRange: string) => void;
   /**
    * Called when marked text is pressed
    * @param {SelectedText} selectedText
    * @returns {void} void
    */
-  onMarkPressed?: (selectedText: SelectedText) => void;
+  onMarkPressed?: (selectedText: SelectedText, cfiRange: string) => void;
   /**
    * Called when screen orientation change is detected
    * @param {string} orientation
    * @returns {void} void
    */
   onOrientationChange?: (orientation: '-90' | '0' | '90') => void;
+  /**
+   * Called when the book is on the homepage
+   * @returns {void} void
+   */
+  onBeginning?: () => void;
+  /**
+   * Called when the book is on the final page
+   * @returns {void} void
+   */
+  onFinish?: () => void;
+  /**
+   * Emit that a section has been rendered
+   * @param {any} section
+   * @param {any} currentSection
+   * @returns {void} void
+   */
+  onRendered?: (section: any, currentSection: any) => void;
+  /**
+   * Called when book layout is change
+   * @param {string} layout
+   * @returns {void} void
+   */
+  onLayout?: (layout: any) => void;
+  /**
+   * @param {any} toc
+   * @returns {void} void
+   */
+  onNavigationLoaded?: (toc: any) => void;
   /**
    * Called when the book was pressed
    * @returns {void} void

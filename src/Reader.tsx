@@ -1,23 +1,28 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useContext, useEffect, useRef } from 'react';
 import { View, TouchableWithoutFeedback } from 'react-native';
 import GestureRecognizer from 'react-native-swipe-detect';
 import { WebView, WebViewMessageEvent } from 'react-native-webview';
-import { useBook } from './hooks/useBook';
+import { BookContext } from './context';
 import template from './template';
 import type { ReaderProps, SelectedText } from './types';
 
 export function Reader({
   src,
   onStarted = () => {},
-  onAttached = () => {},
-  onDisplayed = () => {},
+  onReady = () => {},
   onDisplayError = () => {},
+  onResized = () => {},
+  onLocationChange = () => {},
   onRendered = () => {},
   onSearch = () => {},
   onLocationsReady = () => {},
   onSelected = () => {},
   onMarkPressed = () => {},
   onOrientationChange = () => {},
+  onLayout = () => {},
+  onNavigationLoaded = () => {},
+  onBeginning = () => {},
+  onFinish = () => {},
   onPress = () => {},
   onDoublePress = () => {},
   width,
@@ -30,29 +35,31 @@ export function Reader({
   enableSelection = false,
 }: ReaderProps) {
   const {
-    theme,
     registerBook,
-    setCurrentPage,
-    setTotalPages,
-    setProgress,
-    progress,
-    isLoading,
     setIsLoading,
-    currentLocation,
+    setTotalLocations,
     setCurrentLocation,
-    locations,
+    setProgress,
     setLocations,
-    goToLocation,
-    goPrevious,
+    setAtStart,
+    setAtEnd,
     goNext,
-  } = useBook();
+    goPrevious,
+    isLoading,
+    goToLocation,
+    locations,
+    theme,
+  } = useContext(BookContext);
   const book = useRef<WebView>(null);
 
   let injectedJS = `
+    window.THEME = ${JSON.stringify(theme)};
+  `;
+  /*let injectedJS = `
     window.LOCATIONS = ${locations};
     window.THEME = ${JSON.stringify(theme)};
     window.ENABLE_SELECTION = ${enableSelection};
-  `;
+  `;*/
 
   if (src.base64) {
     injectedJS = `
@@ -68,11 +75,11 @@ export function Reader({
     throw new Error('src must be a base64 or uri');
   }
 
-  if (initialLocation) {
+  /*if (initialLocation) {
     injectedJS = `${injectedJS}window.BOOK_LOCATION = "${initialLocation}"; true`;
   } else if (currentLocation) {
     injectedJS = `${injectedJS}window.BOOK_LOCATION = "${currentLocation}"; true`;
-  }
+  }*/
 
   function onMessage(event: WebViewMessageEvent) {
     let parsedEvent = JSON.parse(event.nativeEvent.data);
@@ -80,7 +87,6 @@ export function Reader({
     let { type } = parsedEvent;
 
     console.log(parsedEvent);
-
     delete parsedEvent.type;
 
     if (type === 'onStarted') {
@@ -91,99 +97,43 @@ export function Reader({
     if (type === 'onReady') {
       const { totalLocations, currentLocation, progress } = parsedEvent;
       setIsLoading(false);
-      onReady({
-        totalLocations,
-        currentLocation,
-        progress,
-      });
-    }
+      setTotalLocations(totalLocations);
+      setCurrentLocation(currentLocation);
+      setProgress(progress);
 
-    if (type === 'onLocationsReady') {
-      const { epubKey, locations } = parsedEvent;
-      if (isLoading) {
-        setIsLoading(parsedEvent.isLoading);
-        setTotalPages(parsedEvent.totalPages);
-        setLocations(parsedEvent.locations);
+      if (initialLocation) {
+        goToLocation(initialLocation);
       }
-      onLocationsReady({
-        epubKey,
-        locations,
-      });
-    }
 
-    if (type === 'onLocationChange') {
-      const { totalLocations, currentLocation, progress } = parsedEvent;
-      setCurrentPage(parsedEvent.currentPage);
-      setTotalPages(parsedEvent.totalPages);
-      setProgress(parsedEvent.progress);
-      setCurrentLocation(parsedEvent.cfi);
-
-      onLocationChange({
-        totalLocations,
-        currentLocation,
-        progress,
-      });
-    }
-
-    if (type === 'onBeginning') {
-      onBeginning();
-    }
-
-    if (type === 'onFinish') {
-      onFinish();
-    }
-
-    if (type === 'onRendered') {
-      const { section, currentSection } = parsedEvent;
-      onRendered({
-        section,
-        currentSection,
-      });
-    }
-
-    if (type === 'onLayout') {
-      const { layout } = parsedEvent;
-      onLayout({
-        layout,
-      });
-    }
-
-    if (type === 'onSelected') {
-      const { cfiRange, text } = parsedEvent;
-      onSelected({
-        cfiRange,
-        text,
-      });
-    }
-
-    if (type === 'onMarkPressed') {
-      const { cfiRange, text } = parsedEvent;
-      onMarkPressed({
-        cfiRange,
-        text,
-      });
-    }
-
-    if (type === 'onResized') {
-      const { layout } = parsedEvent;
-      onResized({
-        layout,
-      });
-    }
-
-    if (type === 'onNavigationLoaded') {
-      const { toc } = parsedEvent;
-      onNavigationLoaded({
-        toc,
-      });
+      return onReady(totalLocations, currentLocation, progress);
     }
 
     if (type === 'onDisplayError') {
       const { reason } = parsedEvent;
       setIsLoading(false);
-      onDisplayError({
-        reason,
-      });
+
+      return onDisplayError(reason);
+    }
+
+    if (type === 'onResized') {
+      const { layout } = parsedEvent;
+
+      return onResized(layout);
+    }
+
+    if (type === 'onLocationChange') {
+      const { totalLocations, currentLocation, progress } = parsedEvent;
+      setTotalLocations(totalLocations);
+      setCurrentLocation(currentLocation);
+      setProgress(progress);
+
+      if (currentLocation.atStart) setAtStart(true);
+      else if (currentLocation.atEnd) setAtEnd(true);
+      else {
+        setAtStart(false);
+        setAtEnd(false);
+      }
+      return onLocationChange(totalLocations, currentLocation, progress);
     }
 
     if (type === 'onSearch') {
@@ -192,9 +142,59 @@ export function Reader({
       return onSearch(results);
     }
 
+    if (type === 'onLocationsReady') {
+      const { epubKey, locations } = parsedEvent;
+      setLocations(locations);
+
+      return onLocationsReady(epubKey, locations);
+    }
+
+    if (type === 'onSelected') {
+      const { cfiRange, text } = parsedEvent;
+
+      return onSelected(text, cfiRange);
+    }
+
+    if (type === 'onMarkPressed') {
+      const { cfiRange, text } = parsedEvent;
+
+      return onMarkPressed(cfiRange, text);
+    }
+
     if (type === 'onOrientationChange') {
       const { orientation } = parsedEvent;
+
       return onOrientationChange(orientation);
+    }
+
+    if (type === 'onBeginning') {
+      setAtStart(true);
+
+      return onBeginning();
+    }
+
+    if (type === 'onFinish') {
+      setAtEnd(true);
+
+      return onFinish();
+    }
+
+    if (type === 'onRendered') {
+      const { section, currentSection } = parsedEvent;
+
+      return onRendered(section, currentSection);
+    }
+
+    if (type === 'onLayout') {
+      const { layout } = parsedEvent;
+
+      return onLayout(layout);
+    }
+
+    if (type === 'onNavigationLoaded') {
+      const { toc } = parsedEvent;
+
+      return onNavigationLoaded(toc);
     }
   }
 
@@ -202,12 +202,10 @@ export function Reader({
     if (book.current) registerBook(book.current);
   }, [registerBook]);
 
-  useEffect(() => {
+  /*useEffect(() => {
     if (initialLocation) goToLocation(initialLocation);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [locations]);
-
-  console.log('locations: ', locations);
+  }, [locations]);*/
 
   let lastTap: number | null = null;
   let timer: NodeJS.Timeout;
@@ -249,7 +247,7 @@ export function Reader({
         position: 'relative',
       }}
     >
-      {!isLoading && (
+      {isLoading && (
         <View
           style={{
             width: '100%',
@@ -278,7 +276,7 @@ export function Reader({
           allowFileAccess
           style={{
             width,
-            backgroundColor: theme.body.background,
+            // backgroundColor: theme.body.background,
             height: isLoading ? 0 : height,
           }}
         />

@@ -41,33 +41,22 @@ export default `
         height: "100%",
       });
 
-      var displayed = rendition.display();
-
       window.ReactNativeWebView.postMessage(JSON.stringify({ type: "onStarted" }));
+
+      // rendition.themes.register({ myTheme: window.THEME });
+      // rendition.themes.select('myTheme');
 
       book.ready
         .then(function () {
           return book.locations.generate(1600);
         })
         .then(function () {
+          var displayed = rendition.display();
+
           displayed.then(function () {
             var viewer = document.getElementById("viewer");
 
             var currentLocation = rendition.currentLocation();
-
-            rendition.themes.default(window.THEME);
-
-            viewer.addEventListener("click", function () {
-              window.ReactNativeWebView.postMessage(JSON.stringify({
-                type: "onClick",
-              }));
-            });
-
-            viewer.addEventListener("dblclick", function () {
-              window.ReactNativeWebView.postMessage(JSON.stringify({
-                type: "onDoubleClick",
-              }));
-            });
 
             window.ReactNativeWebView.postMessage(JSON.stringify({
               type: "onReady",
@@ -82,6 +71,11 @@ export default `
             epubKey: book.key,
             locations: book.locations.save(),
           }));
+
+          rendition.on('started', () => {
+            rendition.themes.register({ theme: window.THEME });
+            rendition.themes.select('theme');
+          });
 
           rendition.on("relocated", function (location) {
             var percent = book.locations.percentageFromCfi(location.start.cfi);

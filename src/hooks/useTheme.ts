@@ -2,7 +2,6 @@ import type { Theme } from 'src/types';
 import useSetState from './useSetState';
 
 export const defaultTheme: Theme = {
-  'fontSize': '12pt',
   'body': {
     'font-family': '"Helvetica Neue", Helvetica, Arial, sans-serif',
     'background': '#fff',
