@@ -1,6 +1,6 @@
 {
   "name": "epubjs-react-native",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "ePub.js Reader for React Native",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
