@@ -266,6 +266,7 @@ export interface ReaderContextProps {
    * @param {FontSize} size {@link FontSize}
    */
   changeFontSize: (size: FontSize) => void;
+
   updateTheme: (name: string) => void;
 
   /**
@@ -292,6 +293,9 @@ export interface ReaderContextProps {
    */
   key: string;
 
+  /**
+   * A object containing all register themes.
+   */
   themes: Themes;
 
   /**
@@ -311,6 +315,9 @@ export interface ReaderContextProps {
    */
   atEnd: boolean;
 
+  /**
+   * The total number of locations
+   */
   totalLocations: number;
 
   /**
