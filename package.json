@@ -1,6 +1,6 @@
 {
   "name": "epubjs-react-native",
-  "version": "0.9.9",
+  "version": "1.0.2",
   "description": "ePub.js Reader for React Native",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
@@ -26,7 +26,7 @@
     "typescript": "tsc --noEmit",
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
     "prepare": "bob build",
-    "release": "release-it",
+    "release": "release-it --ci",
     "example": "yarn --cwd example",
     "pods": "cd example && pod-install --quiet",
     "bootstrap": "yarn example && yarn && yarn pods"
