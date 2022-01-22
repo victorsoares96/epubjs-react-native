@@ -147,6 +147,6 @@
     ]
   },
   "dependencies": {
-    "react-native-swipe-detect": "^1.0.10"
+    "react-native-gesture-handler": "^2.2.0"
   }
 }

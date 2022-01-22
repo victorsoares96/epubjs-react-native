@@ -15,26 +15,7 @@ export default function App() {
 
 function Book() {
   const { width, height } = useWindowDimensions();
-  const {
-    getCurrentLocation,
-    getLocations,
-    progress,
-    totalLocations,
-    currentLocation,
-    atStart,
-    atEnd,
-    selectTheme,
-    changeFontSize,
-    changeFontFamily,
-    activeTheme,
-    themes,
-    isLoading,
-    key,
-    addMark,
-    removeMark,
-    search,
-    searchResults,
-  } = useReader();
+  const { searchResults } = useReader();
 
   React.useEffect(() => {
     console.log(searchResults);
@@ -933,16 +914,14 @@ function Book() {
               flex: 1,
               justifyContent: 'center',
               alignItems: 'center',
-              backgroundColor: 'red',
             }}
           >
             <Text>Loading...</Text>
           </View>
         )}
+        onPress={() => console.log('press')}
+        onDoublePress={() => console.log('double press')}
         // initialLocation="epubcfi(/6/2!/4/2[docs-internal-guid-6b08c32b-7fff-1fdc-5991-d65cd24343e2]/62/4/1:5)"
-        onSelected={(selectedText, cfiRange) =>
-          console.log(selectedText, cfiRange)
-        }
       />
     </View>
   );
