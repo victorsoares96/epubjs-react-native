@@ -48,6 +48,10 @@ export default `
 
       book.ready
         .then(function () {
+          if (window.LOCATIONS) {
+            // alert(window.LOCATIONS);
+            return book.locations.load(window.LOCATIONS);
+          }
           return book.locations.generate(1600);
         })
         .then(function () {
@@ -68,7 +72,7 @@ export default `
 
           window.ReactNativeWebView.postMessage(JSON.stringify({
             type: "onLocationsReady",
-            epubKey: book.key,
+            epubKey: book.key(),
             locations: book.locations.save(),
           }));
 
@@ -125,6 +129,7 @@ export default `
           // rendition.annotations.remove(cfiRange);
         })
         .catch(function (err) {
+          alert(err);
           window.ReactNativeWebView.postMessage(JSON.stringify({
             type: "onDisplayError",
             reason: reason
@@ -132,7 +137,6 @@ export default `
         });
 
         /*rendition.on('started', () => {
-          alert(JSON.stringify(window.THEMES));
           rendition.themes.register(window.THEMES);
           rendition.themes.select(window.ACTIVE_THEME);
         });*/
@@ -187,7 +191,7 @@ export default `
         });
 
         rendition.on("selected", function (cfiRange, contents) {
-          rendition.annotations.add("underline", cfiRange, {}, (e) => {
+          rendition.annotations.add("highlight", cfiRange, {}, (e) => {
             console.log("highlight clicked", e.target);
           });
           contents.window.getSelection().removeAllRanges();
@@ -204,7 +208,7 @@ export default `
         });
 
         rendition.on("markClicked", function (cfiRange, contents) {
-          rendition.annotations.remove(cfiRange, "underline");
+          rendition.annotations.remove(cfiRange, "highlight");
           book.getRange(cfiRange).then(function (range) {
             if (range) {
               window.ReactNativeWebView.postMessage(JSON.stringify({

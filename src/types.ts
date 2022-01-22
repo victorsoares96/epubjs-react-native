@@ -1,5 +1,3 @@
-import type { WebView } from 'react-native-webview';
-
 export type Location = {
   atStart?: boolean;
   atEnd?: boolean;
@@ -27,7 +25,7 @@ export type Location = {
   };
 };
 
-export type Annotation = 'highlight' | 'underline';
+export type Mark = 'highlight' | 'underline';
 
 export type FontSize = string;
 
@@ -45,181 +43,14 @@ export type Themes = {
 
 export type Theme = {
   [key: string]: {
-    [key: string]: any;
+    [key: string]: string;
   };
 };
 
 export type SearchResult = {
-  cfi: string;
+  cfi: ePubCfi;
   excerpt: string;
 };
-
-export type SelectedText = {
-  cfi: string;
-  location: number;
-  progress: number;
-  text: string;
-  totalPages: number;
-  highlightColor: string;
-  currentDate: Date;
-};
-
-export interface ReaderContextProps {
-  /**
-   * Register a book reference
-   * @param {WebView} bookRef
-   */
-  registerBook: (bookRef: WebView) => void;
-
-  /**
-   * Change font size of all elements in the book
-   * @param {FontSize} size {@link FontSize}
-   */
-  changeFontSize: (size: FontSize) => void;
-
-  /**
-   * Change font size of all elements in the book
-   * @param font
-   * @see https://www.w3schools.com/cssref/css_websafe_fonts.asp
-   */
-  changeFontFamily: (font: string) => void;
-
-  /**
-   * Register a theme
-   * @param {string} name
-   * @param theme {@link Theme}
-   * @example
-   * ```
-   * registerTheme({ dark: { "body": { "background": "#333", "color": "white" } } });
-   * ```
-   */
-  registerTheme: (theme: Theme) => void;
-
-  /**
-   * @param themes {@link Themes}
-   * @example
-   * ```
-   * registerThemes({ light: { "body": { "color": "black" } } });
-   * ```
-   */
-  registerThemes: (themes: Themes) => void;
-
-  /**
-   * Select a existing theme
-   * @param {string} name
-   * @example
-   * ```
-   * selectTheme("light");
-   * ```
-   */
-  selectTheme: (name: string) => void;
-
-  /**
-   * Update a existing theme
-   * @param {string} name
-   * @example
-   * ```
-   * updateTheme("light");
-   * ```
-   */
-  updateTheme: (name: string) => void;
-
-  /**
-   * Go to specific location in the book
-   * @param {ePubCfi} target {@link ePubCfi}
-   * @param highlightColor {@link string} color of the highlight (default: yellow)
-   */
-  goToLocation: (target: string, highlightColor?: string) => void;
-
-  /**
-   * Go to previous page in the book
-   */
-  goPrevious: () => void;
-
-  /**
-   * Go to next page in the book
-   */
-  goNext: () => void;
-
-  /**
-   * Search for a specific text in the book
-   * @param {string} query {@link string} text to search
-   */
-  search: (query: string) => void;
-
-  /**
-   * Get the total locations of the book
-   */
-  getLocations: () => ePubCfi[];
-
-  /**
-   * The active theme of the book
-   */
-  activeTheme: string;
-
-  themes: Themes;
-
-  /**
-   * Change the current theme of the book
-   * @param {Theme} theme {@link Theme}
-   */
-  // changeTheme: (theme: Theme) => void;
-
-  /**
-   * The current location of the book
-   */
-  currentLocation: Location | null;
-
-  setCurrentLocation: (currentLocation: Location | null) => void;
-
-  /**
-   * The progress of the book
-   * @returns {number} {@link number}
-   */
-  progress: number;
-
-  setProgress: (progress: number) => void;
-
-  /**
-   * Indicates if the book is loading
-   * @returns {boolean} {@link boolean}
-   */
-  isLoading: boolean;
-
-  setIsLoading: (isLoading: boolean) => void;
-
-  locations: ePubCfi[];
-
-  setLocations: (locations: ePubCfi[]) => void;
-
-  totalLocations: number;
-
-  setTotalLocations: (totalLocations: number) => void;
-
-  /**
-   * Returns the current location of the book
-   * @returns
-   * @param {string} cfi {@link ePubCfi}
-   * @param {number} currentPage {@link number}
-   * @param {number} progress {@link progress}
-   * @param {Date} date {@link Date}
-   */
-  getCurrentLocation: () => Location | null;
-
-  /**
-   * Indicates if you are at the beginning of the book
-   * @returns {boolean} {@link boolean}
-   */
-  atStart?: boolean;
-  setAtStart: (atStart: boolean) => void;
-
-  /**
-   * Indicates if you are at the end of the book
-   * @returns {boolean} {@link boolean}
-   */
-  atEnd?: boolean;
-  setAtEnd: (atEnd: boolean) => void;
-}
 
 export interface ReaderProps {
   /**
@@ -240,6 +71,7 @@ export interface ReaderProps {
      * ```
      */
     base64?: string;
+
     /**
      * The url of the ePub
      * @param {string} uri
@@ -254,6 +86,18 @@ export interface ReaderProps {
      */
     uri?: string;
   };
+  /**
+   * @param {ePubCfi[]} locations
+   * @example
+   * ```
+   * <Reader
+   *  src={{
+   *    locations: ['epubcfi(/6/2...', 'epubcfi(/6/4...']
+   *  }}
+   * />
+   * ```
+   */
+  initialLocations?: ePubCfi[];
   /**
    * Called once the book loads is started
    * @returns {void} void
@@ -312,13 +156,13 @@ export interface ReaderProps {
    * @param {SelectedText} selectedText
    * @returns {void} void
    */
-  onSelected?: (selectedText: SelectedText, cfiRange: string) => void;
+  onSelected?: (selectedText: string, cfiRange: ePubCfi) => void;
   /**
    * Called when marked text is pressed
    * @param {SelectedText} selectedText
    * @returns {void} void
    */
-  onMarkPressed?: (selectedText: SelectedText, cfiRange: string) => void;
+  onMarkPressed?: (selectedText: string, cfiRange: ePubCfi) => void;
   /**
    * Called when screen orientation change is detected
    * @param {string} orientation
@@ -404,7 +248,32 @@ export interface ReaderProps {
    */
   enableSelection?: boolean;
 
+  /**
+   * @param themes {@link Themes}
+   * @example
+   * ```
+   * <Reader
+   *  themes={{
+   *    light: { "body": { "color": "black" } },
+   *    dark: { "body": { "color": "white" } }
+   *  }}
+   * />
+   * ```
+   */
   themes?: Themes;
 
+  /**
+   * @param activeTheme {@link string}
+   * @example
+   * ```
+   * <Reader
+   *  activeTheme="dark"
+   *  themes={{
+   *    light: { "body": { "color": "black" } },
+   *    dark: { "body": { "color": "white" } }
+   *  }}
+   * />
+   * ```
+   */
   activeTheme?: string;
 }

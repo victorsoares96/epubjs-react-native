@@ -4,7 +4,7 @@ import GestureRecognizer from 'react-native-swipe-detect';
 import { WebView, WebViewMessageEvent } from 'react-native-webview';
 import { defaultTheme, ReaderContext } from './context';
 import template from './template';
-import type { ReaderProps, SelectedText } from './types';
+import type { ReaderProps } from './types';
 
 export function Reader({
   src,
@@ -33,8 +33,9 @@ export function Reader({
   onSwipeRight = () => {},
   renderLoadingComponent = () => null,
   enableSelection = false,
-  themes = defaultTheme,
+  themes = { default: defaultTheme },
   activeTheme = 'default',
+  initialLocations,
 }: ReaderProps) {
   const {
     registerBook,
@@ -49,27 +50,19 @@ export function Reader({
     goPrevious,
     isLoading,
     goToLocation,
-    locations,
     selectTheme,
     registerThemes,
+    setKey,
+    setSearchResults,
   } = useContext(ReaderContext);
   const book = useRef<WebView>(null);
 
-  useEffect(() => {
-    registerThemes(themes);
-    selectTheme(activeTheme);
-  }, [themes, activeTheme]);
-
   let injectedJS = `
+    window.LOCATIONS = ${JSON.stringify(initialLocations)};
     window.THEMES = ${JSON.stringify(themes)};
     window.ACTIVE_THEME = '${activeTheme}';
     window.ENABLE_SELECTION = ${enableSelection};
   `;
-  /*let injectedJS = `
-    window.LOCATIONS = ${locations};
-    window.THEME = ${JSON.stringify(theme)};
-    window.ENABLE_SELECTION = ${enableSelection};
-  `;*/
 
   if (src.base64) {
     injectedJS = `
@@ -104,7 +97,9 @@ export function Reader({
       setCurrentLocation(currentLocation);
       setProgress(progress);
 
-      book.current?.forceUpdate();
+      registerThemes(themes);
+      selectTheme(activeTheme);
+
       if (initialLocation) {
         goToLocation(initialLocation);
       }
@@ -142,15 +137,17 @@ export function Reader({
 
     if (type === 'onSearch') {
       const { results } = parsedEvent;
+      setSearchResults(results);
 
       return onSearch(results);
     }
 
     if (type === 'onLocationsReady') {
-      const { epubKey, locations } = parsedEvent;
-      setLocations(locations);
+      const { epubKey } = parsedEvent;
+      setLocations(parsedEvent.locations);
+      setKey(epubKey);
 
-      return onLocationsReady(epubKey, locations);
+      return onLocationsReady(epubKey, parsedEvent.locations);
     }
 
     if (type === 'onSelected') {
