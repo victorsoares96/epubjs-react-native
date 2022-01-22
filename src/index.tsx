@@ -1,3 +1,3 @@
 export { Reader } from './Reader';
-export { BookProvider } from './context';
-export { useBook } from './hooks/useBook';
+export { ReaderProvider } from './context';
+export { useReader } from './hooks/useBook';

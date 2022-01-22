@@ -131,10 +131,14 @@ export default `
           }));
         });
 
-        rendition.on('started', () => {
+        /*rendition.on('started', () => {
+          alert(JSON.stringify(window.THEMES));
           rendition.themes.register(window.THEMES);
           rendition.themes.select(window.ACTIVE_THEME);
-        });
+        });*/
+
+        rendition.themes.register(window.THEMES);
+        rendition.themes.select(window.ACTIVE_THEME);
 
         rendition.on("relocated", function (location) {
           var percent = book.locations.percentageFromCfi(location.start.cfi);

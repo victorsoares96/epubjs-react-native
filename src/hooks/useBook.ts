@@ -1,7 +1,7 @@
 import { useContext } from 'react';
-import { BookContext } from '../context';
+import { ReaderContext } from '../context';
 
-export function useBook() {
-  const context = useContext(BookContext);
+export function useReader() {
+  const context = useContext(ReaderContext);
   return context;
 }

@@ -1,17 +1,14 @@
 import * as React from 'react';
 
 import { SafeAreaView, Text, useWindowDimensions, View } from 'react-native';
-import { Reader, BookProvider, useBook } from 'epubjs-react-native';
+import { Reader, ReaderProvider, useReader } from 'epubjs-react-native';
 
 export default function App() {
   return (
     <SafeAreaView>
-      <BookProvider
-      // themes={}
-      // activeTheme="dark"
-      >
+      <ReaderProvider>
         <Book />
-      </BookProvider>
+      </ReaderProvider>
     </SafeAreaView>
   );
 }
@@ -32,7 +29,8 @@ function Book() {
     activeTheme,
     themes,
     registerTheme,
-  } = useBook();
+    isLoading,
+  } = useReader();
 
   console.log('availableThemes:', themes);
   return (
@@ -44,6 +42,7 @@ function Book() {
         // src={{ uri: 'https://s3.amazonaws.com/moby-dick/OPS/package.opf' }}
         width={width}
         height={height * 0.8}
+        activeTheme="light"
         themes={{
           light: {
             'body': {
@@ -95,41 +94,20 @@ function Book() {
               background: 'lightskyblue',
             },
           },
-          purple: {
-            'body': {
-              background: '#4c12a1',
-            },
-            'span': {
-              color: '#fff !important',
-            },
-            'p': {
-              color: '#fff !important',
-            },
-            'li': {
-              color: '#fff !important',
-            },
-            'h1': {
-              color: '#fff !important',
-            },
-            'a': {
-              'color': '#fff !important',
-              'pointer-events': 'auto',
-              'cursor': 'pointer',
-            },
-            '::selection': {
-              background: 'lightskyblue',
-            },
-          },
         }}
-        activeTheme="dark"
         renderLoadingComponent={() => (
           <View
-            style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+            style={{
+              // flex: 1,
+              justifyContent: 'center',
+              alignItems: 'center',
+              backgroundColor: 'red',
+            }}
           >
             <Text>Loading...</Text>
           </View>
         )}
-        initialLocation="epubcfi(/6/2!/4/2[docs-internal-guid-6b08c32b-7fff-1fdc-5991-d65cd24343e2]/62/4/1:5)"
+        // initialLocation="epubcfi(/6/2!/4/2[docs-internal-guid-6b08c32b-7fff-1fdc-5991-d65cd24343e2]/62/4/1:5)"
       />
 
       <View
@@ -147,7 +125,7 @@ function Book() {
 
         <Text onPress={() => console.log(getLocations())}>getLocations</Text>
 
-        <Text onPress={() => selectTheme('purple')}>selectTheme</Text>
+        <Text onPress={() => selectTheme('dark')}>selectTheme</Text>
 
         <Text onPress={() => changeFontSize('24pt')}>changeFontSize</Text>
 
@@ -218,6 +196,12 @@ function Book() {
         <Text>atEnd: {String(atEnd)}</Text>
 
         <Text>activeTheme: {String(activeTheme)}</Text>
+
+        <Text>isLoading: {String(isLoading)}</Text>
+      </View>
+
+      <View>
+        <Text>themes: {JSON.stringify(Object.keys(themes))}</Text>
       </View>
     </View>
   );

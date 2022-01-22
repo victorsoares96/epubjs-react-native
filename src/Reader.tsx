@@ -2,8 +2,7 @@ import React, { useContext, useEffect, useRef } from 'react';
 import { View, TouchableWithoutFeedback } from 'react-native';
 import GestureRecognizer from 'react-native-swipe-detect';
 import { WebView, WebViewMessageEvent } from 'react-native-webview';
-import { BookContext } from './context';
-import { defaultTheme } from './hooks/useTheme';
+import { defaultTheme, ReaderContext } from './context';
 import template from './template';
 import type { ReaderProps, SelectedText } from './types';
 
@@ -34,7 +33,7 @@ export function Reader({
   onSwipeRight = () => {},
   renderLoadingComponent = () => null,
   enableSelection = false,
-  themes = { defaultTheme },
+  themes = defaultTheme,
   activeTheme = 'default',
 }: ReaderProps) {
   const {
@@ -51,10 +50,15 @@ export function Reader({
     isLoading,
     goToLocation,
     locations,
-    theme,
+    selectTheme,
     registerThemes,
-  } = useContext(BookContext);
+  } = useContext(ReaderContext);
   const book = useRef<WebView>(null);
+
+  useEffect(() => {
+    registerThemes(themes);
+    selectTheme(activeTheme);
+  }, [themes, activeTheme]);
 
   let injectedJS = `
     window.THEMES = ${JSON.stringify(themes)};
@@ -100,6 +104,7 @@ export function Reader({
       setCurrentLocation(currentLocation);
       setProgress(progress);
 
+      book.current?.forceUpdate();
       if (initialLocation) {
         goToLocation(initialLocation);
       }
@@ -260,6 +265,7 @@ export function Reader({
           ref={book}
           source={{ html: template }}
           showsVerticalScrollIndicator={false}
+          javaScriptEnabled
           injectedJavaScriptBeforeContentLoaded={injectedJS}
           originWhitelist={['*']}
           scrollEnabled={false}
