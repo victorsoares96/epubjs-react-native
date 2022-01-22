@@ -1,6 +1,6 @@
 {
   "name": "epubjs-react-native",
-  "version": "0.1.15",
+  "version": "0.9.9",
   "description": "ePub.js Reader for React Native",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
@@ -147,6 +147,6 @@
     ]
   },
   "dependencies": {
-    "react-native-swipe-detect": "^1.0.10"
+    "react-native-gesture-handler": "^2.2.0"
   }
 }

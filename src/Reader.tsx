@@ -1,55 +1,71 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useContext, useEffect, useRef } from 'react';
 import { View, TouchableWithoutFeedback } from 'react-native';
-import GestureRecognizer from 'react-native-swipe-detect';
+import {
+  Directions,
+  FlingGestureHandler,
+  GestureHandlerRootView,
+  State,
+} from 'react-native-gesture-handler';
 import { WebView, WebViewMessageEvent } from 'react-native-webview';
-import { useBook } from './hooks/useBook';
+import { defaultTheme, ReaderContext } from './context';
 import template from './template';
-import type { ReaderProps, SelectedText } from './types';
+import type { ReaderProps } from './types';
 
 export function Reader({
   src,
   onStarted = () => {},
-  onAttached = () => {},
-  onDisplayed = () => {},
+  onReady = () => {},
   onDisplayError = () => {},
+  onResized = () => {},
+  onLocationChange = () => {},
   onRendered = () => {},
   onSearch = () => {},
   onLocationsReady = () => {},
   onSelected = () => {},
   onMarkPressed = () => {},
   onOrientationChange = () => {},
+  onLayout = () => {},
+  onNavigationLoaded = () => {},
+  onBeginning = () => {},
+  onFinish = () => {},
   onPress = () => {},
   onDoublePress = () => {},
   width,
   height,
   initialLocation,
-  enableSwipe = true,
+  // enableSwipe = true,
   onSwipeLeft = () => {},
   onSwipeRight = () => {},
   renderLoadingComponent = () => null,
   enableSelection = false,
+  themes = { default: defaultTheme },
+  activeTheme = 'default',
+  initialLocations,
 }: ReaderProps) {
   const {
-    theme,
     registerBook,
-    setCurrentPage,
-    setTotalPages,
-    setProgress,
-    isLoading,
     setIsLoading,
-    currentLocation,
+    setTotalLocations,
     setCurrentLocation,
-    locations,
+    setProgress,
     setLocations,
-    goToLocation,
-    goPrevious,
+    setAtStart,
+    setAtEnd,
     goNext,
-  } = useBook();
+    goPrevious,
+    isLoading,
+    goToLocation,
+    selectTheme,
+    registerThemes,
+    setKey,
+    setSearchResults,
+  } = useContext(ReaderContext);
   const book = useRef<WebView>(null);
 
   let injectedJS = `
-    window.LOCATIONS = ${locations};
-    window.THEME = ${JSON.stringify(theme)};
+    window.LOCATIONS = ${JSON.stringify(initialLocations)};
+    window.THEMES = ${JSON.stringify(themes)};
+    window.ACTIVE_THEME = '${activeTheme}';
     window.ENABLE_SELECTION = ${enableSelection};
   `;
 
@@ -67,12 +83,6 @@ export function Reader({
     throw new Error('src must be a base64 or uri');
   }
 
-  if (initialLocation) {
-    injectedJS = `${injectedJS}window.BOOK_LOCATION = "${initialLocation}"; true`;
-  } else if (currentLocation) {
-    injectedJS = `${injectedJS}window.BOOK_LOCATION = "${currentLocation}"; true`;
-  }
-
   function onMessage(event: WebViewMessageEvent) {
     let parsedEvent = JSON.parse(event.nativeEvent.data);
 
@@ -80,91 +90,123 @@ export function Reader({
 
     delete parsedEvent.type;
 
-    if (type === 'started') {
+    if (type === 'onStarted') {
       onStarted();
       setIsLoading(true);
     }
 
-    if (type === 'attached') {
-      onAttached();
-    }
-
-    if (
-      type === 'displayed' ||
-      type === 'displayError' ||
-      type === 'rendered'
-    ) {
+    if (type === 'onReady') {
+      const { totalLocations, currentLocation, progress } = parsedEvent;
       setIsLoading(false);
+      setTotalLocations(totalLocations);
+      setCurrentLocation(currentLocation);
+      setProgress(progress);
+
+      registerThemes(themes);
+      selectTheme(activeTheme);
+
+      if (initialLocation) {
+        goToLocation(initialLocation);
+      }
+
+      return onReady(totalLocations, currentLocation, progress);
     }
 
-    if (type === 'displayed') {
-      onDisplayed();
+    if (type === 'onDisplayError') {
+      const { reason } = parsedEvent;
+      setIsLoading(false);
+
+      return onDisplayError(reason);
     }
 
-    if (type === 'displayError') {
-      onDisplayError(parsedEvent.section);
+    if (type === 'onResized') {
+      const { layout } = parsedEvent;
+
+      return onResized(layout);
     }
 
-    if (type === 'rendered') {
-      onRendered(parsedEvent.section, parsedEvent.view);
+    if (type === 'onLocationChange') {
+      const { totalLocations, currentLocation, progress } = parsedEvent;
+      setTotalLocations(totalLocations);
+      setCurrentLocation(currentLocation);
+      setProgress(progress);
+
+      if (currentLocation.atStart) setAtStart(true);
+      else if (currentLocation.atEnd) setAtEnd(true);
+      else {
+        setAtStart(false);
+        setAtEnd(false);
+      }
+      return onLocationChange(totalLocations, currentLocation, progress);
     }
 
-    if (type === 'search') {
-      const results = parsedEvent.results;
+    if (type === 'onSearch') {
+      const { results } = parsedEvent;
+      setSearchResults(results);
 
       return onSearch(results);
     }
 
-    if (type === 'relocated') {
-      setCurrentPage(parsedEvent.currentPage);
-      setTotalPages(parsedEvent.totalPages);
-      setProgress(parsedEvent.progress);
-      setCurrentLocation(parsedEvent.cfi);
+    if (type === 'onLocationsReady') {
+      const { epubKey } = parsedEvent;
+      setLocations(parsedEvent.locations);
+      setKey(epubKey);
+
+      return onLocationsReady(epubKey, parsedEvent.locations);
     }
 
-    if (type === 'locations') {
-      if (isLoading) {
-        setIsLoading(parsedEvent.isLoading);
-        setTotalPages(parsedEvent.totalPages);
-        setLocations(parsedEvent.locations);
-      }
+    if (type === 'onSelected') {
+      const { cfiRange, text } = parsedEvent;
 
-      return onLocationsReady(parsedEvent.locations);
+      return onSelected(text, cfiRange);
     }
 
-    if (type === 'selected') {
-      const { cfi, text } = parsedEvent as SelectedText;
+    if (type === 'onMarkPressed') {
+      const { cfiRange, text } = parsedEvent;
 
-      book.current?.injectJavaScript(`
-        window.rendition.annotations.remove("${cfi}", "highlight");
-        window.rendition.annotations.add("highlight", "${cfi}", {data: "${text}"}, (e) => {}, "", { "fill": "${theme['::selection'].background}" });
-        true
-      `);
-
-      return onSelected(parsedEvent);
+      return onMarkPressed(cfiRange, text);
     }
 
-    if (type === 'markClicked') {
-      return onMarkPressed(parsedEvent);
+    if (type === 'onOrientationChange') {
+      const { orientation } = parsedEvent;
+
+      return onOrientationChange(orientation);
     }
 
-    if (type === 'isLoading') {
-      return setIsLoading(parsedEvent.isLoading);
+    if (type === 'onBeginning') {
+      setAtStart(true);
+
+      return onBeginning();
     }
 
-    if (type === 'orientation') {
-      return onOrientationChange(parsedEvent.orientation);
+    if (type === 'onFinish') {
+      setAtEnd(true);
+
+      return onFinish();
+    }
+
+    if (type === 'onRendered') {
+      const { section, currentSection } = parsedEvent;
+
+      return onRendered(section, currentSection);
+    }
+
+    if (type === 'onLayout') {
+      const { layout } = parsedEvent;
+
+      return onLayout(layout);
+    }
+
+    if (type === 'onNavigationLoaded') {
+      const { toc } = parsedEvent;
+
+      return onNavigationLoaded(toc);
     }
   }
 
   useEffect(() => {
     if (book.current) registerBook(book.current);
   }, [registerBook]);
-
-  useEffect(() => {
-    if (initialLocation) goToLocation(initialLocation);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   let lastTap: number | null = null;
   let timer: NodeJS.Timeout;
@@ -185,61 +227,70 @@ export function Reader({
   };
 
   return (
-    <GestureRecognizer
-      onSwipeLeft={() => {
-        goNext();
-        onSwipeLeft();
-      }}
-      onSwipeRight={() => {
-        goPrevious();
-        onSwipeRight();
-      }}
-      config={{
-        velocityThreshold: 0.1,
-        directionalOffsetThreshold: 80,
-        enableSwipeLeft: enableSwipe,
-        enableSwipeRight: enableSwipe,
-      }}
-      style={{
-        width,
-        height,
-        position: 'relative',
-      }}
-    >
-      {isLoading && (
-        <View
-          style={{
-            width: '100%',
-            height: '100%',
-            position: 'absolute',
-            top: 0,
-            zIndex: 2,
+    <GestureHandlerRootView>
+      <FlingGestureHandler
+        direction={Directions.RIGHT}
+        onHandlerStateChange={({ nativeEvent }) => {
+          if (nativeEvent.state === State.ACTIVE) {
+            goPrevious();
+            onSwipeRight();
+          }
+        }}
+      >
+        <FlingGestureHandler
+          direction={Directions.LEFT}
+          onHandlerStateChange={({ nativeEvent }) => {
+            if (nativeEvent.state === State.ACTIVE) {
+              goNext();
+              onSwipeLeft();
+            }
           }}
         >
-          {renderLoadingComponent()}
-        </View>
-      )}
+          <View
+            style={{
+              height: '100%',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            {isLoading && (
+              <View
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  position: 'absolute',
+                  top: 0,
+                  zIndex: 2,
+                }}
+              >
+                {renderLoadingComponent()}
+              </View>
+            )}
 
-      <TouchableWithoutFeedback onPress={handleDoublePress}>
-        <WebView
-          ref={book}
-          source={{ html: template }}
-          showsVerticalScrollIndicator={false}
-          injectedJavaScriptBeforeContentLoaded={injectedJS}
-          originWhitelist={['*']}
-          scrollEnabled={false}
-          mixedContentMode="compatibility"
-          onMessage={onMessage}
-          allowUniversalAccessFromFileURLs={true}
-          allowFileAccessFromFileURLs={true}
-          allowFileAccess
-          style={{
-            width,
-            backgroundColor: theme.body.background,
-            height: isLoading ? 0 : height,
-          }}
-        />
-      </TouchableWithoutFeedback>
-    </GestureRecognizer>
+            <TouchableWithoutFeedback onPress={handleDoublePress}>
+              <WebView
+                ref={book}
+                source={{ html: template }}
+                showsVerticalScrollIndicator={false}
+                javaScriptEnabled
+                injectedJavaScriptBeforeContentLoaded={injectedJS}
+                originWhitelist={['*']}
+                scrollEnabled={false}
+                mixedContentMode="compatibility"
+                onMessage={onMessage}
+                allowUniversalAccessFromFileURLs={true}
+                allowFileAccessFromFileURLs={true}
+                allowFileAccess
+                style={{
+                  width,
+                  // backgroundColor: theme.body.background,
+                  height: isLoading ? 0 : height,
+                }}
+              />
+            </TouchableWithoutFeedback>
+          </View>
+        </FlingGestureHandler>
+      </FlingGestureHandler>
+    </GestureHandlerRootView>
   );
 }

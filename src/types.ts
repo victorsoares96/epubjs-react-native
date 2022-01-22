@@ -1,183 +1,56 @@
-import type { WebView } from 'react-native-webview';
+export type Location = {
+  atStart?: boolean;
+  atEnd?: boolean;
+  end: {
+    cfi: ePubCfi;
+    displayed: {
+      page: number;
+      total: number;
+    };
+    href: string;
+    index: number;
+    location: number;
+    percentage: number;
+  };
+  start: {
+    cfi: ePubCfi;
+    displayed: {
+      page: number;
+      total: number;
+    };
+    href: string;
+    index: number;
+    location: number;
+    percentage: number;
+  };
+};
+
+export type Mark = 'highlight' | 'underline';
 
 export type FontSize = string;
 
+/**
+ * @example
+ * ````
+ * epubcfi(/6/6!/4/2,/2/2/1:0,/4[q1]/2/14/2/1:14)
+ * ````
+ */
 export type ePubCfi = string;
 
-export type CurrentLocation = {
-  cfi: string | null;
-  currentPage: number;
-  progress: number;
-  date: Date;
+export type Themes = {
+  [key: string]: Theme;
 };
 
 export type Theme = {
-  'fontSize': FontSize;
-  'body': {
-    'font-family': string;
-    'background': string;
-    'font-size': FontSize;
-  };
-  'span': {
-    'font-family': string;
-    'color': string;
-    'font-size': FontSize;
-  };
-  'p': {
-    'font-family': string;
-    'color': string;
-    'font-size': FontSize;
-  };
-  'li': {
-    'font-family': string;
-    'color': string;
-    'font-size': FontSize;
-  };
-  'h1': {
-    'font-family': string;
-    'color': string;
-  };
-  'a': {
-    'font-family': string;
-    'color': string;
-    'pointer-events': string;
-    'cursor': string;
-  };
-  '::selection': {
-    background: string;
+  [key: string]: {
+    [key: string]: string;
   };
 };
 
 export type SearchResult = {
-  cfi: string;
+  cfi: ePubCfi;
   excerpt: string;
 };
-
-export type SelectedText = {
-  cfi: string;
-  location: number;
-  progress: number;
-  text: string;
-  totalPages: number;
-  highlightColor: string;
-  currentDate: Date;
-};
-
-export interface ReaderContextProps {
-  /**
-   * Register a book reference
-   * @param {WebView} bookRef
-   */
-  registerBook: (bookRef: WebView) => void;
-
-  /**
-   * Change font size of all elements in the book
-   * @param {FontSize} size {@link FontSize}
-   */
-  changeFontSize: (size: FontSize) => void;
-
-  /**
-   * Change font size of all elements in the book
-   * @param font
-   * @see https://www.w3schools.com/cssref/css_websafe_fonts.asp
-   */
-  changeFontFamily: (font: string) => void;
-
-  /**
-   * Go to specific location in the book
-   * @param {ePubCfi} target {@link ePubCfi}
-   * @param highlightColor {@link string} color of the highlight (default: yellow)
-   */
-  goToLocation: (target: string, highlightColor?: string) => void;
-
-  /**
-   * Go to specific page in the book
-   * @param {number} page {@link number}
-   */
-  goToPage: (page: number) => void;
-
-  /**
-   * Go to previous page in the book
-   */
-  goPrevious: () => void;
-
-  /**
-   * Go to next page in the book
-   */
-  goNext: () => void;
-
-  goToNote: (cfi: ePubCfi, currentPage?: number) => void;
-
-  /**
-   * Search for a specific text in the book
-   * @param {string} query {@link string} text to search
-   */
-  search: (query: string) => void;
-
-  /**
-   * The theme of the book
-   */
-  theme: Theme;
-
-  /**
-   * Change the current theme of the book
-   * @param {Theme} theme {@link Theme}
-   */
-  changeTheme: (theme: Theme) => void;
-
-  /**
-   * The current location of the book
-   */
-  currentLocation: string | null;
-
-  setCurrentLocation: (currentLocation: string | null) => void;
-
-  /**
-   * The current page
-   * @returns {number} {@link number}
-   */
-  currentPage: number;
-  setCurrentPage: (page: number) => void;
-  /**
-   * The total number of pages
-   * @returns {number} {@link number}
-   */
-  totalPages: number;
-  setTotalPages: (totalPages: number) => void;
-  /**
-   * The progress of the book
-   * @returns {number} {@link number}
-   */
-  progress: number;
-
-  setProgress: (progress: number) => void;
-
-  /**
-   * Indicates if the book is loading
-   * @returns {boolean} {@link boolean}
-   */
-  isLoading: boolean;
-
-  setIsLoading: (isLoading: boolean) => void;
-
-  locations: string | null;
-
-  setLocations: (locations: string | null) => void;
-
-  /**
-   * Returns the current location of the book
-   * @returns
-   * @param {string} cfi {@link ePubCfi}
-   * @param {number} currentPage {@link number}
-   * @param {number} progress {@link progress}
-   * @param {Date} date {@link Date}
-   */
-  getCurrentLocation: () => CurrentLocation;
-  /**
-   * Set the default theme of the book
-   */
-  defaultTheme?: Theme;
-}
 
 export interface ReaderProps {
   /**
@@ -198,6 +71,7 @@ export interface ReaderProps {
      * ```
      */
     base64?: string;
+
     /**
      * The url of the ePub
      * @param {string} uri
@@ -213,20 +87,34 @@ export interface ReaderProps {
     uri?: string;
   };
   /**
+   * @param {ePubCfi[]} locations
+   * @example
+   * ```
+   * <Reader
+   *  src={{
+   *    locations: ['epubcfi(/6/2...', 'epubcfi(/6/4...']
+   *  }}
+   * />
+   * ```
+   */
+  initialLocations?: ePubCfi[];
+  /**
    * Called once the book loads is started
    * @returns {void} void
    */
   onStarted?: () => void;
   /**
-   * Emit that rendering has attached to an element
-   * @returns {void} void
-   */
-  onAttached?: () => void;
-  /**
    * Called once book has been displayed
+   * @params {number} totalLocations {@link number}
+   * @params {currentLocation} currentLocation {@link CurrentLocation}
+   * @params {number} progress {@link number}
    * @returns {void} void
    */
-  onDisplayed?: () => void;
+  onReady?: (
+    totalLocations: number,
+    currentLocation: Location,
+    progress: number
+  ) => void;
   /**
    * Called once book has not been displayed
    * @param {string} reason
@@ -234,26 +122,11 @@ export interface ReaderProps {
    */
   onDisplayError?: (reason: string) => void;
   /**
-   * Emit that a section has been rendered
-   * @param {any} section
-   * @param {any} view
-   * @returns {void} void
-   */
-  onRendered?: (section: any, view: any) => void;
-  /**
-   * Emit that a section has been removed
-   * @param {any} section
-   * @param {any} view
-   * @returns {void} void
-   */
-  onRemoved?: (section: any, view: any) => void;
-  /**
    * Emit that the rendition has been resized
-   * @param {number} width
-   * @param {number} height
+   * @param {any} layout
    * @returns {void} void
    */
-  onResized?: (width: number, height: number) => void;
+  onResized?: (layout: any) => void;
   /**
    * Called when occurred a page change
    * @param {string} cfi
@@ -262,9 +135,9 @@ export interface ReaderProps {
    * @returns {void} void
    */
   onLocationChange?: (
-    cfi: string,
-    progress: number,
-    totalPages: number
+    totalLocations: number,
+    currentLocation: number,
+    progress: number
   ) => void;
   /**
    * Called once when the book has been searched
@@ -277,25 +150,53 @@ export interface ReaderProps {
    * @param {string} locations
    * @returns {void} void
    */
-  onLocationsReady?: (locations: string) => void;
+  onLocationsReady?: (epubKey: string, locations: Location[]) => void;
   /**
    * Called once a text selection has occurred
    * @param {SelectedText} selectedText
    * @returns {void} void
    */
-  onSelected?: (selectedText: SelectedText) => void;
+  onSelected?: (selectedText: string, cfiRange: ePubCfi) => void;
   /**
    * Called when marked text is pressed
    * @param {SelectedText} selectedText
    * @returns {void} void
    */
-  onMarkPressed?: (selectedText: SelectedText) => void;
+  onMarkPressed?: (selectedText: string, cfiRange: ePubCfi) => void;
   /**
    * Called when screen orientation change is detected
    * @param {string} orientation
    * @returns {void} void
    */
   onOrientationChange?: (orientation: '-90' | '0' | '90') => void;
+  /**
+   * Called when the book is on the homepage
+   * @returns {void} void
+   */
+  onBeginning?: () => void;
+  /**
+   * Called when the book is on the final page
+   * @returns {void} void
+   */
+  onFinish?: () => void;
+  /**
+   * Emit that a section has been rendered
+   * @param {any} section
+   * @param {any} currentSection
+   * @returns {void} void
+   */
+  onRendered?: (section: any, currentSection: any) => void;
+  /**
+   * Called when book layout is change
+   * @param {string} layout
+   * @returns {void} void
+   */
+  onLayout?: (layout: any) => void;
+  /**
+   * @param {any} toc
+   * @returns {void} void
+   */
+  onNavigationLoaded?: (toc: any) => void;
   /**
    * Called when the book was pressed
    * @returns {void} void
@@ -346,4 +247,33 @@ export interface ReaderProps {
    * @description Recommend using this with `enableSwipe` disabled
    */
   enableSelection?: boolean;
+
+  /**
+   * @param themes {@link Themes}
+   * @example
+   * ```
+   * <Reader
+   *  themes={{
+   *    light: { "body": { "color": "black" } },
+   *    dark: { "body": { "color": "white" } }
+   *  }}
+   * />
+   * ```
+   */
+  themes?: Themes;
+
+  /**
+   * @param activeTheme {@link string}
+   * @example
+   * ```
+   * <Reader
+   *  activeTheme="dark"
+   *  themes={{
+   *    light: { "body": { "color": "black" } },
+   *    dark: { "body": { "color": "white" } }
+   *  }}
+   * />
+   * ```
+   */
+  activeTheme?: string;
 }
