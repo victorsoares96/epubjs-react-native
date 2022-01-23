@@ -7743,7 +7743,7 @@ react-native-builder-bob@^0.18.0:
   optionalDependencies:
     jetifier "^1.6.6"
 
-react-native-gesture-handler@^2.2.0:
+react-native-gesture-handler@^2.1.1:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/react-native-gesture-handler/-/react-native-gesture-handler-2.2.0.tgz#a551f9ca33d8766d0a24268f49e0f1b05191b105"
   integrity sha512-WF25CNgn164bF9juW8N/jICIFXiEOgsxCuY7DRlnFdiH5ZfvMYtZHRC+zr1fFMap2ty1f2HWDQNVVSo0FDXP4A==
@@ -7754,10 +7754,10 @@ react-native-gesture-handler@^2.2.0:
     lodash "^4.17.21"
     prop-types "^15.7.2"
 
-react-native-webview@^11.15.1:
-  version "11.15.1"
-  resolved "https://registry.yarnpkg.com/react-native-webview/-/react-native-webview-11.15.1.tgz#6add96751542a85016f46b60db582b9f31b682e2"
-  integrity sha512-AA8aYXH+uJxyGkU8eyuzWeebt9hq2P3VjItxJv8ejdxZBH0w2rvtyuVb1RnIxS9EoIk0oTf2TlK/ZsfMMURnng==
+react-native-webview@^11.15.0:
+  version "11.17.0"
+  resolved "https://registry.yarnpkg.com/react-native-webview/-/react-native-webview-11.17.0.tgz#318ee8314662866148ca2b8db07549038e1c0c64"
+  integrity sha512-mm6XYOne4K0c9eYOArmJOuo9fOUeESB7DT+xihLcX84qMTsepPTcnkKha5BxuFwlvKKlSj4KzgkUMl15Mhbvdw==
   dependencies:
     escape-string-regexp "2.0.0"
     invariant "2.2.4"

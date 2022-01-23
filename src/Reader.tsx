@@ -33,7 +33,7 @@ export function Reader({
   width,
   height,
   initialLocation,
-  // enableSwipe = true,
+  enableSwipe = true,
   onSwipeLeft = () => {},
   onSwipeRight = () => {},
   renderLoadingComponent = () => null,
@@ -91,8 +91,12 @@ export function Reader({
     delete parsedEvent.type;
 
     if (type === 'onStarted') {
-      onStarted();
       setIsLoading(true);
+
+      registerThemes(themes);
+      selectTheme(activeTheme);
+
+      return onStarted();
     }
 
     if (type === 'onReady') {
@@ -101,9 +105,6 @@ export function Reader({
       setTotalLocations(totalLocations);
       setCurrentLocation(currentLocation);
       setProgress(progress);
-
-      registerThemes(themes);
-      selectTheme(activeTheme);
 
       if (initialLocation) {
         goToLocation(initialLocation);
@@ -227,11 +228,11 @@ export function Reader({
   };
 
   return (
-    <GestureHandlerRootView>
+    <GestureHandlerRootView style={{ width, height }}>
       <FlingGestureHandler
         direction={Directions.RIGHT}
         onHandlerStateChange={({ nativeEvent }) => {
-          if (nativeEvent.state === State.ACTIVE) {
+          if (nativeEvent.state === State.ACTIVE && enableSwipe) {
             goPrevious();
             onSwipeRight();
           }
@@ -240,7 +241,7 @@ export function Reader({
         <FlingGestureHandler
           direction={Directions.LEFT}
           onHandlerStateChange={({ nativeEvent }) => {
-            if (nativeEvent.state === State.ACTIVE) {
+            if (nativeEvent.state === State.ACTIVE && enableSwipe) {
               goNext();
               onSwipeLeft();
             }
@@ -284,7 +285,7 @@ export function Reader({
                 style={{
                   width,
                   // backgroundColor: theme.body.background,
-                  height: isLoading ? 0 : height,
+                  height,
                 }}
               />
             </TouchableWithoutFeedback>

@@ -123,7 +123,10 @@ function bookReducer(state: InitialState, action: BookActions): InitialState {
     case Types.REGISTER_THEMES:
       return {
         ...state,
-        themes: action.payload,
+        themes: {
+          ...state.themes,
+          ...action.payload,
+        },
       };
     case Types.REGISTER_THEME:
       return {
