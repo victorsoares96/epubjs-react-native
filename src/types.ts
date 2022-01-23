@@ -249,31 +249,13 @@ export interface ReaderProps {
   enableSelection?: boolean;
 
   /**
-   * @param themes {@link Themes}
+   * @param theme {@link Theme}
    * @example
    * ```
    * <Reader
-   *  themes={{
-   *    light: { "body": { "color": "black" } },
-   *    dark: { "body": { "color": "white" } }
-   *  }}
+   *  defaultTheme={{ "body": { "color": "black" } }}
    * />
    * ```
    */
-  themes?: Themes;
-
-  /**
-   * @param activeTheme {@link string}
-   * @example
-   * ```
-   * <Reader
-   *  activeTheme="dark"
-   *  themes={{
-   *    light: { "body": { "color": "black" } },
-   *    dark: { "body": { "color": "white" } }
-   *  }}
-   * />
-   * ```
-   */
-  activeTheme?: string;
+  defaultTheme?: Theme;
 }

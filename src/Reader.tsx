@@ -7,7 +7,7 @@ import {
   State,
 } from 'react-native-gesture-handler';
 import { WebView, WebViewMessageEvent } from 'react-native-webview';
-import { defaultTheme, ReaderContext } from './context';
+import { defaultTheme as initialTheme, ReaderContext } from './context';
 import template from './template';
 import type { ReaderProps } from './types';
 
@@ -38,8 +38,7 @@ export function Reader({
   onSwipeRight = () => {},
   renderLoadingComponent = () => null,
   enableSelection = false,
-  themes = { default: defaultTheme },
-  activeTheme = 'default',
+  defaultTheme = initialTheme,
   initialLocations,
 }: ReaderProps) {
   const {
@@ -55,17 +54,16 @@ export function Reader({
     goPrevious,
     isLoading,
     goToLocation,
-    selectTheme,
-    registerThemes,
+    changeTheme,
     setKey,
     setSearchResults,
+    theme,
   } = useContext(ReaderContext);
   const book = useRef<WebView>(null);
 
   let injectedJS = `
     window.LOCATIONS = ${JSON.stringify(initialLocations)};
-    window.THEMES = ${JSON.stringify(themes)};
-    window.ACTIVE_THEME = '${activeTheme}';
+    window.THEME = ${JSON.stringify(defaultTheme)};
     window.ENABLE_SELECTION = ${enableSelection};
   `;
 
@@ -93,8 +91,7 @@ export function Reader({
     if (type === 'onStarted') {
       setIsLoading(true);
 
-      registerThemes(themes);
-      selectTheme(activeTheme);
+      changeTheme(defaultTheme);
 
       return onStarted();
     }
@@ -284,7 +281,7 @@ export function Reader({
                 allowFileAccess
                 style={{
                   width,
-                  // backgroundColor: theme.body.background,
+                  backgroundColor: theme.body.background,
                   height,
                 }}
               />

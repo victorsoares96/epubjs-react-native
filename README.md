@@ -86,8 +86,7 @@ export default function App() {
 | `onBeginning`            | `function`  | Called when the book is on the homepage. Optional.                  |
 | `onFinish`               | `function`  | Called when the book is on the final page. Optional.                |
 | `onLayout`               | `function`  | Called when book layout is change. Optional.                        |
-| `themes`                 | `object`    | Object containing themes. Optional.                                 |
-| `activeTheme`            | `string`    | Name of active theme. Optional.                                     |
+| `defaultTheme`           | `object`    | Theme object. Optional.                                             |
 
 ## Hooks
 
@@ -110,16 +109,15 @@ const { changeFontSize, goToLocation, ... } = useReader();
 | `goPrevious`         |          | Go to previous page in the book                                           |
 | `goNext`             |          | Go to next page in the book                                               |
 | `search`             | `query`  | Search for a specific text in the book                                    |
-| `selectTheme`        | `name`   | Select a existing theme                                                   |
+| `changeTheme`        | `theme`  | Change active theme                                                       |
 | `getCurrentLocation` |          | Returns the current location of the book                                  |
 | `addMark`            |          | Add mark a specific cfi in the book                                       |
 | `removeMark`         |          | Remove mark a specific cfi in the book                                    |
 
 ##### States
 
-- `themes`: A object containing all register themes.
+- `theme`: A object containing theme.
 - `key`: Works like a unique id for book.
-- `activeTheme`: The active theme of the book.
 - `atStart`: Indicates if you are at the beginning of the book.
 - `atEnd`: Indicates if you are at the end of the book.
 - `currentLocation`: The current location of the book.
@@ -128,9 +126,9 @@ const { changeFontSize, goToLocation, ... } = useReader();
 - `isLoading`: Indicates if the book is loading.
 - `searchResults`: Search results.
 
-#### Register themes
+#### Setting a default theme
 
-If you want, you can register custom themes like this:
+If you want, you can register a custom theme like this:
 
 ```tsx
 import * as React from 'react';
@@ -140,31 +138,29 @@ import { Reader, BookProvider } from 'epubjs-react-native';
 
 // ...
 
-const themes = {
-  dark: {
-    'body': {
-      background: '#333',
-    },
-    'span': {
-      color: '#fff !important',
-    },
-    'p': {
-      color: '#fff !important',
-    },
-    'li': {
-      color: '#fff !important',
-    },
-    'h1': {
-      color: '#fff !important',
-    },
-    'a': {
-      'color': '#fff !important',
-      'pointer-events': 'auto',
-      'cursor': 'pointer',
-    },
-    '::selection': {
-      background: 'lightskyblue',
-    },
+const darkTheme = {
+  'body': {
+    background: '#333',
+  },
+  'span': {
+    color: '#fff !important',
+  },
+  'p': {
+    color: '#fff !important',
+  },
+  'li': {
+    color: '#fff !important',
+  },
+  'h1': {
+    color: '#fff !important',
+  },
+  'a': {
+    'color': '#fff !important',
+    'pointer-events': 'auto',
+    'cursor': 'pointer',
+  },
+  '::selection': {
+    background: 'lightskyblue',
   },
 };
 
@@ -177,8 +173,7 @@ export default function App() {
           src={{ uri: 'https://s3.amazonaws.com/moby-dick/OPS/package.opf' }}
           width={width}
           height={height}
-          themes={themes}
-          activeTheme="dark"
+          defaultTheme={darkTheme}
         />
       </BookProvider>
     </SafeAreaView>

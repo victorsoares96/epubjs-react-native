@@ -7,7 +7,6 @@ import type {
   Mark,
   SearchResult,
   Theme,
-  Themes,
 } from './types';
 
 type ActionMap<M extends { [index: string]: any }> = {
@@ -22,9 +21,7 @@ type ActionMap<M extends { [index: string]: any }> = {
 };
 
 enum Types {
-  REGISTER_THEME = 'REGISTER_THEME',
-  REGISTER_THEMES = 'REGISTER_THEMES',
-  SELECT_THEME = 'SELECT_THEME',
+  CHANGE_THEME = 'CHANGE_THEME',
   CHANGE_FONT_SIZE = 'CHANGE_FONT_SIZE',
   CHANGE_FONT_FAMILY = 'CHANGE_FONT_FAMILY',
   SET_AT_START = 'SET_AT_START',
@@ -39,12 +36,7 @@ enum Types {
 }
 
 type BookPayload = {
-  [Types.REGISTER_THEME]: {
-    name: string;
-    theme: Theme;
-  };
-  [Types.REGISTER_THEMES]: Themes;
-  [Types.SELECT_THEME]: string;
+  [Types.CHANGE_THEME]: Theme;
   [Types.CHANGE_FONT_SIZE]: FontSize;
   [Types.CHANGE_FONT_FAMILY]: string;
   [Types.SET_AT_START]: boolean;
@@ -61,8 +53,7 @@ type BookPayload = {
 type BookActions = ActionMap<BookPayload>[keyof ActionMap<BookPayload>];
 
 type InitialState = {
-  themes: Themes;
-  activeTheme: string;
+  theme: Theme;
   fontFamily: string;
   fontSize: FontSize;
   atStart: boolean;
@@ -103,8 +94,7 @@ export const defaultTheme: Theme = {
 };
 
 const initialState: InitialState = {
-  themes: { default: defaultTheme },
-  activeTheme: 'default',
+  theme: defaultTheme,
   fontFamily: 'Helvetica',
   fontSize: '12pt',
   atStart: false,
@@ -120,26 +110,10 @@ const initialState: InitialState = {
 
 function bookReducer(state: InitialState, action: BookActions): InitialState {
   switch (action.type) {
-    case Types.REGISTER_THEMES:
+    case Types.CHANGE_THEME:
       return {
         ...state,
-        themes: {
-          ...state.themes,
-          ...action.payload,
-        },
-      };
-    case Types.REGISTER_THEME:
-      return {
-        ...state,
-        themes: {
-          ...state.themes,
-          [action.payload.name]: action.payload.theme,
-        },
-      };
-    case Types.SELECT_THEME:
-      return {
-        ...state,
-        activeTheme: action.payload,
+        theme: action.payload,
       };
     case Types.CHANGE_FONT_SIZE:
       return {
@@ -244,18 +218,15 @@ export interface ReaderContextProps {
    */
   search: (query: string) => void;
 
-  registerTheme: (name: string, theme: Theme) => void;
-  registerThemes: (themes: Themes) => void;
-
   /**
-   * Select a existing theme
-   * @param {string} name
+   * @param theme {@link Theme}
+   * @description Theme object.
    * @example
    * ```
-   * selectTheme("light");
+   * selectTheme({ body: { background: '#fff' } });
    * ```
    */
-  selectTheme: (name: string) => void;
+  changeTheme: (theme: Theme) => void;
 
   /**
    * Change font size of all elements in the book
@@ -269,8 +240,6 @@ export interface ReaderContextProps {
    * @param {FontSize} size {@link FontSize}
    */
   changeFontSize: (size: FontSize) => void;
-
-  updateTheme: (name: string) => void;
 
   /**
    * Add Mark a specific cfi in the book
@@ -297,14 +266,9 @@ export interface ReaderContextProps {
   key: string;
 
   /**
-   * A object containing all register themes.
+   * A theme object.
    */
-  themes: Themes;
-
-  /**
-   * The active theme of the book
-   */
-  activeTheme: string;
+  theme: Theme;
 
   /**
    * Indicates if you are at the beginning of the book
@@ -368,12 +332,9 @@ const ReaderContext = createContext<ReaderContextProps>({
   getCurrentLocation: () => null,
   search: () => {},
 
-  registerTheme: () => {},
-  registerThemes: () => {},
-  selectTheme: () => {},
+  changeTheme: () => {},
   changeFontFamily: () => {},
   changeFontSize: () => {},
-  updateTheme: () => {},
 
   addMark: () => {},
   removeMark: () => {},
@@ -381,8 +342,7 @@ const ReaderContext = createContext<ReaderContextProps>({
   setKey: () => {},
   key: '',
 
-  themes: { default: defaultTheme },
-  activeTheme: 'default',
+  theme: defaultTheme,
   atStart: false,
   atEnd: false,
   totalLocations: 0,
@@ -403,27 +363,14 @@ const ReaderProvider: React.FC = ({ children }) => {
     book.current = bookRef;
   }
 
-  function registerTheme(name: string, theme: Theme) {
+  function changeTheme(theme: Theme) {
     book.current?.injectJavaScript(`
-      rendition.themes.register('${JSON.stringify(theme)}');
+      window.THEME = ${JSON.stringify(theme)};
+      window.rendition.themes.register({ theme: window.THEME });
+        window.rendition.themes.select('theme');
+        window.rendition.views().forEach(view => view.pane ? view.pane.render() : null)
     `);
-    dispatch({ type: Types.REGISTER_THEME, payload: { name, theme } });
-  }
-
-  function registerThemes(themes_: Themes) {
-    book.current?.injectJavaScript(`
-      window.THEMES = ${JSON.stringify(themes_)};
-      window.rendition.themes.register('${JSON.stringify(themes_)}'); true
-    `);
-    dispatch({ type: Types.REGISTER_THEMES, payload: themes_ });
-  }
-
-  function selectTheme(name: string) {
-    book.current?.injectJavaScript(`
-      window.ACTIVE_THEME = '${name}';
-      window.rendition.themes.select('${name}'); true
-    `);
-    dispatch({ type: Types.SELECT_THEME, payload: name });
+    dispatch({ type: Types.CHANGE_THEME, payload: theme });
   }
 
   function changeFontFamily(fontFamily: string) {
@@ -438,12 +385,6 @@ const ReaderProvider: React.FC = ({ children }) => {
       rendition.themes.fontSize('${size}'); true
     `);
     dispatch({ type: Types.CHANGE_FONT_SIZE, payload: size });
-  }
-
-  function updateTheme(name: string) {
-    book.current?.injectJavaScript(`
-      rendition.themes.update('${name}'); true
-    `);
   }
 
   function setAtStart(atStart: boolean) {
@@ -573,15 +514,11 @@ const ReaderProvider: React.FC = ({ children }) => {
         setKey,
         key: state.key,
 
-        registerTheme,
-        registerThemes,
-        selectTheme,
+        changeTheme,
         changeFontFamily,
         changeFontSize,
-        updateTheme,
-        themes: state.themes,
+        theme: state.theme,
 
-        activeTheme: state.activeTheme,
         atStart: state.atStart,
         atEnd: state.atEnd,
         totalLocations: state.totalLocations,

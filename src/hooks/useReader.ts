@@ -5,7 +5,7 @@ export function useReader() {
   const {
     changeFontSize,
     changeFontFamily,
-    selectTheme,
+    changeTheme,
     goToLocation,
     goPrevious,
     goNext,
@@ -14,8 +14,7 @@ export function useReader() {
     search,
     addMark,
     removeMark,
-    themes,
-    activeTheme,
+    theme,
     atStart,
     atEnd,
     totalLocations,
@@ -30,7 +29,7 @@ export function useReader() {
   return {
     changeFontSize,
     changeFontFamily,
-    selectTheme,
+    changeTheme,
     goToLocation,
     goPrevious,
     goNext,
@@ -39,8 +38,7 @@ export function useReader() {
     search,
     addMark,
     removeMark,
-    themes,
-    activeTheme,
+    theme,
     atStart,
     atEnd,
     totalLocations,
@@ -54,7 +52,7 @@ export function useReader() {
     ReaderContextProps,
     | 'changeFontSize'
     | 'changeFontFamily'
-    | 'selectTheme'
+    | 'changeTheme'
     | 'goToLocation'
     | 'goPrevious'
     | 'goNext'
@@ -63,8 +61,7 @@ export function useReader() {
     | 'search'
     | 'addMark'
     | 'removeMark'
-    | 'themes'
-    | 'activeTheme'
+    | 'theme'
     | 'atStart'
     | 'atEnd'
     | 'totalLocations'
