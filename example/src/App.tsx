@@ -15,13 +15,40 @@ export default function App() {
 
 function Book() {
   const { width, height } = useWindowDimensions();
-
   return (
     <View>
       <Reader
         src={{ uri: 'https://s3.amazonaws.com/moby-dick/OPS/package.opf' }}
         width={width}
         height={height}
+        themes={{
+          dark: {
+            'body': {
+              background: '#333',
+            },
+            'span': {
+              color: '#fff !important',
+            },
+            'p': {
+              color: '#fff !important',
+            },
+            'li': {
+              color: '#fff !important',
+            },
+            'h1': {
+              color: '#fff !important',
+            },
+            'a': {
+              'color': '#fff !important',
+              'pointer-events': 'auto',
+              'cursor': 'pointer',
+            },
+            '::selection': {
+              background: 'lightskyblue',
+            },
+          },
+        }}
+        activeTheme="dark"
       />
     </View>
   );

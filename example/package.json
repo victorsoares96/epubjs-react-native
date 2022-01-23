@@ -11,7 +11,7 @@
   "dependencies": {
     "react": "16.13.1",
     "react-native": "0.63.4",
-    "react-native-gesture-handler": "^2.2.0",
+    "react-native-gesture-handler": "^2.1.1",
     "react-native-webview": "^11.15.0"
   },
   "devDependencies": {
