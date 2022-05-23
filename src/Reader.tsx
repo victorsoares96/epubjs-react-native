@@ -268,7 +268,7 @@ export function Reader({
             <TouchableWithoutFeedback onPress={handleDoublePress}>
               <WebView
                 ref={book}
-                source={{ html: template }}
+                source={{ html: template, baseUrl: 'app://local' }}
                 showsVerticalScrollIndicator={false}
                 javaScriptEnabled
                 injectedJavaScriptBeforeContentLoaded={injectedJS}
