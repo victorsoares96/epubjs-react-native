@@ -60,7 +60,6 @@ export function Reader({
     theme,
   } = useContext(ReaderContext);
   const book = useRef<WebView>(null);
-
   let injectedJS = `
     window.LOCATIONS = ${JSON.stringify(initialLocations)};
     window.THEME = ${JSON.stringify(defaultTheme)};
@@ -223,7 +222,6 @@ export function Reader({
       }, 300);
     }
   };
-
   return (
     <GestureHandlerRootView style={{ width, height }}>
       <FlingGestureHandler
@@ -268,7 +266,7 @@ export function Reader({
             <TouchableWithoutFeedback onPress={handleDoublePress}>
               <WebView
                 ref={book}
-                source={{ html: template, baseUrl: 'app://local' }}
+                source={{ html: template, baseUrl: "file://" }}
                 showsVerticalScrollIndicator={false}
                 javaScriptEnabled
                 injectedJavaScriptBeforeContentLoaded={injectedJS}
@@ -278,7 +276,13 @@ export function Reader({
                 onMessage={onMessage}
                 allowUniversalAccessFromFileURLs={true}
                 allowFileAccessFromFileURLs={true}
-                allowFileAccess
+                onShouldStartLoadWithRequest={(request)=>{
+                  if(!isLoading && request.url != request.mainDocumentURL) {
+                    goToLocation(request.url.replace(request.mainDocumentURL, ""))
+                  }
+                  return true;
+                }}
+                allowFileAccess={true}
                 style={{
                   width,
                   backgroundColor: theme.body.background,
