@@ -54,8 +54,7 @@ jobs:
         with:
           token: ${{ secrets.NPM_TOKEN }}
           check-version: true
-          greater-version-only: true
 
-      - if: steps.publish.outputs.type != 'none'
+      - if: steps.publish.outputs.type != 'none' || steps.publish.outputs.version >= steps.publish.outputs.old-version
         run: |
           echo "Version changed: ${{ steps.publish.outputs.old-version }} => ${{ steps.publish.outputs.version }}"
