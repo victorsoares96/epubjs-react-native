@@ -22,7 +22,7 @@
     "!**/__mocks__"
   ],
   "scripts": {
-    "prepare": "bob build",
+    "prepare": "husky install",
     "prettier:format": "prettier --write .",
     "lint": "eslint ./src/ --ext .ts,.tsx,.js,.json",
     "lint:fix": "eslint --fix ./src/ --ext .ts,.js,.json",
