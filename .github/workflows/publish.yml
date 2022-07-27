@@ -1,0 +1,57 @@
+name: Release & Publish
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [16.x]
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install dependencies
+        run: yarn --frozen-lockfile
+
+      - name: Linting
+        run: yarn lint
+
+      - name: Type Check
+        run: yarn type-check
+
+      - name: Unit Testing
+        run: yarn test:coverage
+
+  publish:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [16.x]
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install dependencies
+        run: yarn --frozen-lockfile
+      - name: Build
+        run: yarn build
+      - uses: JS-DevTools/npm-publish@v1
+        with:
+          token: ${{ secrets.NPM_TOKEN }}
+      - if: steps.publish.outputs.type != 'none'
+        run: |
+          echo "Version changed: ${{ steps.publish.outputs.old-version }} => ${{ steps.publish.outputs.version }}"
