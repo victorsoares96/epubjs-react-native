@@ -1,5 +1,5 @@
 {
-  "name": "epubjs-react-native-test",
+  "name": "epubjs-react-native",
   "version": "1.0.5",
   "description": "ePub.js Reader for React Native",
   "main": "lib/commonjs/index",
@@ -32,7 +32,7 @@
     "build": "bob build",
     "release": "yarn build && npm publish",
     "release-local": "yarn build && npm link && echo [FINISH]: Run \"npm link epubjs-react-native\" to link the package to your project",
-    "example": "yarn --cwd example",
+    "example": "yarn build && yarn --cwd example",
     "pods": "cd example && pod-install --quiet",
     "bootstrap": "yarn example && yarn && yarn pods"
   },
