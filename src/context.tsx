@@ -475,10 +475,10 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
 
       book.current?.injectJavaScript(`
       rendition.annotations.add('${type}', '${cfiRange}', ${JSON.stringify(
-      data ?? {}
-    )}, ${JSON.stringify(
-      callback ? callback() : () => {}
-    )}, '${className}', ${JSON.stringify(styles ?? defaultStyles )}); true
+        data ?? {}
+      )}, ${JSON.stringify(
+        callback ? callback() : () => {}
+      )}, '${className}', ${JSON.stringify(styles ?? defaultStyles)}); true
     `);
     },
     []
