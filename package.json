@@ -27,7 +27,7 @@
     "lint": "eslint ./src/ --ext .ts,.tsx,.js,.json",
     "lint:fix": "eslint --fix ./src/ --ext .ts,.js,.json",
     "type-check": "tsc -p tsconfig.json --noEmit",
-    "test": "jest --no-cache --runInBand --passWithNoTests",
+    "test": "jest --watch --runInBand --passWithNoTests",
     "test:coverage": "jest --coverage --no-cache --runInBand --passWithNoTests",
     "build": "bob build",
     "release": "yarn build && npm publish",
@@ -56,10 +56,15 @@
     "registry": "https://registry.npmjs.org/"
   },
   "devDependencies": {
+    "@formidable-webview/ersatz": "^2.1.3",
+    "@formidable-webview/ersatz-testing": "^2.0.5",
     "@react-native-community/eslint-config": "^3.0.3",
-    "@types/jest": "^26.0.0",
+    "@testing-library/jest-native": "^4.0.5",
+    "@testing-library/react-native": "^11.0.0",
+    "@types/jest": "^28.1.6",
     "@types/react": "^16.9.19",
     "@types/react-native": "0.62.13",
+    "@types/react-test-renderer": "^16.9.3",
     "@typescript-eslint/eslint-plugin": "^5.13.0",
     "@typescript-eslint/parser": "^5.0.0",
     "commitizen": "^4.2.5",
@@ -73,8 +78,9 @@
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-react": "^7.28.0",
     "eslint-plugin-react-hooks": "^4.3.0",
+    "eslint-plugin-testing-library": "^5.5.1",
     "husky": "^8.0.1",
-    "jest": "^26.0.1",
+    "jest": "^28.1.3",
     "lint-staged": "^13.0.3",
     "pod-install": "^0.1.0",
     "prettier": "^2.0.5",
@@ -83,6 +89,9 @@
     "react-native-builder-bob": "^0.18.0",
     "react-native-gesture-handler": "^2.1.1",
     "react-native-webview": "^11.15.0",
+    "react-test-renderer": "16.13.1",
+    "ts-jest": "^28.0.7",
+    "ts-node": "^10.9.1",
     "typescript": "^4.4.4"
   },
   "peerDependencies": {
@@ -98,13 +107,6 @@
     "commitizenEmoji": {
       "conventionalFormat": true
     }
-  },
-  "jest": {
-    "preset": "react-native",
-    "modulePathIgnorePatterns": [
-      "<rootDir>/example/node_modules",
-      "<rootDir>/lib/"
-    ]
   },
   "react-native-builder-bob": {
     "source": "src",
