@@ -28,35 +28,21 @@ export default `
     <div id="viewer"></div>
 
     <script>
-      var book;
+      function loadBook(bookFile) {
+        document.getElementById("viewer").innerHTML = "";
 
-      // alert('BASE64: ' + window.BOOK_BASE64);
-      // alert('URI: ' + window.BOOK_URI);
+        const book = ePub(bookFile, { encoding: "base64" });
 
-      function hello(name) {
-        alert(name);
-      }
+        const rendition = book.renderTo("viewer", {
+          width: "100%",
+          height: "100%",
+        });
 
-      if (window.BOOK_BASE64) {
-        book = ePub(window.BOOK_BASE64, { encoding: "base64" });
-      } else if (window.BOOK_URI) {
-        book = ePub(window.BOOK_URI);
-      }
+        window.ReactNativeWebView.postMessage(JSON.stringify({ type: "onStarted" }));
 
-      var rendition = book.renderTo("viewer", {
-        width: "100%",
-        height: "100%",
-      });
-
-      window.ReactNativeWebView.postMessage(JSON.stringify({ type: "onStarted" }));
-
-      // rendition.themes.register({ myTheme: window.THEME });
-      // rendition.themes.select('myTheme');
-
-      book.ready
+        book.ready
         .then(function () {
           if (window.LOCATIONS) {
-            // alert(window.LOCATIONS);
             return book.locations.load(window.LOCATIONS);
           }
           return book.locations.generate(1600);
@@ -89,51 +75,6 @@ export default `
               toc: toc,
             }));
           });
-
-
-          // Select fontSize
-          // rendition.themes.fontSize("140%");
-
-          // Change font family
-          // rendition.themes.font("serif");
-
-          // Register themes
-          // Default theme
-          /* rendition.themes.default({
-              h2: {
-                'font-size': '32px',
-                color: 'purple'
-              },
-              p: {
-                "margin": '10px'
-              }
-            });
-          */
-          // rendition.themes.register("dark", "themes.css");
-          // themes.register("light", "http://example.com/light.css");
-          // themes.register("light", { "body": { "color": "purple"}});
-          // themes.register({ "light" : {...}, "dark" : {...}});
-
-          // Select theme
-          // rendition.themes.select('my_theme');
-
-          // Update theme
-          // rendition.themes.update("my_theme", { "body": { "color": "purple"}});
-
-          // Override theme
-          // rendition.themes.override("my_theme", { "body": { "color": "purple"}});
-
-          // Display a current section
-          // rendition.display(currentSection_loc or chapter_href or cfiRange);
-
-          // Annotations
-
-          // Add an annotation
-          // rendition.annotations.add(cfiRange, {}, (e) => {
-          //   console.log("annotation clicked", e.target);
-          // });
-          // Remove an annotation
-          // rendition.annotations.remove(cfiRange);
         })
         .catch(function (err) {
           alert(err);
@@ -230,6 +171,7 @@ export default `
             layout: layout,
           }));
         });
+      }
     </script>
   </body>
 </html>

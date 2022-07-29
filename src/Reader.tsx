@@ -65,7 +65,6 @@ export function Reader({
   const {
     downloadFile,
     downloading: downloadingFile,
-    // file,
     progress: downloadFileProgress,
     success: downloadFileSuccess,
     error: downloadFileError,
@@ -73,31 +72,11 @@ export function Reader({
   } = useDownloadFile();
   const book = useRef<WebView>(null);
 
-  /* const [injectedJS, setInjectedJS] = useState(`
-    window.LOCATIONS = ${JSON.stringify(initialLocations)};
-    window.THEME = ${JSON.stringify(defaultTheme)};
-    window.ENABLE_SELECTION = ${enableSelection};
-  `); */
-
   const injectedJS = `
     window.LOCATIONS = ${JSON.stringify(initialLocations)};
     window.THEME = ${JSON.stringify(defaultTheme)};
     window.ENABLE_SELECTION = ${enableSelection};
   `;
-
-  /* if (src.base64) {
-    injectedJS = `
-      window.BOOK_BASE64 = ${JSON.stringify(src.base64)};
-      ${injectedJS}
-    `;
-  } else if (src.uri) {
-    injectedJS = `
-      window.BOOK_URI = ${JSON.stringify(src.uri)};
-      ${injectedJS}
-    `;
-  } else {
-    throw new Error('src must be a base64 or uri');
-  } */
 
   const onMessage = (event: WebViewMessageEvent) => {
     const parsedEvent = JSON.parse(event.nativeEvent.data);
@@ -226,6 +205,31 @@ export function Reader({
     if (book.current) registerBook(book.current);
   }, [registerBook]);
 
+  useEffect(() => {
+    if (src.base64) {
+      book.current?.injectJavaScript(
+        `loadBook(${JSON.stringify(src.base64)}); true`
+      );
+    }
+
+    if (src.uri) {
+      const { uri } = src;
+
+      (async () => {
+        const fileName = `${RNFS.CachesDirectoryPath}/book_${Date.now()}.opf`;
+
+        try {
+          const res = await downloadFile(uri, fileName, 'base64');
+          book.current?.injectJavaScript(
+            `loadBook(${JSON.stringify(res.file)}); true`
+          );
+        } catch (error) {
+          console.log(error);
+        }
+      })();
+    }
+  }, [downloadFile, injectedJS, src, src.base64, src.uri]);
+
   let lastTap: number | null = null;
   let timer: NodeJS.Timeout;
 
@@ -243,31 +247,6 @@ export function Reader({
       }, 300);
     }
   };
-
-  useEffect(() => {
-    (async () => {
-      if (src.uri) {
-        const fileName = `${RNFS.CachesDirectoryPath}/book_${Date.now()}.epub`;
-
-        try {
-          const res = await downloadFile(src.uri, fileName, 'base64');
-          console.log({ jobId: res.jobId, file: res.file });
-          /* setInjectedJS((oldValue) =>
-            `window.BOOK_BASE64 = ${JSON.stringify(res.file)};`.concat(oldValue)
-          ); */
-          book.current?.injectJavaScript(
-            `window.BOOK_BASE64 = ${JSON.stringify(res.file)};`.concat(
-              injectedJS
-            )
-          );
-          book.current?.injectJavaScript('book = window.BOOK_BASE64;');
-          book.current?.injectJavaScript("hello('johndoe');");
-        } catch (error) {
-          console.log(error);
-        }
-      }
-    })();
-  }, [downloadFile, injectedJS, src.uri]);
   return (
     <GestureHandlerRootView style={{ width, height }}>
       <FlingGestureHandler
@@ -321,7 +300,6 @@ export function Reader({
                 showsVerticalScrollIndicator={false}
                 javaScriptEnabled
                 injectedJavaScriptBeforeContentLoaded={injectedJS}
-                // injectedJavaScript={injectedJS}
                 originWhitelist={['*']}
                 scrollEnabled={false}
                 mixedContentMode="compatibility"
