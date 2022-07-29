@@ -8,6 +8,7 @@ import {
 } from 'react-native-gesture-handler';
 import { WebView, WebViewMessageEvent } from 'react-native-webview';
 import { defaultTheme as initialTheme, ReaderContext } from './context';
+import { LoadingComponent } from './utils/LoadingComponent';
 import template from './template';
 import type { ReaderProps } from './types';
 
@@ -36,7 +37,7 @@ export function Reader({
   enableSwipe = true,
   onSwipeLeft = () => {},
   onSwipeRight = () => {},
-  renderLoadingComponent = () => null,
+  renderLoadingComponent = () => <LoadingComponent />,
   enableSelection = false,
   defaultTheme = initialTheme,
   initialLocations,
