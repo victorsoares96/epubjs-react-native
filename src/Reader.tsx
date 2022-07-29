@@ -6,11 +6,13 @@ import {
   GestureHandlerRootView,
   State,
 } from 'react-native-gesture-handler';
+import RNFS from 'react-native-fs';
 import { WebView, WebViewMessageEvent } from 'react-native-webview';
 import { defaultTheme as initialTheme, ReaderContext } from './context';
 import { LoadingComponent } from './utils/LoadingComponent';
 import template from './template';
 import type { ReaderProps } from './types';
+import { useDownloadFile } from './hooks/useDownloadFile';
 
 export function Reader({
   src,
@@ -60,15 +62,30 @@ export function Reader({
     setSearchResults,
     theme,
   } = useContext(ReaderContext);
+  const {
+    downloadFile,
+    downloading: downloadingFile,
+    // file,
+    progress: downloadFileProgress,
+    success: downloadFileSuccess,
+    error: downloadFileError,
+    size: fileSize,
+  } = useDownloadFile();
   const book = useRef<WebView>(null);
 
-  let injectedJS = `
+  /* const [injectedJS, setInjectedJS] = useState(`
+    window.LOCATIONS = ${JSON.stringify(initialLocations)};
+    window.THEME = ${JSON.stringify(defaultTheme)};
+    window.ENABLE_SELECTION = ${enableSelection};
+  `); */
+
+  const injectedJS = `
     window.LOCATIONS = ${JSON.stringify(initialLocations)};
     window.THEME = ${JSON.stringify(defaultTheme)};
     window.ENABLE_SELECTION = ${enableSelection};
   `;
 
-  if (src.base64) {
+  /* if (src.base64) {
     injectedJS = `
       window.BOOK_BASE64 = ${JSON.stringify(src.base64)};
       ${injectedJS}
@@ -80,7 +97,7 @@ export function Reader({
     `;
   } else {
     throw new Error('src must be a base64 or uri');
-  }
+  } */
 
   const onMessage = (event: WebViewMessageEvent) => {
     const parsedEvent = JSON.parse(event.nativeEvent.data);
@@ -227,6 +244,30 @@ export function Reader({
     }
   };
 
+  useEffect(() => {
+    (async () => {
+      if (src.uri) {
+        const fileName = `${RNFS.CachesDirectoryPath}/book_${Date.now()}.epub`;
+
+        try {
+          const res = await downloadFile(src.uri, fileName, 'base64');
+          console.log({ jobId: res.jobId, file: res.file });
+          /* setInjectedJS((oldValue) =>
+            `window.BOOK_BASE64 = ${JSON.stringify(res.file)};`.concat(oldValue)
+          ); */
+          book.current?.injectJavaScript(
+            `window.BOOK_BASE64 = ${JSON.stringify(res.file)};`.concat(
+              injectedJS
+            )
+          );
+          book.current?.injectJavaScript('book = window.BOOK_BASE64;');
+          book.current?.injectJavaScript("hello('johndoe');");
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    })();
+  }, [downloadFile, injectedJS, src.uri]);
   return (
     <GestureHandlerRootView style={{ width, height }}>
       <FlingGestureHandler
@@ -254,7 +295,7 @@ export function Reader({
               alignItems: 'center',
             }}
           >
-            {isLoading && (
+            {(isLoading || downloadingFile) && (
               <View
                 style={{
                   width: '100%',
@@ -264,7 +305,12 @@ export function Reader({
                   zIndex: 2,
                 }}
               >
-                {renderLoadingComponent()}
+                {renderLoadingComponent(
+                  fileSize,
+                  downloadFileProgress,
+                  downloadFileSuccess,
+                  downloadFileError
+                )}
               </View>
             )}
 
@@ -275,6 +321,7 @@ export function Reader({
                 showsVerticalScrollIndicator={false}
                 javaScriptEnabled
                 injectedJavaScriptBeforeContentLoaded={injectedJS}
+                // injectedJavaScript={injectedJS}
                 originWhitelist={['*']}
                 scrollEnabled={false}
                 mixedContentMode="compatibility"

@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { SafeAreaView, useWindowDimensions, View } from 'react-native';
+import { SafeAreaView, Text, useWindowDimensions, View } from 'react-native';
 import { Reader, ReaderProvider } from 'epubjs-react-native';
 
 export default function App() {
@@ -18,9 +18,16 @@ function Book() {
   return (
     <View>
       <Reader
-        src={{ uri: 'https://s3.amazonaws.com/moby-dick/OPS/package.opf' }}
+        src={{
+          uri: 'https://epubjs-react-native.s3.amazonaws.com/stamped.epub',
+        }}
         width={width}
         height={height}
+        renderLoadingComponent={(fileSize, progress) => (
+          <Text>
+            Loading... fileSize: {fileSize} progress: {progress}
+          </Text>
+        )}
       />
     </View>
   );

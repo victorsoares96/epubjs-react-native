@@ -30,6 +30,13 @@ export default `
     <script>
       var book;
 
+      // alert('BASE64: ' + window.BOOK_BASE64);
+      // alert('URI: ' + window.BOOK_URI);
+
+      function hello(name) {
+        alert(name);
+      }
+
       if (window.BOOK_BASE64) {
         book = ePub(window.BOOK_BASE64, { encoding: "base64" });
       } else if (window.BOOK_URI) {

@@ -240,7 +240,12 @@ export interface ReaderProps {
    * Render when the book is loading
    * @returns {React.ReactNode} React.ReactNode
    */
-  renderLoadingComponent?: () => React.ReactNode;
+  renderLoadingComponent?: (
+    fileSize: number,
+    progress: number,
+    success: boolean,
+    error: string | null
+  ) => React.ReactNode;
   /**
    * Enable text selection feature on the book
    * @default false
