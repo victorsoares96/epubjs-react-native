@@ -5,8 +5,6 @@ import { waitForWindow } from '@formidable-webview/ersatz-testing';
 import { render } from '@testing-library/react-native';
 import WebView, { WebViewProps } from 'react-native-webview';
 
-jest.mock('react-native-webview');
-
 function MyComponent({ source }: Pick<WebViewProps, 'source'>) {
   return (
     <WebView source={source} injectedJavaScript="window.awesomeGlobal = 1;" />
