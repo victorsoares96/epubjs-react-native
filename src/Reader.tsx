@@ -81,10 +81,10 @@ export function Reader({
     throw new Error('src must be a base64 or uri');
   }
 
-  function onMessage(event: WebViewMessageEvent) {
-    let parsedEvent = JSON.parse(event.nativeEvent.data);
+  const onMessage = (event: WebViewMessageEvent) => {
+    const parsedEvent = JSON.parse(event.nativeEvent.data);
 
-    let { type } = parsedEvent;
+    const { type } = parsedEvent;
 
     delete parsedEvent.type;
 
@@ -200,7 +200,9 @@ export function Reader({
 
       return onNavigationLoaded(toc);
     }
-  }
+
+    return null;
+  };
 
   useEffect(() => {
     if (book.current) registerBook(book.current);
@@ -276,8 +278,8 @@ export function Reader({
                 scrollEnabled={false}
                 mixedContentMode="compatibility"
                 onMessage={onMessage}
-                allowUniversalAccessFromFileURLs={true}
-                allowFileAccessFromFileURLs={true}
+                allowUniversalAccessFromFileURLs
+                allowFileAccessFromFileURLs
                 allowFileAccess
                 style={{
                   width,
