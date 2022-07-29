@@ -1,4 +1,7 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
+. "$(dirname "$0")/common.sh"
 
-yarn lint && yarn typescript
+[ -n "$CI" ] && exit 0
+
+npx lint-staged
