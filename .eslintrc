@@ -20,7 +20,13 @@
     "sourceType": "module",
     "project": "./tsconfig.json"
   },
-  "plugins": ["react", "@typescript-eslint", "prettier", "testing-library"],
+  "plugins": ["react", "@typescript-eslint", "prettier"],
+  "overrides": [
+    {
+      "files": ["**/__tests__/**/*.[jt]s?(x)", "**/?(*.)+(spec|test).[jt]s?(x)"],
+      "extends": ["plugin:testing-library/react"]
+    }
+  ],
   "rules": {
     "prettier/prettier": "error",
     "import/prefer-default-export": "off",
