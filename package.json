@@ -26,7 +26,7 @@
     "prettier:format": "prettier --write .",
     "lint": "eslint ./src/ --ext .ts,.tsx,.js,.json",
     "lint:fix": "eslint --fix ./src/ --ext .ts,.js,.json",
-    "type-check": "tsc -p tsconfig.json --noEmit",
+    "type-check": "tsc -p tsconfig.json --noEmit --pretty",
     "test": "jest --watch --runInBand --passWithNoTests",
     "test:coverage": "jest --coverage --no-cache --runInBand --passWithNoTests",
     "build": "bob build",

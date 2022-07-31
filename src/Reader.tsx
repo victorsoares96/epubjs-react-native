@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import React, { useContext, useEffect, useRef } from 'react';
 import { View, TouchableWithoutFeedback } from 'react-native';
 import {
@@ -6,6 +7,7 @@ import {
   GestureHandlerRootView,
   State,
 } from 'react-native-gesture-handler';
+import * as FileSystem from 'expo-file-system';
 import { WebView, WebViewMessageEvent } from 'react-native-webview';
 import { defaultTheme as initialTheme, ReaderContext } from './context';
 import { LoadingComponent } from './utils/LoadingComponent';
@@ -208,6 +210,34 @@ export function Reader({
   useEffect(() => {
     if (book.current) registerBook(book.current);
   }, [registerBook]);
+
+  useEffect(() => {
+    (async () => {
+      const callback = (downloadProgress: any) => {
+        const progress =
+          downloadProgress.totalBytesWritten /
+          downloadProgress.totalBytesExpectedToWrite;
+        console.log({
+          downloadProgress: progress,
+        });
+      };
+
+      const downloadResumable = FileSystem.createDownloadResumable(
+        'https://epubjs-react-native.s3.amazonaws.com/the-book-of-koli.epub',
+        `${FileSystem.documentDirectory}small.mp4`,
+        {},
+        callback
+      );
+
+      try {
+        // @ts-ignore
+        const { uri } = await downloadResumable.downloadAsync();
+        console.log('Finished downloading to ', uri);
+      } catch (e) {
+        console.error(e);
+      }
+    })();
+  }, []);
 
   let lastTap: number | null = null;
   let timer: NodeJS.Timeout;
