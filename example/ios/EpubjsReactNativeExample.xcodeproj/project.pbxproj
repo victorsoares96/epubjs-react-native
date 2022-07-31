@@ -11,6 +11,7 @@
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
+		3F68E5E12C03EFCE92A514BB /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1A832A5A994806B19B5973E /* ExpoModulesProvider.swift */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 /* End PBXBuildFile section */
 
@@ -25,6 +26,7 @@
 		5709B34CF0A7D63546082F79 /* Pods-EpubjsReactNativeExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EpubjsReactNativeExample.release.xcconfig"; path = "Target Support Files/Pods-EpubjsReactNativeExample/Pods-EpubjsReactNativeExample.release.xcconfig"; sourceTree = "<group>"; };
 		5DCACB8F33CDC322A6C60F78 /* libPods-EpubjsReactNativeExample.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-EpubjsReactNativeExample.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = EpubjsReactNativeExample/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		A1A832A5A994806B19B5973E /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-EpubjsReactNativeExample/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -62,6 +64,22 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		3D3EE54A35E4208ECCEA1CC2 /* EpubjsReactNativeExample */ = {
+			isa = PBXGroup;
+			children = (
+				A1A832A5A994806B19B5973E /* ExpoModulesProvider.swift */,
+			);
+			name = EpubjsReactNativeExample;
+			sourceTree = "<group>";
+		};
+		7B92E2DA2FE8EE710D7B2B12 /* ExpoModulesProviders */ = {
+			isa = PBXGroup;
+			children = (
+				3D3EE54A35E4208ECCEA1CC2 /* EpubjsReactNativeExample */,
+			);
+			name = ExpoModulesProviders;
+			sourceTree = "<group>";
+		};
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
@@ -77,6 +95,7 @@
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				BBD78D7AC51CEA395F1C20DB /* Pods */,
+				7B92E2DA2FE8EE710D7B2B12 /* ExpoModulesProviders */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -271,6 +290,7 @@
 			files = (
 				13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
+				3F68E5E12C03EFCE92A514BB /* ExpoModulesProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -295,6 +315,7 @@
 					"-ObjC",
 					"-lc++",
 				);
+				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
 				PRODUCT_BUNDLE_IDENTIFIER = com.example.reactnativeepubjsreactnative;
 				PRODUCT_NAME = EpubjsReactNativeExample;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -320,6 +341,7 @@
 					"-ObjC",
 					"-lc++",
 				);
+				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
 				PRODUCT_BUNDLE_IDENTIFIER = com.example.reactnativeepubjsreactnative;
 				PRODUCT_NAME = EpubjsReactNativeExample;
 				SWIFT_VERSION = 5.0;
@@ -376,7 +398,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					/usr/lib/swift,
 					"$(inherited)",
@@ -440,7 +462,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					/usr/lib/swift,
 					"$(inherited)",
