@@ -245,9 +245,9 @@ export interface ReaderProps {
   onSwipeRight?: () => void;
   /**
    * Render when the book is loading
-   * @returns {React.ReactNode} React.ReactNode
+   * @returns {JSX.Element} JSX.Element
    */
-  renderLoadingComponent?: (props: LoadingComponentProps) => React.ReactNode;
+  renderLoadingComponent?: (props: LoadingComponentProps) => JSX.Element;
   /**
    * Enable text selection feature on the book
    * @default false
