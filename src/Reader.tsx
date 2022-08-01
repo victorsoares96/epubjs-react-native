@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 import React, { useContext, useEffect, useRef } from 'react';
 import { View, TouchableWithoutFeedback } from 'react-native';
 import {
@@ -7,7 +6,8 @@ import {
   GestureHandlerRootView,
   State,
 } from 'react-native-gesture-handler';
-import * as FileSystem from 'expo-file-system';
+import { Asset } from 'expo-asset';
+// import * as FileSystem from 'expo-file-system';
 import { WebView, WebViewMessageEvent } from 'react-native-webview';
 import { defaultTheme as initialTheme, ReaderContext } from './context';
 import { LoadingComponent } from './utils/LoadingComponent';
@@ -213,6 +213,19 @@ export function Reader({
 
   useEffect(() => {
     (async () => {
+      if (src.uri) {
+        const res = await Asset.fromURI(src.uri).downloadAsync();
+
+        book.current?.injectJavaScript(
+          `loadBook(${JSON.stringify(res.localUri)}); true`
+        );
+        console.log('res.localUri', res.localUri, res.uri, res.downloading);
+      }
+    })();
+  }, [src.uri]);
+
+  /* useEffect(() => {
+    (async () => {
       const callback = (downloadProgress: any) => {
         const progress =
           downloadProgress.totalBytesWritten /
@@ -237,7 +250,7 @@ export function Reader({
         console.error(e);
       }
     })();
-  }, []);
+  }, []); */
 
   let lastTap: number | null = null;
   let timer: NodeJS.Timeout;
@@ -301,7 +314,7 @@ export function Reader({
             <TouchableWithoutFeedback onPress={handleDoublePress}>
               <WebView
                 ref={book}
-                source={{ html: template }}
+                source={{ html: template, baseUrl: 'file:///' }}
                 showsVerticalScrollIndicator={false}
                 javaScriptEnabled
                 injectedJavaScriptBeforeContentLoaded={injectedJS}
@@ -312,6 +325,14 @@ export function Reader({
                 allowUniversalAccessFromFileURLs
                 allowFileAccessFromFileURLs
                 allowFileAccess
+                onShouldStartLoadWithRequest={(request) => {
+                  if (!isLoading && request.url !== request.mainDocumentURL) {
+                    goToLocation(
+                      request.url.replace(request.mainDocumentURL!, '')
+                    );
+                  }
+                  return true;
+                }}
                 style={{
                   width,
                   backgroundColor: theme.body.background,
