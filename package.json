@@ -55,7 +55,7 @@
     "registry": "https://registry.npmjs.org/"
   },
   "devDependencies": {
-    "@formidable-webview/ersatz": "^2.1.3",
+    "@formidable-webview/ersatz": "2.1.3",
     "@formidable-webview/ersatz-testing": "2.0.5",
     "@react-native-community/eslint-config": "3.0.3",
     "@testing-library/jest-native": "4.0.5",
