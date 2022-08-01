@@ -1,7 +1,8 @@
 import * as React from 'react';
 // import DocumentPicker from 'react-native-document-picker';
-import { SafeAreaView, useWindowDimensions, View } from 'react-native';
-import { Reader, ReaderProvider } from 'epubjs-react-native';
+import { SafeAreaView, Text, useWindowDimensions, View } from 'react-native';
+import { Reader, ReaderProvider, useReader } from 'epubjs-react-native';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
 export default function App() {
   /* React.useEffect(() => {
@@ -25,8 +26,13 @@ export default function App() {
 
 function Book() {
   const { width, height } = useWindowDimensions();
+  const { goNext } = useReader();
+  console.log('oie');
   return (
     <View>
+      <TouchableOpacity onPress={goNext}>
+        <Text>Next Page</Text>
+      </TouchableOpacity>
       <Reader
         src={{
           uri: 'https://epubjs-react-native.s3.amazonaws.com/the-book-of-koli.epub',

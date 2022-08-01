@@ -1,5 +1,5 @@
-import React, { useContext, useEffect, useRef } from 'react';
-import { View, TouchableWithoutFeedback } from 'react-native';
+import React, { useContext, useEffect, useRef, useState } from 'react';
+import { TouchableWithoutFeedback } from 'react-native';
 import {
   Directions,
   FlingGestureHandler,
@@ -70,13 +70,13 @@ export function Reader({
     error: downloadError,
   } = useDownloadFile();
 
-  let injectedJS = `
-    window.LOCATIONS = ${JSON.stringify(initialLocations)};
-    window.THEME = ${JSON.stringify(defaultTheme)};
-    window.ENABLE_SELECTION = ${enableSelection};
-  `;
+  const [injectedJS, setInjectedJS] = useState(`
+  window.LOCATIONS = ${JSON.stringify(initialLocations)};
+  window.THEME = ${JSON.stringify(defaultTheme)};
+  window.ENABLE_SELECTION = ${enableSelection};
+`);
 
-  if (src.base64) {
+  /* if (src.base64) {
     injectedJS = `
       window.BOOK_BASE64 = ${JSON.stringify(src.base64)};
       ${injectedJS}
@@ -88,7 +88,7 @@ export function Reader({
     `;
   } else {
     throw new Error('src must be a base64 or uri');
-  }
+  } */
 
   const onMessage = (event: WebViewMessageEvent) => {
     const parsedEvent = JSON.parse(event.nativeEvent.data);
@@ -225,8 +225,8 @@ export function Reader({
           src.uri,
           'the-book-of-koli.epub'
         );
-        book.current?.injectJavaScript(
-          `loadBook(${JSON.stringify(bookFile)}); true`
+        setInjectedJS((oldValue) =>
+          `window.BOOK_URI = ${JSON.stringify(bookFile)};`.concat(oldValue)
         );
         setIsLoading(false);
       }
@@ -251,6 +251,14 @@ export function Reader({
     }
   };
 
+  if (isLoading) {
+    return renderLoadingComponent({
+      fileSize,
+      downloadProgress,
+      downloadSuccess,
+      downloadError,
+    });
+  }
   return (
     <GestureHandlerRootView style={{ width, height }}>
       <FlingGestureHandler
@@ -271,62 +279,35 @@ export function Reader({
             }
           }}
         >
-          <View
-            style={{
-              height: '100%',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
-          >
-            {isLoading && (
-              <View
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  position: 'absolute',
-                  top: 0,
-                  zIndex: 2,
-                }}
-              >
-                {renderLoadingComponent({
-                  fileSize,
-                  downloadProgress,
-                  downloadSuccess,
-                  downloadError,
-                })}
-              </View>
-            )}
-
-            <TouchableWithoutFeedback onPress={handleDoublePress}>
-              <WebView
-                ref={book}
-                source={{ html: template, baseUrl: 'file:///' }}
-                showsVerticalScrollIndicator={false}
-                javaScriptEnabled
-                injectedJavaScriptBeforeContentLoaded={injectedJS}
-                originWhitelist={['*']}
-                scrollEnabled={false}
-                mixedContentMode="compatibility"
-                onMessage={onMessage}
-                allowUniversalAccessFromFileURLs
-                allowFileAccessFromFileURLs
-                allowFileAccess
-                onShouldStartLoadWithRequest={(request) => {
-                  if (!isLoading && request.url !== request.mainDocumentURL) {
-                    goToLocation(
-                      request.url.replace(request.mainDocumentURL!, '')
-                    );
-                  }
-                  return true;
-                }}
-                style={{
-                  width,
-                  backgroundColor: theme.body.background,
-                  height,
-                }}
-              />
-            </TouchableWithoutFeedback>
-          </View>
+          <TouchableWithoutFeedback onPress={handleDoublePress}>
+            <WebView
+              ref={book}
+              source={{ html: template, baseUrl: 'file:///' }}
+              showsVerticalScrollIndicator={false}
+              javaScriptEnabled
+              injectedJavaScriptBeforeContentLoaded={injectedJS}
+              originWhitelist={['*']}
+              scrollEnabled={false}
+              mixedContentMode="compatibility"
+              onMessage={onMessage}
+              allowUniversalAccessFromFileURLs
+              allowFileAccessFromFileURLs
+              allowFileAccess
+              onShouldStartLoadWithRequest={(request) => {
+                if (!isLoading && request.url !== request.mainDocumentURL) {
+                  goToLocation(
+                    request.url.replace(request.mainDocumentURL!, '')
+                  );
+                }
+                return true;
+              }}
+              style={{
+                width,
+                backgroundColor: theme.body.background,
+                height,
+              }}
+            />
+          </TouchableWithoutFeedback>
         </FlingGestureHandler>
       </FlingGestureHandler>
     </GestureHandlerRootView>
