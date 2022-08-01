@@ -35,7 +35,8 @@ function Book() {
       </TouchableOpacity>
       <Reader
         src={{
-          uri: 'https://epubjs-react-native.s3.amazonaws.com/the-book-of-koli.epub',
+          uri:
+            'https://epubjs-react-native.s3.amazonaws.com/the-book-of-koli.epub',
         }}
         width={width}
         height={height}
