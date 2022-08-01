@@ -52,6 +52,13 @@ export type SearchResult = {
   excerpt: string;
 };
 
+export type LoadingComponentProps = {
+  fileSize: number;
+  downloadProgress: number;
+  downloadSuccess: boolean;
+  downloadError: string | null;
+};
+
 export interface ReaderProps {
   /**
    * The source of your ePub. Can be a base64 string or a URL
@@ -240,7 +247,7 @@ export interface ReaderProps {
    * Render when the book is loading
    * @returns {React.ReactNode} React.ReactNode
    */
-  renderLoadingComponent?: () => React.ReactNode;
+  renderLoadingComponent?: (props: LoadingComponentProps) => React.ReactNode;
   /**
    * Enable text selection feature on the book
    * @default false

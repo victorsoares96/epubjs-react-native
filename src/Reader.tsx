@@ -6,13 +6,12 @@ import {
   GestureHandlerRootView,
   State,
 } from 'react-native-gesture-handler';
-import { Asset } from 'expo-asset';
-// import * as FileSystem from 'expo-file-system';
 import { WebView, WebViewMessageEvent } from 'react-native-webview';
 import { defaultTheme as initialTheme, ReaderContext } from './context';
 import { LoadingComponent } from './utils/LoadingComponent';
 import template from './template';
 import type { ReaderProps } from './types';
+import { useDownloadFile } from './hooks/useDownloadFile';
 
 export function Reader({
   src,
@@ -39,7 +38,7 @@ export function Reader({
   enableSwipe = true,
   onSwipeLeft = () => {},
   onSwipeRight = () => {},
-  renderLoadingComponent = () => <LoadingComponent />,
+  renderLoadingComponent = (props) => <LoadingComponent {...props} />,
   enableSelection = false,
   defaultTheme = initialTheme,
   initialLocations,
@@ -63,6 +62,13 @@ export function Reader({
     theme,
   } = useContext(ReaderContext);
   const book = useRef<WebView>(null);
+  const {
+    downloadFile,
+    size: fileSize,
+    progress: downloadProgress,
+    success: downloadSuccess,
+    error: downloadError,
+  } = useDownloadFile();
 
   let injectedJS = `
     window.LOCATIONS = ${JSON.stringify(initialLocations)};
@@ -214,43 +220,18 @@ export function Reader({
   useEffect(() => {
     (async () => {
       if (src.uri) {
-        const res = await Asset.fromURI(src.uri).downloadAsync();
-
-        book.current?.injectJavaScript(
-          `loadBook(${JSON.stringify(res.localUri)}); true`
+        setIsLoading(true);
+        const { uri: bookFile } = await downloadFile(
+          src.uri,
+          'the-book-of-koli.epub'
         );
-        console.log('res.localUri', res.localUri, res.uri, res.downloading);
+        book.current?.injectJavaScript(
+          `loadBook(${JSON.stringify(bookFile)}); true`
+        );
+        setIsLoading(false);
       }
     })();
-  }, [src.uri]);
-
-  /* useEffect(() => {
-    (async () => {
-      const callback = (downloadProgress: any) => {
-        const progress =
-          downloadProgress.totalBytesWritten /
-          downloadProgress.totalBytesExpectedToWrite;
-        console.log({
-          downloadProgress: progress,
-        });
-      };
-
-      const downloadResumable = FileSystem.createDownloadResumable(
-        'https://epubjs-react-native.s3.amazonaws.com/the-book-of-koli.epub',
-        `${FileSystem.documentDirectory}small.mp4`,
-        {},
-        callback
-      );
-
-      try {
-        // @ts-ignore
-        const { uri } = await downloadResumable.downloadAsync();
-        console.log('Finished downloading to ', uri);
-      } catch (e) {
-        console.error(e);
-      }
-    })();
-  }, []); */
+  }, [downloadFile, setIsLoading, src.uri]);
 
   let lastTap: number | null = null;
   let timer: NodeJS.Timeout;
@@ -307,7 +288,12 @@ export function Reader({
                   zIndex: 2,
                 }}
               >
-                {renderLoadingComponent()}
+                {renderLoadingComponent({
+                  fileSize,
+                  downloadProgress,
+                  downloadSuccess,
+                  downloadError,
+                })}
               </View>
             )}
 
