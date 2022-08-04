@@ -60,15 +60,7 @@ export function View({
   } = useContext(ReaderContext);
   const book = useRef<WebView>(null);
 
-  let injectedJS = `
-    window.LOCATIONS = ${JSON.stringify(initialLocations)};
-    window.THEME = ${JSON.stringify(defaultTheme)};
-    window.ENABLE_SELECTION = ${enableSelection};
-    foo = 'bar';
-  `;
-
-  console.log({ injectedJS });
-  if (src.base64) {
+  /* if (src.base64) {
     injectedJS = `
       window.BOOK_BASE64 = ${JSON.stringify(src.base64)};
       ${injectedJS}
@@ -80,7 +72,7 @@ export function View({
     `;
   } else {
     throw new Error('src must be a base64 or uri');
-  }
+  } */
 
   const onMessage = (event: WebViewMessageEvent) => {
     const parsedEvent = JSON.parse(event.nativeEvent.data);
@@ -202,7 +194,7 @@ export function View({
       return onNavigationLoaded(toc);
     }
 
-    return null;
+    return () => {};
   };
 
   useEffect(() => {
@@ -227,6 +219,10 @@ export function View({
     }
   };
 
+  /* useEffect(() => {
+    console.log(src.uri);
+    book.current?.injectJavaScript(`alert(window.book) true;`);
+  }, [src.uri]); */
   return (
     <GestureHandlerRootView style={{ width, height }}>
       <FlingGestureHandler
@@ -274,7 +270,7 @@ export function View({
                 source={{ html: template, baseUrl: 'file:///' }}
                 showsVerticalScrollIndicator={false}
                 javaScriptEnabled
-                injectedJavaScriptBeforeContentLoaded={injectedJS}
+                injectedJavaScriptBeforeContentLoaded={`window.book = '${src.uri}'; true;`}
                 originWhitelist={['*']}
                 scrollEnabled={false}
                 mixedContentMode="compatibility"
@@ -282,14 +278,6 @@ export function View({
                 allowUniversalAccessFromFileURLs
                 allowFileAccessFromFileURLs
                 allowFileAccess
-                onShouldStartLoadWithRequest={(request) => {
-                  if (!isLoading && request.url !== request.mainDocumentURL) {
-                    goToLocation(
-                      request.url.replace(request.mainDocumentURL!, '')
-                    );
-                  }
-                  return true;
-                }}
                 style={{
                   width,
                   backgroundColor: theme.body.background,

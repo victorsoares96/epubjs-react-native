@@ -28,9 +28,13 @@ export default `
     <div id="viewer"></div>
 
     <script>
-      var foo;
-      alert(foo);
-      const book = ePub(window.BOOK_FILE);
+      document.addEventListener('DOMContentLoaded', () => alert(window.book));
+      /*setTimeout(() => {
+        alert(window.book)
+      }, 2000)*/
+      function loadBook(file) {
+        alert(file);
+        const book = ePub(file);
       const rendition = book.renderTo("viewer", {
         width: "100%",
         height: "100%",
@@ -150,6 +154,7 @@ export default `
           layout: layout,
         }));
       });
+      }
     </script>
   </body>
 </html>
