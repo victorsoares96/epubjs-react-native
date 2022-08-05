@@ -1,5 +1,10 @@
 import React, { useContext, useEffect, useRef } from 'react';
-import { Text, TouchableWithoutFeedback, View as RNView } from 'react-native';
+import {
+  Alert,
+  Text,
+  TouchableWithoutFeedback,
+  View as RNView,
+} from 'react-native';
 import {
   Directions,
   FlingGestureHandler,
@@ -270,7 +275,11 @@ export function View({
                 source={{ html: template, baseUrl: 'file:///' }}
                 showsVerticalScrollIndicator={false}
                 javaScriptEnabled
-                injectedJavaScriptBeforeContentLoaded={`window.book = '${src.uri}'; true;`}
+                injectedJavaScriptBeforeContentLoaded={`window.book = '${
+                  src.uri
+                }'; window.theme = ${JSON.stringify(
+                  defaultTheme
+                )}; window.locations = ${initialLocations}; window.enable_selection = ${enableSelection}; true;`}
                 originWhitelist={['*']}
                 scrollEnabled={false}
                 mixedContentMode="compatibility"
@@ -278,6 +287,19 @@ export function View({
                 allowUniversalAccessFromFileURLs
                 allowFileAccessFromFileURLs
                 allowFileAccess
+                onError={(error) => Alert.alert(error.toString())}
+                onShouldStartLoadWithRequest={(request) => {
+                  if (
+                    !isLoading &&
+                    request.mainDocumentURL &&
+                    request.url !== request.mainDocumentURL
+                  ) {
+                    goToLocation(
+                      request.url.replace(request.mainDocumentURL, '')
+                    );
+                  }
+                  return true;
+                }}
                 style={{
                   width,
                   backgroundColor: theme.body.background,

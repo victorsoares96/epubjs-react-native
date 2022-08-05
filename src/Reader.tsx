@@ -1,12 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { /* useContext, */ useEffect, useState } from 'react';
 import { LoadingComponent } from './utils/LoadingComponent';
 import type { ReaderProps } from './types';
 import { useDownloadFile } from './hooks/useDownloadFile';
 import { View } from './View';
+// import { ReaderContext } from './context';
 
 export function Reader({
   src,
-  renderLoadingComponent = (props) => <LoadingComponent {...props} />,
+  width,
+  height,
+  renderLoadingComponent = (props) => (
+    <LoadingComponent {...props} width={width} height={height} />
+  ),
   ...rest
 }: ReaderProps) {
   const {
@@ -17,6 +22,7 @@ export function Reader({
     error: downloadError,
   } = useDownloadFile();
 
+  // const {  } = useContext(ReaderContext);
   const [isLoading, setIsLoading] = useState(true);
   const [file, setFile] = useState<string | undefined>(undefined);
 
@@ -38,5 +44,5 @@ export function Reader({
       downloadError,
     });
   }
-  return <View src={{ uri: file }} {...rest} />;
+  return <View src={{ uri: file }} width={width} height={height} {...rest} />;
 }

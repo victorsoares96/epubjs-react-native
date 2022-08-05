@@ -371,10 +371,9 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
 
   const changeTheme = useCallback((theme: Theme) => {
     book.current?.injectJavaScript(`
-      window.THEME = ${JSON.stringify(theme)};
-      window.rendition.themes.register({ theme: window.THEME });
-        window.rendition.themes.select('theme');
-        window.rendition.views().forEach(view => view.pane ? view.pane.render() : null)
+      rendition.themes.register({ theme: ${JSON.stringify(theme)} });
+      rendition.themes.select('theme');
+      rendition.views().forEach(view => view.pane ? view.pane.render() : null); true;
     `);
     dispatch({ type: Types.CHANGE_THEME, payload: theme });
   }, []);
