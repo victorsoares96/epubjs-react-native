@@ -441,8 +441,8 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
   const search = useCallback((query: string) => {
     book.current?.injectJavaScript(`
       Promise.all(
-        window.book.spine.spineItems.map((item) => {
-          return item.load(window.book.load.bind(window.book)).then(() => {
+        book.spine.spineItems.map((item) => {
+          return item.load(book.load.bind(book)).then(() => {
             let results = item.find('${query}'.trim());
             item.unload();
             return Promise.resolve(results);

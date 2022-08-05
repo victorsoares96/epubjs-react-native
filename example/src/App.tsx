@@ -6,6 +6,7 @@ import {
   useWindowDimensions,
   View,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import { Reader, ReaderProvider, useReader } from 'epubjs-react-native';
 
@@ -31,8 +32,30 @@ export default function App() {
 
 function Book() {
   const { width, height } = useWindowDimensions();
-  const { goPrevious, goNext, changeFontSize } = useReader();
+  const {
+    goPrevious,
+    goNext,
+    changeFontSize,
+    changeTheme,
+    changeFontFamily,
+    theme,
+    atStart,
+    atEnd,
+    currentLocation,
+    getCurrentLocation,
+    getLocations,
+    search,
+    searchResults,
+    goToLocation,
+    addMark,
+    removeMark,
+    progress,
+    totalLocations,
+  } = useReader();
 
+  React.useEffect(() => {
+    console.log(JSON.stringify(searchResults));
+  }, [searchResults]);
   return (
     <View
       style={{
@@ -42,21 +65,67 @@ function Book() {
         alignItems: 'center',
       }}
     >
-      <TouchableOpacity onPress={goPrevious}>
-        <Text>Previous Page</Text>
-      </TouchableOpacity>
+      <View
+        style={{
+          flexDirection: 'row',
+          flexWrap: 'wrap',
+          alignItems: 'center',
+          justifyContent: 'space-evenly',
+          width: '100%',
+        }}
+      >
+        <TouchableOpacity onPress={goPrevious}>
+          <Text>Previous Page</Text>
+        </TouchableOpacity>
 
-      <TouchableOpacity onPress={goNext}>
-        <Text>Next Page</Text>
-      </TouchableOpacity>
+        <TouchableOpacity onPress={goNext}>
+          <Text>Next Page</Text>
+        </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => changeFontSize('36pt')}>
-        <Text>Big Font</Text>
-      </TouchableOpacity>
+        <TouchableOpacity onPress={() => changeFontSize('36pt')}>
+          <Text>Big Font</Text>
+        </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => changeFontSize('14pt')}>
-        <Text>Little Font</Text>
-      </TouchableOpacity>
+        <TouchableOpacity onPress={() => changeFontSize('14pt')}>
+          <Text>Little Font</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() =>
+            changeTheme({
+              'body': {
+                background: '#333',
+              },
+              'span': {
+                color: '#fff !important',
+              },
+              'p': {
+                color: '#fff !important',
+              },
+              'li': {
+                color: '#fff !important',
+              },
+              'h1': {
+                color: '#fff !important',
+              },
+              'a': {
+                'color': '#fff !important',
+                'pointer-events': 'auto',
+                'cursor': 'pointer',
+              },
+              '::selection': {
+                background: 'lightskyblue',
+              },
+            })
+          }
+        >
+          <Text>Night Theme</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={() => changeFontFamily('courier')}>
+          <Text>Change to ComicSans</Text>
+        </TouchableOpacity>
+      </View>
 
       <Reader
         src={{
@@ -64,8 +133,77 @@ function Book() {
             'https://epubjs-react-native.s3.amazonaws.com/the-book-of-koli.epub',
         }}
         width={width}
-        height={height * 0.8}
+        height={height * 0.5}
       />
+
+      <View
+        style={{
+          flexDirection: 'row',
+          flexWrap: 'wrap',
+          alignItems: 'center',
+          justifyContent: 'space-evenly',
+          width: '100%',
+        }}
+      >
+        {/* <Text>theme: {JSON.stringify(theme)}</Text> */}
+
+        <Text>atStart: {JSON.stringify(atStart)}</Text>
+
+        {/* <Text>currentLocation: {JSON.stringify(currentLocation)}</Text> */}
+
+        <TouchableOpacity>
+          <Text
+            onPress={() =>
+              Alert.alert('Alert', JSON.stringify(getCurrentLocation()))
+            }
+          >
+            Get Current Location
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity>
+          <Text
+            onPress={() => Alert.alert('Alert', JSON.stringify(getLocations()))}
+          >
+            Get Locations
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity>
+          <Text onPress={() => search('probably')}>Search</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => goToLocation('epubcfi(/6/8!/4/5012,/1:58,/1:66)')}
+        >
+          <Text>Go to Location</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() =>
+            addMark(
+              'highlight',
+              'epubcfi(/6/8!/4/5012,/1:58,/1:66)',
+              undefined,
+              () => Alert.alert('hello')
+            )
+          }
+        >
+          <Text>Add Mark</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() =>
+            removeMark('epubcfi(/6/8!/4/5012,/1:58,/1:66)', 'highlight')
+          }
+        >
+          <Text>Remove Mark</Text>
+        </TouchableOpacity>
+
+        <Text>Progress: {progress}</Text>
+
+        <Text>Total Locations: {totalLocations}</Text>
+      </View>
     </View>
   );
 }
