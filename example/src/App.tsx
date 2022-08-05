@@ -31,7 +31,7 @@ export default function App() {
 
 function Book() {
   const { width, height } = useWindowDimensions();
-  const { goPrevious, goNext } = useReader();
+  const { goPrevious, goNext, changeFontSize } = useReader();
 
   return (
     <View
@@ -48,6 +48,14 @@ function Book() {
 
       <TouchableOpacity onPress={goNext}>
         <Text>Next Page</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity onPress={() => changeFontSize('36pt')}>
+        <Text>Big Font</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity onPress={() => changeFontSize('14pt')}>
+        <Text>Little Font</Text>
       </TouchableOpacity>
 
       <Reader
