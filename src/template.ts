@@ -32,6 +32,7 @@ export default `
       let rendition;
 
       document.addEventListener('DOMContentLoaded', () => {
+        const type = window.type;
         const file = window.book;
         const theme = window.theme;
         const initialLocations = window.locations;
@@ -41,7 +42,14 @@ export default `
           alert('Failed load book');
         }
 
-        book = ePub(file);
+        if (type === 'binary' || type === 'url') {
+          book = ePub(file);
+        } else if (type === 'base64') {
+          book = ePub(file, { encoding: "base64" });
+        } else {
+          alert('Missing file type');
+        }
+
         rendition = book.renderTo("viewer", {
           width: "100%",
           height: "100%",

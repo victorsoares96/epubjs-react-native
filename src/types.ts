@@ -81,17 +81,46 @@ export interface ReaderProps {
 
     /**
      * The url of the ePub
+     * @deprecated use url instead
      * @param {string} uri
      * @example
      * ```
      * <Reader
      *  src={{
-     *    uri: 'https://example.com/epub.epub'
+     *    uri: 'https://epubjs-react-native.s3.amazonaws.com/the-book-of-koli.epub'
      *  }}
      * />
      * ```
      */
     uri?: string;
+
+    /**
+     * The url of the ePub
+     * @param {string} url
+     * @example
+     * ```
+     * <Reader
+     *  src={{
+     *    url: 'https://epubjs-react-native.s3.amazonaws.com/the-book-of-koli.epub'
+     *  }}
+     * />
+     * ```
+     */
+    url?: string;
+
+    /**
+     * The file path of the ePub
+     * @param {string} file
+     * @example
+     * ```
+     * <Reader
+     *  src={{
+     *    file: 'file:/data/user/0/com.example.reactnativeepubjsreactnative/cache/658a5d9b-a2821/the-book-of-koli.epub'
+     *  }}
+     * />
+     * ```
+     */
+    file?: string;
   };
   /**
    * @param {ePubCfi[]} locations

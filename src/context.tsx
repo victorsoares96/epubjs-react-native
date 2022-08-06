@@ -110,7 +110,7 @@ const initialState: InitialState = {
   currentLocation: null,
   progress: 0,
   locations: [],
-  isLoading: false,
+  isLoading: true,
   searchResults: [],
 };
 

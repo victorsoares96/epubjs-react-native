@@ -1,5 +1,5 @@
 import * as React from 'react';
-// import DocumentPicker from 'react-native-document-picker';
+import DocumentPicker from 'react-native-document-picker';
 import {
   SafeAreaView,
   Text,
@@ -11,16 +11,6 @@ import {
 import { Reader, ReaderProvider, useReader } from 'epubjs-react-native';
 
 export default function App() {
-  /* React.useEffect(() => {
-    (async () => {
-      const [res] = await DocumentPicker.pick({
-        type: [DocumentPicker.types.allFiles],
-        allowMultiSelection: false,
-        copyTo: 'cachesDirectory',
-      });
-      console.log(res);
-    })();
-  }, []); */
   return (
     <SafeAreaView>
       <ReaderProvider>
@@ -125,15 +115,28 @@ function Book() {
         <TouchableOpacity onPress={() => changeFontFamily('courier')}>
           <Text>Change to ComicSans</Text>
         </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={async () => {
+            const [res] = await DocumentPicker.pick({
+              type: [DocumentPicker.types.allFiles],
+              allowMultiSelection: false,
+              copyTo: 'cachesDirectory',
+            });
+            console.log(res);
+          }}
+        >
+          <Text>Open file</Text>
+        </TouchableOpacity>
       </View>
 
       <Reader
         src={{
-          uri:
+          url:
             'https://epubjs-react-native.s3.amazonaws.com/the-book-of-koli.epub',
         }}
         width={width}
-        height={height * 0.5}
+        height={height * 0.7}
       />
 
       <View

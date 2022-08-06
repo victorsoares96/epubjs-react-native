@@ -1,14 +1,17 @@
-import React, { /* useContext, */ useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { LoadingComponent } from './utils/LoadingComponent';
 import type { ReaderProps } from './types';
 import { useDownloadFile } from './hooks/useDownloadFile';
 import { View } from './View';
-// import { ReaderContext } from './context';
+import { useInjectBookVariables } from './hooks/useInjectBookVariables';
+import { ReaderContext, defaultTheme as initialTheme } from './context';
 
 export function Reader({
   src,
   width,
   height,
+  defaultTheme = initialTheme,
+  initialLocations,
   renderLoadingComponent = (props) => (
     <LoadingComponent {...props} width={width} height={height} />
   ),
@@ -22,19 +25,65 @@ export function Reader({
     error: downloadError,
   } = useDownloadFile();
 
-  // const {  } = useContext(ReaderContext);
-  const [isLoading, setIsLoading] = useState(true);
-  const [file, setFile] = useState<string | undefined>(undefined);
+  const { setIsLoading, isLoading } = useContext(ReaderContext);
+  const { injectBookVariables } = useInjectBookVariables();
+  // const [isLoading, setIsLoading] = useState(true);
+
+  const [template, setTemplate] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
-      if (src.uri) {
-        const { uri: bookFile } = await downloadFile(src.uri, 'test.epub');
-        setFile(bookFile!);
+      setIsLoading(true);
+
+      if (src.base64) {
+        setTemplate(
+          injectBookVariables({
+            type: 'base64',
+            book: src.base64,
+            theme: defaultTheme,
+            locations: initialLocations,
+            enableSelection: true,
+          })
+        );
+      } else if (src.url) {
+        const { uri: bookFile } = await downloadFile(src.url, 'test.epub');
+
+        if (!bookFile) throw new Error("Couldn't download book");
+
+        setTemplate(
+          injectBookVariables({
+            type: 'url',
+            book: bookFile,
+            theme: defaultTheme,
+            locations: initialLocations,
+            enableSelection: true,
+          })
+        );
         setIsLoading(false);
+      } else if (src.file) {
+        setTemplate(
+          injectBookVariables({
+            type: 'file',
+            book: src.file,
+            theme: defaultTheme,
+            locations: initialLocations,
+            enableSelection: true,
+          })
+        );
+      } else {
+        throw new Error('src must be a base64, uri or a file object');
       }
-    })();
-  }, [downloadFile, src.uri]);
+    })().finally(() => setIsLoading(false));
+  }, [
+    defaultTheme,
+    downloadFile,
+    initialLocations,
+    injectBookVariables,
+    setIsLoading,
+    src.base64,
+    src.file,
+    src.url,
+  ]);
 
   if (isLoading) {
     return renderLoadingComponent({
@@ -44,5 +93,7 @@ export function Reader({
       downloadError,
     });
   }
-  return <View src={{ uri: file }} width={width} height={height} {...rest} />;
+
+  if (!template) throw new Error('Template is not set');
+  return <View template={template} width={width} height={height} {...rest} />;
 }

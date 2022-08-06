@@ -13,11 +13,10 @@ import {
 } from 'react-native-gesture-handler';
 import { WebView, WebViewMessageEvent } from 'react-native-webview';
 import { defaultTheme as initialTheme, ReaderContext } from './context';
-import template from './template';
 import type { ReaderProps } from './types';
 
 export function View({
-  src,
+  template,
   onStarted = () => {},
   onReady = () => {},
   onDisplayError = () => {},
@@ -41,10 +40,8 @@ export function View({
   enableSwipe = true,
   onSwipeLeft = () => {},
   onSwipeRight = () => {},
-  enableSelection = false,
   defaultTheme = initialTheme,
-  initialLocations,
-}: ReaderProps) {
+}: Omit<ReaderProps, 'src'> & { template: string }) {
   const {
     registerBook,
     setIsLoading,
@@ -64,20 +61,6 @@ export function View({
     theme,
   } = useContext(ReaderContext);
   const book = useRef<WebView>(null);
-
-  /* if (src.base64) {
-    injectedJS = `
-      window.BOOK_BASE64 = ${JSON.stringify(src.base64)};
-      ${injectedJS}
-    `;
-  } else if (src.uri) {
-    injectedJS = `
-      window.BOOK_FILE = '${src.uri}';
-      ${injectedJS}
-    `;
-  } else {
-    throw new Error('src must be a base64 or uri');
-  } */
 
   const onMessage = (event: WebViewMessageEvent) => {
     const parsedEvent = JSON.parse(event.nativeEvent.data);
@@ -224,10 +207,6 @@ export function View({
     }
   };
 
-  /* useEffect(() => {
-    console.log(src.uri);
-    book.current?.injectJavaScript(`alert(window.book) true;`);
-  }, [src.uri]); */
   return (
     <GestureHandlerRootView style={{ width, height }}>
       <FlingGestureHandler
@@ -275,11 +254,6 @@ export function View({
                 source={{ html: template, baseUrl: 'file:///' }}
                 showsVerticalScrollIndicator={false}
                 javaScriptEnabled
-                injectedJavaScriptBeforeContentLoaded={`window.book = '${
-                  src.uri
-                }'; window.theme = ${JSON.stringify(
-                  defaultTheme
-                )}; window.locations = ${initialLocations}; window.enable_selection = ${enableSelection}; true;`}
                 originWhitelist={['*']}
                 scrollEnabled={false}
                 mixedContentMode="compatibility"
