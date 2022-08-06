@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import type { Theme, ePubCfi } from '../types';
 import template from '../template';
+import type { SourceType } from '../utils/enums/source-type.enum';
 
 export function useInjectBookVariables() {
   const injectBookVariables = useCallback(
@@ -11,7 +12,7 @@ export function useInjectBookVariables() {
       enableSelection,
       locations,
     }: {
-      type: 'file' | 'base64' | 'url';
+      type: SourceType;
       book: string;
       theme: Theme;
       enableSelection: boolean;

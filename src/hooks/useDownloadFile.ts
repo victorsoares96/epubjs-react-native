@@ -53,6 +53,9 @@ export function useDownloadFile() {
       .finally(() => setDownloading(false));
   }, []);
 
+  const getFileInfo = useCallback((fileUri: string) => {
+    return FileSystem.getInfoAsync(fileUri);
+  }, []);
   return {
     file,
     progress,
@@ -61,5 +64,6 @@ export function useDownloadFile() {
     error,
     success,
     downloadFile,
+    getFileInfo,
   };
 }

@@ -5,6 +5,10 @@ import { useDownloadFile } from './hooks/useDownloadFile';
 import { View } from './View';
 import { useInjectBookVariables } from './hooks/useInjectBookVariables';
 import { ReaderContext, defaultTheme as initialTheme } from './context';
+import { isURL } from './utils/isURL';
+import { getSourceType } from './utils/getSourceType';
+import { getSourceName } from './utils/getPathname';
+import { SourceType } from './utils/enums/source-type.enum';
 
 export function Reader({
   src,
@@ -27,7 +31,6 @@ export function Reader({
 
   const { setIsLoading, isLoading } = useContext(ReaderContext);
   const { injectBookVariables } = useInjectBookVariables();
-  // const [isLoading, setIsLoading] = useState(true);
 
   const [template, setTemplate] = useState<string | null>(null);
 
@@ -35,72 +38,74 @@ export function Reader({
     (async () => {
       setIsLoading(true);
 
-      if (src.base64) {
-        setTemplate(
-          injectBookVariables({
-            type: 'base64',
-            book: src.base64,
-            theme: defaultTheme,
-            locations: initialLocations,
-            enableSelection: true,
-          })
-        );
-      } else if (src.url) {
-        const { uri: bookFile } = await downloadFile(src.url, 'test.epub');
+      if (src) {
+        const sourceType = getSourceType(src);
+        const isExternalSource = isURL(src);
 
-        if (!bookFile) throw new Error("Couldn't download book");
+        if (!sourceType) {
+          throw new Error(`Invalid source type: ${src}`);
+        }
 
-        setTemplate(
-          injectBookVariables({
-            type: 'url',
-            book: bookFile,
-            theme: defaultTheme,
-            locations: initialLocations,
-            enableSelection: true,
-          })
-        );
-        setIsLoading(false);
-      } else if (src.uri) {
-        const { uri: bookFile } = await downloadFile(src.uri, 'test.epub');
+        if (!isExternalSource) {
+          if (sourceType === SourceType.BASE64) {
+            setTemplate(
+              injectBookVariables({
+                type: SourceType.BASE64,
+                book: src,
+                theme: defaultTheme,
+                locations: initialLocations,
+                enableSelection: true,
+              })
+            );
 
-        if (!bookFile) throw new Error("Couldn't download book");
+            setIsLoading(false);
+          } else {
+            setTemplate(
+              injectBookVariables({
+                type: SourceType.BINARY,
+                book: src,
+                theme: defaultTheme,
+                locations: initialLocations,
+                enableSelection: true,
+              })
+            );
 
-        // const x = new URL('eita');
-        // const extension = x.pathname.split('.').pop();
-        setTemplate(
-          injectBookVariables({
-            type: 'url',
-            book: bookFile,
-            theme: defaultTheme,
-            locations: initialLocations,
-            enableSelection: true,
-          })
-        );
-        setIsLoading(false);
-      } else if (src.file) {
-        setTemplate(
-          injectBookVariables({
-            type: 'file',
-            book: src.file,
-            theme: defaultTheme,
-            locations: initialLocations,
-            enableSelection: true,
-          })
-        );
-      } else {
-        throw new Error('src must be a base64, uri or a file object');
+            setIsLoading(false);
+          }
+        }
+
+        if (isExternalSource) {
+          const sourceName = getSourceName(src);
+
+          if (!sourceName) {
+            throw new Error(`Invalid source name: ${src}`);
+          }
+
+          const { uri: bookFile } = await downloadFile(src, sourceName);
+
+          if (!bookFile) throw new Error("Couldn't download book");
+
+          setTemplate(
+            injectBookVariables({
+              type: sourceType,
+              book: bookFile,
+              theme: defaultTheme,
+              locations: initialLocations,
+              enableSelection: true,
+            })
+          );
+
+          setIsLoading(false);
+        }
       }
-    })().finally(() => setIsLoading(false));
+    })();
   }, [
     defaultTheme,
     downloadFile,
     initialLocations,
     injectBookVariables,
     setIsLoading,
-    src.base64,
-    src.file,
-    src.uri,
-    src.url,
+    src,
   ]);
 
   if (isLoading) {
