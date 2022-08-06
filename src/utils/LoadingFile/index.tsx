@@ -1,14 +1,14 @@
 import React from 'react';
 import { ActivityIndicator, Text, View } from 'react-native';
-import type { LoadingComponentProps, ReaderProps } from 'src/types';
+import type { LoadingFileProps, ReaderProps } from 'src/types';
 
 import { styles } from './styles';
 
-export function LoadingComponent({
+export function LoadingFile({
   downloadProgress,
   width,
   height,
-}: LoadingComponentProps & Pick<ReaderProps, 'width' | 'height'>) {
+}: LoadingFileProps & Pick<ReaderProps, 'width' | 'height'>) {
   return (
     <View style={[styles.container, { width, height }]}>
       <ActivityIndicator size="large" />

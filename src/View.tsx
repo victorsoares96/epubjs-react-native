@@ -1,10 +1,5 @@
 import React, { useContext, useEffect, useRef } from 'react';
-import {
-  Alert,
-  Text,
-  TouchableWithoutFeedback,
-  View as RNView,
-} from 'react-native';
+import { TouchableWithoutFeedback, View as RNView } from 'react-native';
 import {
   Directions,
   FlingGestureHandler,
@@ -14,6 +9,7 @@ import {
 import { WebView, WebViewMessageEvent } from 'react-native-webview';
 import { defaultTheme as initialTheme, ReaderContext } from './context';
 import type { ReaderProps } from './types';
+import { OpeningBook } from './utils/OpeningBook';
 
 export function View({
   template,
@@ -41,10 +37,12 @@ export function View({
   onSwipeLeft = () => {},
   onSwipeRight = () => {},
   defaultTheme = initialTheme,
+  renderOpeningBookComponent = () => (
+    <OpeningBook width={width} height={height} />
+  ),
 }: Omit<ReaderProps, 'src'> & { template: string }) {
   const {
     registerBook,
-    setIsLoading,
     setTotalLocations,
     setCurrentLocation,
     setProgress,
@@ -53,7 +51,8 @@ export function View({
     setAtEnd,
     goNext,
     goPrevious,
-    isLoading,
+    isRendering,
+    setIsRendering,
     goToLocation,
     changeTheme,
     setKey,
@@ -70,7 +69,7 @@ export function View({
     delete parsedEvent.type;
 
     if (type === 'onStarted') {
-      setIsLoading(true);
+      setIsRendering(true);
 
       changeTheme(defaultTheme);
 
@@ -79,7 +78,7 @@ export function View({
 
     if (type === 'onReady') {
       const { totalLocations, currentLocation, progress } = parsedEvent;
-      setIsLoading(false);
+      setIsRendering(false);
       setTotalLocations(totalLocations);
       setCurrentLocation(currentLocation);
       setProgress(progress);
@@ -93,7 +92,7 @@ export function View({
 
     if (type === 'onDisplayError') {
       const { reason } = parsedEvent;
-      setIsLoading(false);
+      setIsRendering(false);
 
       return onDisplayError(reason);
     }
@@ -234,7 +233,7 @@ export function View({
               alignItems: 'center',
             }}
           >
-            {isLoading && (
+            {isRendering && (
               <RNView
                 style={{
                   width: '100%',
@@ -244,7 +243,7 @@ export function View({
                   zIndex: 2,
                 }}
               >
-                <Text>carregando</Text>
+                {renderOpeningBookComponent()}
               </RNView>
             )}
 
@@ -261,10 +260,9 @@ export function View({
                 allowUniversalAccessFromFileURLs
                 allowFileAccessFromFileURLs
                 allowFileAccess
-                onError={(error) => Alert.alert(error.toString())}
                 onShouldStartLoadWithRequest={(request) => {
                   if (
-                    !isLoading &&
+                    !isRendering &&
                     request.mainDocumentURL &&
                     request.url !== request.mainDocumentURL
                   ) {

@@ -52,7 +52,7 @@ export type SearchResult = {
   excerpt: string;
 };
 
-export type LoadingComponentProps = {
+export type LoadingFileProps = {
   fileSize: number;
   downloadProgress: number;
   downloadSuccess: boolean;
@@ -276,7 +276,12 @@ export interface ReaderProps {
    * Render when the book is loading
    * @returns {JSX.Element} JSX.Element
    */
-  renderLoadingComponent?: (props: LoadingComponentProps) => JSX.Element;
+  renderLoadingFileComponent?: (props: LoadingFileProps) => JSX.Element;
+  /**
+   * Appears when the book is been rendering
+   * @returns {JSX.Element} JSX.Element
+   */
+  renderOpeningBookComponent?: () => JSX.Element;
   /**
    * Enable text selection feature on the book
    * @default false

@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { LoadingComponent } from './utils/LoadingComponent';
+import { LoadingFile } from './utils/LoadingFile';
 import type { ReaderProps } from './types';
 import { useDownloadFile } from './hooks/useDownloadFile';
 import { View } from './View';
@@ -12,8 +12,8 @@ export function Reader({
   height,
   defaultTheme = initialTheme,
   initialLocations,
-  renderLoadingComponent = (props) => (
-    <LoadingComponent {...props} width={width} height={height} />
+  renderLoadingFileComponent = (props) => (
+    <LoadingFile {...props} width={width} height={height} />
   ),
   ...rest
 }: ReaderProps) {
@@ -60,6 +60,23 @@ export function Reader({
           })
         );
         setIsLoading(false);
+      } else if (src.uri) {
+        const { uri: bookFile } = await downloadFile(src.uri, 'test.epub');
+
+        if (!bookFile) throw new Error("Couldn't download book");
+
+        // const x = new URL('eita');
+        // const extension = x.pathname.split('.').pop();
+        setTemplate(
+          injectBookVariables({
+            type: 'url',
+            book: bookFile,
+            theme: defaultTheme,
+            locations: initialLocations,
+            enableSelection: true,
+          })
+        );
+        setIsLoading(false);
       } else if (src.file) {
         setTemplate(
           injectBookVariables({
@@ -82,11 +99,12 @@ export function Reader({
     setIsLoading,
     src.base64,
     src.file,
+    src.uri,
     src.url,
   ]);
 
   if (isLoading) {
-    return renderLoadingComponent({
+    return renderLoadingFileComponent({
       fileSize,
       downloadProgress,
       downloadSuccess,

@@ -42,7 +42,7 @@ export default `
           alert('Failed load book');
         }
 
-        if (type === 'binary' || type === 'url') {
+        if (type === 'file' || type === 'url' || type === 'uri') {
           book = ePub(file);
         } else if (type === 'base64') {
           book = ePub(file, { encoding: "base64" });
