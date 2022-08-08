@@ -59,11 +59,9 @@ export default `
       book.ready
         .then(function () {
           if (initialLocations) {
-            return book.locations.load(initialLocations);
-          }
-          return book.locations.generate(1600);
-        })
-        .then(function () {
+            book.locations.load(initialLocations);
+          } else book.locations.generate(1600);
+
           var displayed = rendition.display();
 
           displayed.then(function () {

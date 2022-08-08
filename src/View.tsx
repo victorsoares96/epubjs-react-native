@@ -11,6 +11,10 @@ import { defaultTheme as initialTheme, ReaderContext } from './context';
 import type { ReaderProps } from './types';
 import { OpeningBook } from './utils/OpeningBook';
 
+export type ViewProps = Omit<ReaderProps, 'src' | 'fileSystem'> & {
+  template: string;
+};
+
 export function View({
   template,
   onStarted = () => {},
@@ -40,7 +44,7 @@ export function View({
   renderOpeningBookComponent = () => (
     <OpeningBook width={width} height={height} />
   ),
-}: Omit<ReaderProps, 'src'> & { template: string }) {
+}: ViewProps) {
   const {
     registerBook,
     setTotalLocations,

@@ -8,7 +8,12 @@ import {
   TouchableOpacity,
   Alert,
 } from 'react-native';
-import { Reader, ReaderProvider, useReader } from 'epubjs-react-native';
+import {
+  Reader,
+  ReaderProvider,
+  useReader,
+  useFileSystem,
+} from 'epubjs-react-native';
 
 export default function App() {
   return (
@@ -44,7 +49,7 @@ function Book() {
   } = useReader();
 
   const [src, setSrc] = React.useState(
-    'https://epubjs-react-native.s3.amazonaws.com/failing-forward.epub'
+    'https://s3.amazonaws.com/moby-dick/OPS/package.opf'
   );
   React.useEffect(() => {
     console.log(JSON.stringify(searchResults));
@@ -133,7 +138,12 @@ function Book() {
         </TouchableOpacity>
       </View>
 
-      <Reader src={src} width={width} height={height * 0.7} />
+      <Reader
+        src={src}
+        width={width}
+        height={height * 0.7}
+        fileSystem={useFileSystem}
+      />
 
       <View
         style={{

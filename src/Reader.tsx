@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { LoadingFile } from './utils/LoadingFile';
 import type { ReaderProps } from './types';
-import { useDownloadFile } from './hooks/useDownloadFile';
 import { View } from './View';
 import { useInjectBookVariables } from './hooks/useInjectBookVariables';
 import { ReaderContext, defaultTheme as initialTheme } from './context';
@@ -19,6 +18,7 @@ export function Reader({
   renderLoadingFileComponent = (props) => (
     <LoadingFile {...props} width={width} height={height} />
   ),
+  fileSystem: useFileSystem,
   ...rest
 }: ReaderProps) {
   const {
@@ -27,7 +27,7 @@ export function Reader({
     progress: downloadProgress,
     success: downloadSuccess,
     error: downloadError,
-  } = useDownloadFile();
+  } = useFileSystem();
 
   const { setIsLoading, isLoading } = useContext(ReaderContext);
   const { injectBookVariables } = useInjectBookVariables();
@@ -81,21 +81,35 @@ export function Reader({
             throw new Error(`Invalid source name: ${src}`);
           }
 
-          const { uri: bookFile } = await downloadFile(src, sourceName);
+          if (sourceType === SourceType.OPF) {
+            setTemplate(
+              injectBookVariables({
+                type: sourceType,
+                book: src,
+                theme: defaultTheme,
+                locations: initialLocations,
+                enableSelection: true,
+              })
+            );
 
-          if (!bookFile) throw new Error("Couldn't download book");
+            setIsLoading(false);
+          } else {
+            const { uri: bookFile } = await downloadFile(src, sourceName);
 
-          setTemplate(
-            injectBookVariables({
-              type: sourceType,
-              book: bookFile,
-              theme: defaultTheme,
-              locations: initialLocations,
-              enableSelection: true,
-            })
-          );
+            if (!bookFile) throw new Error("Couldn't download book");
 
-          setIsLoading(false);
+            setTemplate(
+              injectBookVariables({
+                type: sourceType,
+                book: bookFile,
+                theme: defaultTheme,
+                locations: initialLocations,
+                enableSelection: true,
+              })
+            );
+
+            setIsLoading(false);
+          }
         }
       }
     })();

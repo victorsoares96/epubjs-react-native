@@ -1,8 +1,29 @@
 import { useCallback, useState } from 'react';
-import * as FileSystem from 'expo-file-system';
+import * as ExpoFileSystem from 'expo-file-system';
 import type { DownloadProgressData } from 'expo-file-system';
 
-export function useDownloadFile() {
+export type FileSystem = {
+  file: string | null;
+  progress: number;
+  downloading: boolean;
+  size: number;
+  error: string | null;
+  success: boolean;
+  downloadFile: (
+    fromUrl: string,
+    toFile: string
+  ) => Promise<{ uri: string | null; mimeType: string | null }>;
+  getFileInfo: (
+    fileUri: string
+  ) => Promise<{
+    uri: string;
+    exists: boolean;
+    isDirectory: boolean;
+    size: number | undefined;
+  }>;
+};
+
+export function useFileSystem(): FileSystem {
   const [file, setFile] = useState<string | null>(null);
   const [progress, setProgress] = useState<number>(0);
   const [downloading, setDownloading] = useState<boolean>(false);
@@ -20,9 +41,9 @@ export function useDownloadFile() {
       setProgress(currentProgress);
     };
 
-    const downloadResumable = FileSystem.createDownloadResumable(
+    const downloadResumable = ExpoFileSystem.createDownloadResumable(
       fromUrl,
-      FileSystem.documentDirectory + toFile,
+      ExpoFileSystem.documentDirectory + toFile,
       { cache: true },
       callback
     );
@@ -53,8 +74,20 @@ export function useDownloadFile() {
       .finally(() => setDownloading(false));
   }, []);
 
-  const getFileInfo = useCallback((fileUri: string) => {
-    return FileSystem.getInfoAsync(fileUri);
+  const getFileInfo = useCallback(async (fileUri: string) => {
+    const {
+      uri,
+      exists,
+      isDirectory,
+      size: fileSize,
+    } = await ExpoFileSystem.getInfoAsync(fileUri);
+
+    return {
+      uri,
+      exists,
+      isDirectory,
+      size: fileSize,
+    };
   }, []);
   return {
     file,
