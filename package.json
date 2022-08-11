@@ -31,7 +31,7 @@
     "test:coverage": "jest --coverage --no-cache --runInBand --passWithNoTests --forceExit",
     "build": "bob build",
     "release": "yarn build && npm publish",
-    "release-local": "yarn build && npm link && echo [FINISH]: Run \"npm link epubjs-react-native\" to link the package to your project",
+    "release-local": "yarn build && npm link && echo [FINISH]: Run \"npm link @epubjs-react-native/core\" to link the package to your project",
     "example-bare": "yarn --cwd example-bare",
     "example-expo": "yarn --cwd example-expo",
     "bootstrap": "yarn example-bare && yarn example-expo && yarn && yarn example-bare pods && yarn example-expo pods"
@@ -53,7 +53,8 @@
   },
   "homepage": "https://github.com/victorsoares96/epubjs-react-native#readme",
   "publishConfig": {
-    "registry": "https://registry.npmjs.org/"
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
   },
   "devDependencies": {
     "@formidable-webview/ersatz": "2.1.3",
