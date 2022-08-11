@@ -1,6 +1,6 @@
 {
-  "name": "epubjs-react-native",
-  "version": "1.1.0",
+  "name": "@epubjs-react-native/core",
+  "version": "0.0.0-20220811-1043",
   "description": "ePub.js Reader for React Native",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
@@ -32,8 +32,9 @@
     "build": "bob build",
     "release": "yarn build && npm publish",
     "release-local": "yarn build && npm link && echo [FINISH]: Run \"npm link epubjs-react-native\" to link the package to your project",
-    "example": "yarn --cwd example",
-    "bootstrap": "yarn example && yarn && yarn example pods"
+    "example-bare": "yarn --cwd example-bare",
+    "example-expo": "yarn --cwd example-expo",
+    "bootstrap": "yarn example-bare && yarn example-expo && yarn && yarn example-bare pods && yarn example-expo pods"
   },
   "keywords": [
     "react",
@@ -125,8 +126,5 @@
       ]
     ]
   },
-  "dependencies": {
-    "expo": "^45.0.6",
-    "expo-file-system": "^14.0.0"
-  }
+  "dependencies": {}
 }

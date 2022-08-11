@@ -8,22 +8,8 @@ import {
   TouchableOpacity,
   Alert,
 } from 'react-native';
-import {
-  Reader,
-  ReaderProvider,
-  useReader,
-  useFileSystem,
-} from 'epubjs-react-native';
-
-export default function App() {
-  return (
-    <SafeAreaView>
-      <ReaderProvider>
-        <Book />
-      </ReaderProvider>
-    </SafeAreaView>
-  );
-}
+import { Reader, ReaderProvider, useReader } from '@epubjs-react-native/core';
+import { useFileSystem } from '@epubjs-react-native/file-system';
 
 function Book() {
   const { width, height } = useWindowDimensions();
@@ -33,10 +19,10 @@ function Book() {
     changeFontSize,
     changeTheme,
     changeFontFamily,
-    theme,
+    // theme,
     atStart,
-    atEnd,
-    currentLocation,
+    // atEnd,
+    // currentLocation,
     getCurrentLocation,
     getLocations,
     search,
@@ -214,5 +200,15 @@ function Book() {
         <Text>Total Locations: {totalLocations}</Text>
       </View>
     </View>
+  );
+}
+
+export default function App() {
+  return (
+    <SafeAreaView>
+      <ReaderProvider>
+        <Book />
+      </ReaderProvider>
+    </SafeAreaView>
   );
 }
