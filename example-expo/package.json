@@ -1,0 +1,30 @@
+{
+  "name": "react-native-epubjs-react-native-example-expo",
+  "description": "Example app for react-native-epubjs-react-native",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "android": "react-native run-android",
+    "ios": "react-native run-ios",
+    "start": "react-native start",
+    "pods": "pod-install --quiet",
+    "postinstall": "patch-package"
+  },
+  "dependencies": {
+    "@epubjs-react-native/expo-file-system": "^0.0.1",
+    "expo": "^45.0.0",
+    "react": "17.0.2",
+    "react-native": "0.68.2",
+    "react-native-document-picker": "^8.1.1",
+    "react-native-gesture-handler": "2.1.1",
+    "react-native-webview": "11.15.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.12.10",
+    "@babel/runtime": "^7.12.5",
+    "babel-plugin-module-resolver": "^4.1.0",
+    "metro-react-native-babel-preset": "^0.67.0",
+    "patch-package": "^6.4.7",
+    "postinstall-postinstall": "^2.1.0"
+  }
+}

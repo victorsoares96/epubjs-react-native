@@ -1,4 +1,10 @@
-import React, { createContext, useReducer, useRef } from 'react';
+import React, {
+  createContext,
+  useCallback,
+  useMemo,
+  useReducer,
+  useRef,
+} from 'react';
 import type WebView from 'react-native-webview';
 import type {
   ePubCfi,
@@ -32,6 +38,7 @@ enum Types {
   SET_PROGRESS = 'SET_PROGRESS',
   SET_LOCATIONS = 'SET_LOCATIONS',
   SET_IS_LOADING = 'SET_IS_LOADING',
+  SET_IS_RENDERING = 'SET_IS_RENDERING',
   SET_SEARCH_RESULTS = 'SET_SEARCH_RESULTS',
 }
 
@@ -47,6 +54,7 @@ type BookPayload = {
   [Types.SET_PROGRESS]: number;
   [Types.SET_LOCATIONS]: ePubCfi[];
   [Types.SET_IS_LOADING]: boolean;
+  [Types.SET_IS_RENDERING]: boolean;
   [Types.SET_SEARCH_RESULTS]: SearchResult[];
 };
 
@@ -64,6 +72,7 @@ type InitialState = {
   progress: number;
   locations: ePubCfi[];
   isLoading: boolean;
+  isRendering: boolean;
   searchResults: SearchResult[];
 };
 
@@ -104,7 +113,8 @@ const initialState: InitialState = {
   currentLocation: null,
   progress: 0,
   locations: [],
-  isLoading: false,
+  isLoading: true,
+  isRendering: true,
   searchResults: [],
 };
 
@@ -165,6 +175,11 @@ function bookReducer(state: InitialState, action: BookActions): InitialState {
         ...state,
         isLoading: action.payload,
       };
+    case Types.SET_IS_RENDERING:
+      return {
+        ...state,
+        isRendering: action.payload,
+      };
     case Types.SET_SEARCH_RESULTS:
       return {
         ...state,
@@ -184,6 +199,7 @@ export interface ReaderContextProps {
   setProgress: (progress: number) => void;
   setLocations: (locations: ePubCfi[]) => void;
   setIsLoading: (isLoading: boolean) => void;
+  setIsRendering: (isRendering: boolean) => void;
 
   /**
    * Go to specific location in the book
@@ -307,6 +323,12 @@ export interface ReaderContextProps {
   isLoading: boolean;
 
   /**
+   * Indicates if the book is rendering
+   * @returns {boolean} {@link boolean}
+   */
+  isRendering: boolean;
+
+  /**
    * Search results
    * @returns {SearchResult[]} {@link SearchResult[]}
    */
@@ -324,6 +346,7 @@ const ReaderContext = createContext<ReaderContextProps>({
   setProgress: () => {},
   setLocations: () => {},
   setIsLoading: () => {},
+  setIsRendering: () => {},
 
   goToLocation: () => {},
   goPrevious: () => {},
@@ -349,98 +372,99 @@ const ReaderContext = createContext<ReaderContextProps>({
   currentLocation: null,
   progress: 0,
   locations: [],
-  isLoading: false,
+  isLoading: true,
+  isRendering: true,
 
   searchResults: [],
   setSearchResults: () => {},
 });
 
-const ReaderProvider: React.FC = ({ children }) => {
+function ReaderProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(bookReducer, initialState);
   const book = useRef<WebView | null>(null);
 
-  function registerBook(bookRef: WebView) {
+  const registerBook = useCallback((bookRef: WebView) => {
     book.current = bookRef;
-  }
+  }, []);
 
-  function changeTheme(theme: Theme) {
+  const changeTheme = useCallback((theme: Theme) => {
     book.current?.injectJavaScript(`
-      window.THEME = ${JSON.stringify(theme)};
-      window.rendition.themes.register({ theme: window.THEME });
-        window.rendition.themes.select('theme');
-        window.rendition.views().forEach(view => view.pane ? view.pane.render() : null)
+      rendition.themes.register({ theme: ${JSON.stringify(theme)} });
+      rendition.themes.select('theme');
+      rendition.views().forEach(view => view.pane ? view.pane.render() : null); true;
     `);
     dispatch({ type: Types.CHANGE_THEME, payload: theme });
-  }
+  }, []);
 
-  function changeFontFamily(fontFamily: string) {
+  const changeFontFamily = useCallback((fontFamily: string) => {
     book.current?.injectJavaScript(`
       rendition.themes.font('${fontFamily}');
     `);
     dispatch({ type: Types.CHANGE_FONT_FAMILY, payload: fontFamily });
-  }
+  }, []);
 
-  function changeFontSize(size: FontSize) {
+  const changeFontSize = useCallback((size: FontSize) => {
     book.current?.injectJavaScript(`
       rendition.themes.fontSize('${size}'); true
     `);
     dispatch({ type: Types.CHANGE_FONT_SIZE, payload: size });
-  }
+  }, []);
 
-  function setAtStart(atStart: boolean) {
+  const setAtStart = useCallback((atStart: boolean) => {
     dispatch({ type: Types.SET_AT_START, payload: atStart });
-  }
+  }, []);
 
-  function setAtEnd(atEnd: boolean) {
+  const setAtEnd = useCallback((atEnd: boolean) => {
     dispatch({ type: Types.SET_AT_END, payload: atEnd });
-  }
+  }, []);
 
-  function setTotalLocations(totalLocations: number) {
+  const setTotalLocations = useCallback((totalLocations: number) => {
     dispatch({ type: Types.SET_TOTAL_LOCATIONS, payload: totalLocations });
-  }
+  }, []);
 
-  function setCurrentLocation(location: Location) {
+  const setCurrentLocation = useCallback((location: Location) => {
     dispatch({ type: Types.SET_CURRENT_LOCATION, payload: location });
-  }
+  }, []);
 
-  function setProgress(progress: number) {
+  const setProgress = useCallback((progress: number) => {
     dispatch({ type: Types.SET_PROGRESS, payload: progress });
-  }
+  }, []);
 
-  function setLocations(locations: ePubCfi[]) {
+  const setLocations = useCallback((locations: ePubCfi[]) => {
     dispatch({ type: Types.SET_LOCATIONS, payload: locations });
-  }
+  }, []);
 
-  function setIsLoading(isLoading: boolean) {
+  const setIsLoading = useCallback((isLoading: boolean) => {
     dispatch({ type: Types.SET_IS_LOADING, payload: isLoading });
-  }
+  }, []);
 
-  function goToLocation(target: ePubCfi) {
-    book.current?.injectJavaScript(`rendition.display('${target}'); true`);
-  }
+  const setIsRendering = useCallback((isRendering: boolean) => {
+    dispatch({ type: Types.SET_IS_RENDERING, payload: isRendering });
+  }, []);
 
-  function goPrevious() {
+  const goToLocation = useCallback((targetCfi: ePubCfi) => {
+    book.current?.injectJavaScript(`rendition.display('${targetCfi}'); true`);
+  }, []);
+
+  const goPrevious = useCallback(() => {
     book.current?.injectJavaScript(`rendition.prev(); true`);
-  }
+  }, []);
 
-  function goNext() {
+  const goNext = useCallback(() => {
     book.current?.injectJavaScript(`rendition.next(); true`);
-  }
+  }, []);
 
-  function getLocations() {
-    return state.locations;
-  }
+  const getLocations = useCallback(() => state.locations, [state.locations]);
 
-  function getCurrentLocation() {
-    return state.currentLocation;
-  }
+  const getCurrentLocation = useCallback(() => state.currentLocation, [
+    state.currentLocation,
+  ]);
 
-  // Works
-  function search(query: string) {
+  const search = useCallback((query: string) => {
     book.current?.injectJavaScript(`
       Promise.all(
-        window.book.spine.spineItems.map((item) => {
-          return item.load(window.book.load.bind(window.book)).then(() => {
+        book.spine.spineItems.map((item) => {
+          return item.load(book.load.bind(book)).then(() => {
             let results = item.find('${query}'.trim());
             item.unload();
             return Promise.resolve(results);
@@ -452,88 +476,127 @@ const ReaderProvider: React.FC = ({ children }) => {
         )
       ); true
     `);
-  }
+  }, []);
 
-  function setSearchResults(results: SearchResult[]) {
+  const setSearchResults = useCallback((results: SearchResult[]) => {
     dispatch({ type: Types.SET_SEARCH_RESULTS, payload: results });
-  }
+  }, []);
 
-  // Works
-  function addMark(
-    type: Mark,
-    cfiRange: string,
-    data?: any,
-    callback?: () => void,
-    className?: string,
-    styles?: any
-  ) {
-    const defaultStyles = { fill: 'yellow' };
+  const addMark = useCallback(
+    (
+      type: Mark,
+      cfiRange: string,
+      data?: any,
+      callback?: () => void,
+      className?: string,
+      styles?: any
+    ) => {
+      const defaultStyles = { fill: 'yellow' };
 
-    book.current?.injectJavaScript(`
+      book.current?.injectJavaScript(`
       rendition.annotations.add('${type}', '${cfiRange}', ${JSON.stringify(
-      data ?? {}
-    )}, ${JSON.stringify(
-      callback ? callback() : () => {}
-    )}, '${className}', ${JSON.stringify(defaultStyles ?? styles)}); true
+        data ?? {}
+      )}, ${JSON.stringify(
+        callback ? callback() : () => {}
+      )}, '${className}', ${JSON.stringify(styles ?? defaultStyles)}); true
     `);
-  }
+    },
+    []
+  );
 
-  // Works
-  function removeMark(cfiRange: string, type: Mark) {
+  const removeMark = useCallback((cfiRange: string, type: Mark) => {
     book.current?.injectJavaScript(`
       rendition.annotations.remove('${cfiRange}', '${type}'); true
     `);
-  }
+  }, []);
 
-  // Works
-  function setKey(key: string) {
+  const setKey = useCallback((key: string) => {
     dispatch({ type: Types.SET_KEY, payload: key });
-  }
+  }, []);
+
+  const contextValue = useMemo(
+    () => ({
+      registerBook,
+      setAtStart,
+      setAtEnd,
+      setTotalLocations,
+      setCurrentLocation,
+      setProgress,
+      setLocations,
+      setIsLoading,
+      setIsRendering,
+
+      goToLocation,
+      goPrevious,
+      goNext,
+      getLocations,
+      getCurrentLocation,
+      search,
+
+      addMark,
+      removeMark,
+
+      setKey,
+      key: state.key,
+
+      changeTheme,
+      changeFontFamily,
+      changeFontSize,
+      theme: state.theme,
+
+      atStart: state.atStart,
+      atEnd: state.atEnd,
+      totalLocations: state.totalLocations,
+      currentLocation: state.currentLocation,
+      progress: state.progress,
+      locations: state.locations,
+      isLoading: state.isLoading,
+      isRendering: state.isRendering,
+
+      searchResults: state.searchResults,
+      setSearchResults,
+    }),
+    [
+      addMark,
+      changeFontFamily,
+      changeFontSize,
+      changeTheme,
+      getCurrentLocation,
+      getLocations,
+      goNext,
+      goPrevious,
+      goToLocation,
+      registerBook,
+      removeMark,
+      search,
+      setAtEnd,
+      setAtStart,
+      setCurrentLocation,
+      setIsLoading,
+      setIsRendering,
+      setKey,
+      setLocations,
+      setProgress,
+      setSearchResults,
+      setTotalLocations,
+      state.atEnd,
+      state.atStart,
+      state.currentLocation,
+      state.isLoading,
+      state.isRendering,
+      state.key,
+      state.locations,
+      state.progress,
+      state.searchResults,
+      state.theme,
+      state.totalLocations,
+    ]
+  );
   return (
-    <ReaderContext.Provider
-      value={{
-        registerBook,
-        setAtStart,
-        setAtEnd,
-        setTotalLocations,
-        setCurrentLocation,
-        setProgress,
-        setLocations,
-        setIsLoading,
-
-        goToLocation,
-        goPrevious,
-        goNext,
-        getLocations,
-        getCurrentLocation,
-        search,
-
-        addMark,
-        removeMark,
-
-        setKey,
-        key: state.key,
-
-        changeTheme,
-        changeFontFamily,
-        changeFontSize,
-        theme: state.theme,
-
-        atStart: state.atStart,
-        atEnd: state.atEnd,
-        totalLocations: state.totalLocations,
-        currentLocation: state.currentLocation,
-        progress: state.progress,
-        locations: state.locations,
-        isLoading: state.isLoading,
-
-        searchResults: state.searchResults,
-        setSearchResults,
-      }}
-    >
+    <ReaderContext.Provider value={contextValue}>
       {children}
     </ReaderContext.Provider>
   );
-};
+}
 
 export { ReaderProvider, ReaderContext };

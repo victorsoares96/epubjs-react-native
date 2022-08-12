@@ -52,40 +52,40 @@ export type SearchResult = {
   excerpt: string;
 };
 
+export type LoadingFileProps = {
+  fileSize: number;
+  downloadProgress: number;
+  downloadSuccess: boolean;
+  downloadError: string | null;
+};
+
+type FileSystem = {
+  file: string | null;
+  progress: number;
+  downloading: boolean;
+  size: number;
+  error: string | null;
+  success: boolean;
+  downloadFile: (
+    fromUrl: string,
+    toFile: string
+  ) => Promise<{ uri: string | null; mimeType: string | null }>;
+  getFileInfo: (
+    fileUri: string
+  ) => Promise<{
+    uri: string;
+    exists: boolean;
+    isDirectory: boolean;
+    size: number | undefined;
+  }>;
+};
+
 export interface ReaderProps {
   /**
-   * The source of your ePub. Can be a base64 string or a URL
+   * Can be a `base64`, `epub`, `opf` or `binary`.
    * @param {object} src
    */
-  src: {
-    /**
-     * The base64 string of the ePub
-     * @param {string} base64
-     * @example
-     * ```
-     * <Reader
-     *    src={{
-     *    base64: 'base64 string'
-     *  }}
-     * />
-     * ```
-     */
-    base64?: string;
-
-    /**
-     * The url of the ePub
-     * @param {string} uri
-     * @example
-     * ```
-     * <Reader
-     *  src={{
-     *    uri: 'https://example.com/epub.epub'
-     *  }}
-     * />
-     * ```
-     */
-    uri?: string;
-  };
+  src: string;
   /**
    * @param {ePubCfi[]} locations
    * @example
@@ -238,9 +238,14 @@ export interface ReaderProps {
   onSwipeRight?: () => void;
   /**
    * Render when the book is loading
-   * @returns {React.ReactNode} React.ReactNode
+   * @returns {JSX.Element} JSX.Element
    */
-  renderLoadingComponent?: () => React.ReactNode;
+  renderLoadingFileComponent?: (props: LoadingFileProps) => JSX.Element;
+  /**
+   * Appears when the book is been rendering
+   * @returns {JSX.Element} JSX.Element
+   */
+  renderOpeningBookComponent?: () => JSX.Element;
   /**
    * Enable text selection feature on the book
    * @default false
@@ -258,4 +263,6 @@ export interface ReaderProps {
    * ```
    */
   defaultTheme?: Theme;
+
+  fileSystem(): FileSystem;
 }
