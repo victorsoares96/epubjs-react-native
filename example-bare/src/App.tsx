@@ -2,7 +2,13 @@ import * as React from 'react';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaView, StyleSheet, Text, TouchableOpacity } from 'react-native';
-import { Basic, Formats } from './examples';
+import {
+  Basic,
+  Formats,
+  CustomThemes,
+  InitialLocation,
+  Search,
+} from './examples';
 
 const { Navigator, Screen } = createNativeStackNavigator();
 
@@ -24,15 +30,34 @@ const styles = StyleSheet.create({
 export const examples = [
   {
     title: 'Basic',
-    description: 'The minimum to work',
+    description: 'The minimum to work.',
     route: 'Basic',
     component: Basic,
   },
   {
     title: 'Formats',
-    description: 'Loading a book of different formats. (opf, epub, base64)',
+    description:
+      'Loading a book of different formats. (opf, epub, base64 and internal)',
     route: 'Formats',
     component: Formats,
+  },
+  {
+    title: 'Custom Themes',
+    description: 'Loading a book with custom themes.',
+    route: 'Themes',
+    component: CustomThemes,
+  },
+  {
+    title: 'Initial Location',
+    description: 'Open book in specific location.',
+    route: 'InitialLocation',
+    component: InitialLocation,
+  },
+  {
+    title: 'Search',
+    description: 'Search terms in the book.',
+    route: 'Search',
+    component: Search,
   },
 ];
 
