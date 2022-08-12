@@ -9,6 +9,7 @@ import { getSourceType } from './utils/getSourceType';
 import { getSourceName } from './utils/getPathname';
 import { SourceType } from './utils/enums/source-type.enum';
 
+// ...
 export function Reader({
   src,
   width,
