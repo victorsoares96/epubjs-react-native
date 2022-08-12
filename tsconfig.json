@@ -2,7 +2,7 @@
   "compilerOptions": {
     "baseUrl": "./",
     "paths": {
-      "epubjs-react-native": ["./src/index"]
+      "@epubjs-react-native/core": ["./src/index"]
     },
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,

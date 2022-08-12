@@ -1,6 +1,6 @@
 {
-  "name": "epubjs-react-native",
-  "version": "1.1.0",
+  "name": "@epubjs-react-native/core",
+  "version": "0.0.0-20220811-1043",
   "description": "ePub.js Reader for React Native",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
@@ -26,14 +26,15 @@
     "prettier:format": "prettier --write .",
     "lint": "eslint ./src/ --ext .ts,.tsx,.js,.json",
     "lint:fix": "eslint --fix ./src/ --ext .ts,.tsx,.js,.json",
-    "type-check": "tsc -p tsconfig.json --noEmit",
+    "type-check": "tsc -p tsconfig.build.json --noEmit --pretty",
     "test": "jest --watch --runInBand --passWithNoTests",
     "test:coverage": "jest --coverage --no-cache --runInBand --passWithNoTests --forceExit",
     "build": "bob build",
     "release": "yarn build && npm publish",
-    "release-local": "yarn build && npm link && echo [FINISH]: Run \"npm link epubjs-react-native\" to link the package to your project",
-    "example": "yarn --cwd example",
-    "bootstrap": "yarn example && yarn && yarn example pods"
+    "release-local": "yarn build && npm link && echo [FINISH]: Run \"npm link @epubjs-react-native/core\" to link the package to your project",
+    "example-bare": "yarn --cwd example-bare",
+    "example-expo": "yarn --cwd example-expo",
+    "bootstrap": "yarn example-bare && yarn example-expo && yarn && yarn example-bare pods && yarn example-expo pods"
   },
   "keywords": [
     "react",
@@ -52,7 +53,8 @@
   },
   "homepage": "https://github.com/victorsoares96/epubjs-react-native#readme",
   "publishConfig": {
-    "registry": "https://registry.npmjs.org/"
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
   },
   "devDependencies": {
     "@formidable-webview/ersatz": "2.1.3",
@@ -124,5 +126,6 @@
         }
       ]
     ]
-  }
+  },
+  "dependencies": {}
 }

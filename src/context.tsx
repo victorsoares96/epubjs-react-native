@@ -38,6 +38,7 @@ enum Types {
   SET_PROGRESS = 'SET_PROGRESS',
   SET_LOCATIONS = 'SET_LOCATIONS',
   SET_IS_LOADING = 'SET_IS_LOADING',
+  SET_IS_RENDERING = 'SET_IS_RENDERING',
   SET_SEARCH_RESULTS = 'SET_SEARCH_RESULTS',
 }
 
@@ -53,6 +54,7 @@ type BookPayload = {
   [Types.SET_PROGRESS]: number;
   [Types.SET_LOCATIONS]: ePubCfi[];
   [Types.SET_IS_LOADING]: boolean;
+  [Types.SET_IS_RENDERING]: boolean;
   [Types.SET_SEARCH_RESULTS]: SearchResult[];
 };
 
@@ -70,6 +72,7 @@ type InitialState = {
   progress: number;
   locations: ePubCfi[];
   isLoading: boolean;
+  isRendering: boolean;
   searchResults: SearchResult[];
 };
 
@@ -110,7 +113,8 @@ const initialState: InitialState = {
   currentLocation: null,
   progress: 0,
   locations: [],
-  isLoading: false,
+  isLoading: true,
+  isRendering: true,
   searchResults: [],
 };
 
@@ -171,6 +175,11 @@ function bookReducer(state: InitialState, action: BookActions): InitialState {
         ...state,
         isLoading: action.payload,
       };
+    case Types.SET_IS_RENDERING:
+      return {
+        ...state,
+        isRendering: action.payload,
+      };
     case Types.SET_SEARCH_RESULTS:
       return {
         ...state,
@@ -190,6 +199,7 @@ export interface ReaderContextProps {
   setProgress: (progress: number) => void;
   setLocations: (locations: ePubCfi[]) => void;
   setIsLoading: (isLoading: boolean) => void;
+  setIsRendering: (isRendering: boolean) => void;
 
   /**
    * Go to specific location in the book
@@ -313,6 +323,12 @@ export interface ReaderContextProps {
   isLoading: boolean;
 
   /**
+   * Indicates if the book is rendering
+   * @returns {boolean} {@link boolean}
+   */
+  isRendering: boolean;
+
+  /**
    * Search results
    * @returns {SearchResult[]} {@link SearchResult[]}
    */
@@ -330,6 +346,7 @@ const ReaderContext = createContext<ReaderContextProps>({
   setProgress: () => {},
   setLocations: () => {},
   setIsLoading: () => {},
+  setIsRendering: () => {},
 
   goToLocation: () => {},
   goPrevious: () => {},
@@ -355,7 +372,8 @@ const ReaderContext = createContext<ReaderContextProps>({
   currentLocation: null,
   progress: 0,
   locations: [],
-  isLoading: false,
+  isLoading: true,
+  isRendering: true,
 
   searchResults: [],
   setSearchResults: () => {},
@@ -371,10 +389,9 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
 
   const changeTheme = useCallback((theme: Theme) => {
     book.current?.injectJavaScript(`
-      window.THEME = ${JSON.stringify(theme)};
-      window.rendition.themes.register({ theme: window.THEME });
-        window.rendition.themes.select('theme');
-        window.rendition.views().forEach(view => view.pane ? view.pane.render() : null)
+      rendition.themes.register({ theme: ${JSON.stringify(theme)} });
+      rendition.themes.select('theme');
+      rendition.views().forEach(view => view.pane ? view.pane.render() : null); true;
     `);
     dispatch({ type: Types.CHANGE_THEME, payload: theme });
   }, []);
@@ -421,6 +438,10 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
     dispatch({ type: Types.SET_IS_LOADING, payload: isLoading });
   }, []);
 
+  const setIsRendering = useCallback((isRendering: boolean) => {
+    dispatch({ type: Types.SET_IS_RENDERING, payload: isRendering });
+  }, []);
+
   const goToLocation = useCallback((targetCfi: ePubCfi) => {
     book.current?.injectJavaScript(`rendition.display('${targetCfi}'); true`);
   }, []);
@@ -442,8 +463,8 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
   const search = useCallback((query: string) => {
     book.current?.injectJavaScript(`
       Promise.all(
-        window.book.spine.spineItems.map((item) => {
-          return item.load(window.book.load.bind(window.book)).then(() => {
+        book.spine.spineItems.map((item) => {
+          return item.load(book.load.bind(book)).then(() => {
             let results = item.find('${query}'.trim());
             item.unload();
             return Promise.resolve(results);
@@ -503,6 +524,7 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       setProgress,
       setLocations,
       setIsLoading,
+      setIsRendering,
 
       goToLocation,
       goPrevious,
@@ -529,6 +551,7 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       progress: state.progress,
       locations: state.locations,
       isLoading: state.isLoading,
+      isRendering: state.isRendering,
 
       searchResults: state.searchResults,
       setSearchResults,
@@ -550,6 +573,7 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       setAtStart,
       setCurrentLocation,
       setIsLoading,
+      setIsRendering,
       setKey,
       setLocations,
       setProgress,
@@ -559,6 +583,7 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       state.atStart,
       state.currentLocation,
       state.isLoading,
+      state.isRendering,
       state.key,
       state.locations,
       state.progress,
