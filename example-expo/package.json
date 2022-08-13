@@ -11,12 +11,17 @@
     "postinstall": "patch-package"
   },
   "dependencies": {
-    "@epubjs-react-native/expo-file-system": "^0.0.1",
-    "expo": "^45.0.0",
+    "@epubjs-react-native/expo-file-system": "0.0.1",
+    "expo": "45.0.0",
+    "expo-file-system": "14.1.0",
+    "@react-navigation/native": "6.0.11",
+    "@react-navigation/native-stack": "6.7.0",
     "react": "17.0.2",
     "react-native": "0.68.2",
-    "react-native-document-picker": "^8.1.1",
+    "react-native-document-picker": "8.1.1",
     "react-native-gesture-handler": "2.1.1",
+    "react-native-safe-area-context": "3.4.1",
+    "react-native-screens": "3.15.0",
     "react-native-webview": "11.15.0"
   },
   "devDependencies": {
