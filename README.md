@@ -1,34 +1,38 @@
 # epubjs-react-native
 
-ePub.js Reader for React Native
+A digital book reader in .opf .epub format for react native using epub.js library inside a webview.
 
 ## Installation
 
 ```sh
-npm install epubjs-react-native
+npm install @epubjs-react-native/core
 ```
-
-#### Installing dependencies into a bare React Native project
-
-In your project, run:
 
 ```sh
-npm install react-native-webview react-native-gesture-handler
+yarn add @epubjs-react-native/core
 ```
 
-#### If you use Expo
+follow these steps below based on the type of project you want to apply this library:
 
-In your project, run:
+#### Bare Installation
 
 ```sh
-expo install react-native-webview react-native-gesture-handler
+npm install @epubjs-react-native/file-system react-native-fs react-native-webview react-native-gesture-handler
 ```
-
-##### If you develop for iOS use this command for install CocoaPods deps (if you use Expo you don't need this)
 
 ```sh
-cd ios
+yarn add @epubjs-react-native/file-system react-native-fs react-native-webview react-native-gesture-handler
 ```
+
+#### Expo Installation
+
+```sh
+expo install @epubjs-react-native/expo-file-system react-native-fs react-native-webview react-native-gesture-handler
+```
+
+#### If you develop for iOS use this command for install CocoaPods deps (if you use an expo managed project you don't need this)
+
+In your ios project folder run:
 
 ```sh
 npx pod install
@@ -40,7 +44,9 @@ npx pod install
 import * as React from 'react';
 
 import { SafeAreaView, useWindowDimensions } from 'react-native';
-import { Reader, ReaderProvider } from 'epubjs-react-native';
+import { Reader, ReaderProvider } from '@epubjs-react-native/core';
+// import { useFileSystem } from '@epubjs-react-native/file-system'; // for Bare React Native project
+// import { useFileSystem } from '@epubjs-react-native/expo-file-system'; // for Expo project
 
 export default function App() {
   const { width, height } = useWindowDimensions();
@@ -48,9 +54,10 @@ export default function App() {
     <SafeAreaView>
       <ReaderProvider>
         <Reader
-          src={{ uri: 'https://s3.amazonaws.com/moby-dick/OPS/package.opf' }}
+          src="https://s3.amazonaws.com/moby-dick/OPS/package.opf"
           width={width}
           height={height}
+          fileSystem={useFileSystem}
         />
       </ReaderProvider>
     </SafeAreaView>
@@ -60,33 +67,35 @@ export default function App() {
 
 ## Reader Params
 
-| Param                    | Type        | Description                                                         |
-| ------------------------ | ----------- | ------------------------------------------------------------------- |
-| `src`                    | `string`    | The source of your ePub. Can be a base64 string or a URL. Required. |
-| `width`                  | `number`    | The width of the ePub Rendition. Required.                          |
-| `height`                 | `number`    | The height of the ePub Rendition. Required.                         |
-| `initialLocation`        | `ePubCfi`   | Can be an ePubCfi or chapter url. Optional.                         |
-| `enableSwipe`            | `boolean`   | Enable swipe actions. Default is `true`.                            |
-| `onSwipeLeft`            | `function`  | Called when swipe left gesture is detected. Optional.               |
-| `onSwipeRight`           | `function`  | Called when swipe right gesture is detected. Optional.              |
-| `renderLoadingComponent` | `ReactNode` | Render when the book is loading. Optional.                          |
-| `onStarted`              | `function`  | Called once the book loads is started. Optional.                    |
-| `onReady`                | `function`  | Called once book has been displayed. Optional.                      |
-| `onDisplayError`         | `function`  | Called once book has not been displayed. Optional.                  |
-| `onRendered`             | `function`  | Emit that a section has been rendered. Optional.                    |
-| `onResized`              | `function`  | Called when occurred a page change. Optional.                       |
-| `onLocationChange`       | `function`  | Called when occurred a page change. Optional.                       |
-| `onSearch`               | `function`  | Called once when the book has been searched. Optional.              |
-| `onLocationsReady`       | `function`  | Called once the locations has been generated. Optional.             |
-| `onSelected`             | `function`  | Called once a text selection has occurred. Optional.                |
-| `onMarkPressed`          | `function`  | Called when marked text is pressed. Optional.                       |
-| `onOrientationChange`    | `function`  | Called when screen orientation change is detected. Optional.        |
-| `onPress`                | `function`  | Called when the book was pressed. Optional.                         |
-| `onDoublePress`          | `function`  | Called when the book was double pressed. Optional.                  |
-| `onBeginning`            | `function`  | Called when the book is on the homepage. Optional.                  |
-| `onFinish`               | `function`  | Called when the book is on the final page. Optional.                |
-| `onLayout`               | `function`  | Called when book layout is change. Optional.                        |
-| `defaultTheme`           | `object`    | Theme object. Optional.                                             |
+| Param                        | Type          | Description                                                  |
+| ---------------------------- | ------------- | ------------------------------------------------------------ |
+| `src`                        | `string`      | Can be a `base64`, `epub`, `opf`. Required.                  |
+| `width`                      | `number`      | The width of the ePub Rendition. Required.                   |
+| `height`                     | `number`      | The height of the ePub Rendition. Required.                  |
+| `fileSystem`                 | `function`    | A function that returns a `FileSystem` object. Required.     |
+| `initialLocation`            | `ePubCfi`     | Can be an ePubCfi or chapter url. Optional.                  |
+| `enableSwipe`                | `boolean`     | Enable swipe actions. Default is `true`.                     |
+| `onSwipeLeft`                | `function`    | Called when swipe left gesture is detected. Optional.        |
+| `onSwipeRight`               | `function`    | Called when swipe right gesture is detected. Optional.       |
+| `renderLoadingFileComponent` | `JSX.Element` | Render when the book is loading. Optional.                   |
+| `renderOpeningBookComponent` | `JSX.Element` | Appears when the book is been rendering. Optional.           |
+| `onStarted`                  | `function`    | Called once the book loads is started. Optional.             |
+| `onReady`                    | `function`    | Called once book has been displayed. Optional.               |
+| `onDisplayError`             | `function`    | Called once book has not been displayed. Optional.           |
+| `onRendered`                 | `function`    | Emit that a section has been rendered. Optional.             |
+| `onResized`                  | `function`    | Called when occurred a page change. Optional.                |
+| `onLocationChange`           | `function`    | Called when occurred a page change. Optional.                |
+| `onSearch`                   | `function`    | Called once when the book has been searched. Optional.       |
+| `onLocationsReady`           | `function`    | Called once the locations has been generated. Optional.      |
+| `onSelected`                 | `function`    | Called once a text selection has occurred. Optional.         |
+| `onMarkPressed`              | `function`    | Called when marked text is pressed. Optional.                |
+| `onOrientationChange`        | `function`    | Called when screen orientation change is detected. Optional. |
+| `onPress`                    | `function`    | Called when the book was pressed. Optional.                  |
+| `onDoublePress`              | `function`    | Called when the book was double pressed. Optional.           |
+| `onBeginning`                | `function`    | Called when the book is on the homepage. Optional.           |
+| `onFinish`                   | `function`    | Called when the book is on the final page. Optional.         |
+| `onLayout`                   | `function`    | Called when book layout is change. Optional.                 |
+| `defaultTheme`               | `object`      | Theme object. Optional.                                      |
 
 ## Hooks
 
@@ -126,64 +135,18 @@ const { changeFontSize, goToLocation, ... } = useReader();
 - `isLoading`: Indicates if the book is loading.
 - `searchResults`: Search results.
 
-#### Setting a default theme
+#### Examples
 
-If you want, you can register a custom theme like this:
+You can see the examples in these repositories:
 
-```tsx
-import * as React from 'react';
-
-import { SafeAreaView, useWindowDimensions } from 'react-native';
-import { Reader, BookProvider } from 'epubjs-react-native';
-
-// ...
-
-const darkTheme = {
-  'body': {
-    background: '#333',
-  },
-  'span': {
-    color: '#fff !important',
-  },
-  'p': {
-    color: '#fff !important',
-  },
-  'li': {
-    color: '#fff !important',
-  },
-  'h1': {
-    color: '#fff !important',
-  },
-  'a': {
-    'color': '#fff !important',
-    'pointer-events': 'auto',
-    'cursor': 'pointer',
-  },
-  '::selection': {
-    background: 'lightskyblue',
-  },
-};
-
-export default function App() {
-  const { width, height } = useWindowDimensions();
-  return (
-    <SafeAreaView>
-      <BookProvider>
-        <Reader
-          src={{ uri: 'https://s3.amazonaws.com/moby-dick/OPS/package.opf' }}
-          width={width}
-          height={height}
-          defaultTheme={darkTheme}
-        />
-      </BookProvider>
-    </SafeAreaView>
-  );
-}
-```
+- [Examples running on Expo Project](example-expo/src/App.tsx)
+- [Examples running on Bare React Native Project](example-bare/src/App.tsx)
 
 ## Contributing
 
 See the [contributing guide](CONTRIBUTING.md) to learn how to contribute to the repository and the development workflow.
+
+Did you like this project? Consider sponsoring the development of this project to keep it alive! ❤️
 
 ## License
 
