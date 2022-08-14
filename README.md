@@ -67,35 +67,35 @@ export default function App() {
 
 ## Reader Params
 
-| Param                    | Type        | Description                                                         |
-| ------------------------ | ----------- | ------------------------------------------------------------------- |
-| `src`                    | `string`    | Can be a `base64`, `epub`, `opf`. Required. |
-| `width`                  | `number`    | The width of the ePub Rendition. Required.                          |
-| `height`                 | `number`    | The height of the ePub Rendition. Required.                         |
-| `fileSystem`             | `function`  | A function that returns a `FileSystem` object. Required.            |
-| `initialLocation`        | `ePubCfi`   | Can be an ePubCfi or chapter url. Optional.                         |
-| `enableSwipe`            | `boolean`   | Enable swipe actions. Default is `true`.                            |
-| `onSwipeLeft`            | `function`  | Called when swipe left gesture is detected. Optional.               |
-| `onSwipeRight`           | `function`  | Called when swipe right gesture is detected. Optional.              |
-| `renderLoadingFileComponent` | `JSX.Element` | Render when the book is loading. Optional.                          |
-| `renderOpeningBookComponent`   | `JSX.Element` | Appears when the book is been rendering. Optional.                         |
-| `onStarted`              | `function`  | Called once the book loads is started. Optional.                    |
-| `onReady`                | `function`  | Called once book has been displayed. Optional.                      |
-| `onDisplayError`         | `function`  | Called once book has not been displayed. Optional.                  |
-| `onRendered`             | `function`  | Emit that a section has been rendered. Optional.                    |
-| `onResized`              | `function`  | Called when occurred a page change. Optional.                       |
-| `onLocationChange`       | `function`  | Called when occurred a page change. Optional.                       |
-| `onSearch`               | `function`  | Called once when the book has been searched. Optional.              |
-| `onLocationsReady`       | `function`  | Called once the locations has been generated. Optional.             |
-| `onSelected`             | `function`  | Called once a text selection has occurred. Optional.                |
-| `onMarkPressed`          | `function`  | Called when marked text is pressed. Optional.                       |
-| `onOrientationChange`    | `function`  | Called when screen orientation change is detected. Optional.        |
-| `onPress`                | `function`  | Called when the book was pressed. Optional.                         |
-| `onDoublePress`          | `function`  | Called when the book was double pressed. Optional.                  |
-| `onBeginning`            | `function`  | Called when the book is on the homepage. Optional.                  |
-| `onFinish`               | `function`  | Called when the book is on the final page. Optional.                |
-| `onLayout`               | `function`  | Called when book layout is change. Optional.                        |
-| `defaultTheme`           | `object`    | Theme object. Optional.                                             |
+| Param                        | Type          | Description                                                  |
+| ---------------------------- | ------------- | ------------------------------------------------------------ |
+| `src`                        | `string`      | Can be a `base64`, `epub`, `opf`. Required.                  |
+| `width`                      | `number`      | The width of the ePub Rendition. Required.                   |
+| `height`                     | `number`      | The height of the ePub Rendition. Required.                  |
+| `fileSystem`                 | `function`    | A function that returns a `FileSystem` object. Required.     |
+| `initialLocation`            | `ePubCfi`     | Can be an ePubCfi or chapter url. Optional.                  |
+| `enableSwipe`                | `boolean`     | Enable swipe actions. Default is `true`.                     |
+| `onSwipeLeft`                | `function`    | Called when swipe left gesture is detected. Optional.        |
+| `onSwipeRight`               | `function`    | Called when swipe right gesture is detected. Optional.       |
+| `renderLoadingFileComponent` | `JSX.Element` | Render when the book is loading. Optional.                   |
+| `renderOpeningBookComponent` | `JSX.Element` | Appears when the book is been rendering. Optional.           |
+| `onStarted`                  | `function`    | Called once the book loads is started. Optional.             |
+| `onReady`                    | `function`    | Called once book has been displayed. Optional.               |
+| `onDisplayError`             | `function`    | Called once book has not been displayed. Optional.           |
+| `onRendered`                 | `function`    | Emit that a section has been rendered. Optional.             |
+| `onResized`                  | `function`    | Called when occurred a page change. Optional.                |
+| `onLocationChange`           | `function`    | Called when occurred a page change. Optional.                |
+| `onSearch`                   | `function`    | Called once when the book has been searched. Optional.       |
+| `onLocationsReady`           | `function`    | Called once the locations has been generated. Optional.      |
+| `onSelected`                 | `function`    | Called once a text selection has occurred. Optional.         |
+| `onMarkPressed`              | `function`    | Called when marked text is pressed. Optional.                |
+| `onOrientationChange`        | `function`    | Called when screen orientation change is detected. Optional. |
+| `onPress`                    | `function`    | Called when the book was pressed. Optional.                  |
+| `onDoublePress`              | `function`    | Called when the book was double pressed. Optional.           |
+| `onBeginning`                | `function`    | Called when the book is on the homepage. Optional.           |
+| `onFinish`                   | `function`    | Called when the book is on the final page. Optional.         |
+| `onLayout`                   | `function`    | Called when book layout is change. Optional.                 |
+| `defaultTheme`               | `object`      | Theme object. Optional.                                      |
 
 ## Hooks
 
@@ -125,22 +125,22 @@ const { changeFontSize, goToLocation, ... } = useReader();
 
 ##### States
 
-* `theme`: A object containing theme.
-* `key`: Works like a unique id for book.
-* `atStart`: Indicates if you are at the beginning of the book.
-* `atEnd`: Indicates if you are at the end of the book.
-* `currentLocation`: The current location of the book.
-* `totalLocations`: The total number of locations.
-* `progress`: The progress of the book.
-* `isLoading`: Indicates if the book is loading.
-* `searchResults`: Search results.
+- `theme`: A object containing theme.
+- `key`: Works like a unique id for book.
+- `atStart`: Indicates if you are at the beginning of the book.
+- `atEnd`: Indicates if you are at the end of the book.
+- `currentLocation`: The current location of the book.
+- `totalLocations`: The total number of locations.
+- `progress`: The progress of the book.
+- `isLoading`: Indicates if the book is loading.
+- `searchResults`: Search results.
 
 #### Examples
 
 You can see the examples in these repositories:
 
-* [Examples running on Expo Project](example-expo/src/App.tsx)
-* [Examples running on Bare React Native Project](example-bare/src/App.tsx)
+- [Examples running on Expo Project](example-expo/src/App.tsx)
+- [Examples running on Bare React Native Project](example-bare/src/App.tsx)
 
 ## Contributing
 
