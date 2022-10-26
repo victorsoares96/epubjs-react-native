@@ -1,3 +1,3 @@
 export function isURL(value: string) {
-  return value.includes('http');
+  return value.slice(0,4) == 'http';
 }
