@@ -76,6 +76,15 @@ export default `
             }));
           });
 
+          window.ReactNativeWebView.postMessage(JSON.stringify({ 
+            type: "meta", 
+            data: {
+              coverUrl: book.coverUrl(),
+              author: book.packaging.metadata.creator,
+              title: book.packaging.metadata.title,
+            }
+          }));
+
           window.ReactNativeWebView.postMessage(JSON.stringify({
             type: "onLocationsReady",
             epubKey: book.key(),

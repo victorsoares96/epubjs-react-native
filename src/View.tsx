@@ -49,6 +49,7 @@ export function View({
     registerBook,
     setTotalLocations,
     setCurrentLocation,
+    setMeta,
     setProgress,
     setLocations,
     setAtStart,
@@ -71,6 +72,11 @@ export function View({
     const { type } = parsedEvent;
 
     delete parsedEvent.type;
+
+    if (type === 'meta') {
+      const { meta } = parsedEvent;
+      setMeta(meta);
+    }
 
     if (type === 'onStarted') {
       setIsRendering(true);
