@@ -74,8 +74,8 @@ export function View({
     delete parsedEvent.type;
 
     if (type === 'meta') {
-      const { meta } = parsedEvent;
-      setMeta(meta);
+      const { metadata } = parsedEvent;
+      setMeta(metadata);
     }
 
     if (type === 'onStarted') {

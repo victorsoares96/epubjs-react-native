@@ -76,15 +76,45 @@ export default `
             }));
           });
 
-          window.ReactNativeWebView.postMessage(JSON.stringify({ 
-            type: "meta", 
-            data: {
-              coverUrl: book.coverUrl(),
-              author: book.packaging.metadata.creator,
-              title: book.packaging.metadata.title,
-            }
-          }));
-
+          book
+          .coverUrl()
+          .then(async (url) => {
+            var reader = new FileReader();
+            reader.onload = (res) => {
+              window.ReactNativeWebView.postMessage(
+                JSON.stringify({
+                  type: "meta",
+                  metadata: {
+                    cover: reader.result,
+                    author: book.package.metadata.creator,
+                    title: book.package.metadata.title,
+                    description: book.package.metadata.description,
+                    language: book.package.metadata.language,
+                    publisher: book.package.metadata.publisher,
+                    rights: book.package.metadata.rights,
+                  },
+                })
+              );
+            };
+            reader.readAsDataURL(await fetch(url).then((res) => res.blob()));
+          })
+          .catch(() => {
+            window.ReactNativeWebView.postMessage(
+              JSON.stringify({
+                type: "meta",
+                metadata: {
+                  cover: undefined,
+                  author: book.package.metadata.creator,
+                  title: book.package.metadata.title,
+                  description: book.package.metadata.description,
+                  language: book.package.metadata.language,
+                  publisher: book.package.metadata.publisher,
+                  rights: book.package.metadata.rights,
+                },
+              })
+            );
+          });
+          
           window.ReactNativeWebView.postMessage(JSON.stringify({
             type: "onLocationsReady",
             epubKey: book.key(),

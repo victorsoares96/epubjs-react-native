@@ -52,7 +52,7 @@ type BookPayload = {
   [Types.SET_KEY]: string;
   [Types.SET_TOTAL_LOCATIONS]: number;
   [Types.SET_CURRENT_LOCATION]: Location;
-  [Types.SET_META]: { coverUrl: string; author: string; title: string };
+  [Types.SET_META]: { cover: string | ArrayBuffer | null | undefined, author: string, title: string, description: string, language: string, publisher: string, rights: string, };
   [Types.SET_PROGRESS]: number;
   [Types.SET_LOCATIONS]: ePubCfi[];
   [Types.SET_IS_LOADING]: boolean;
@@ -71,7 +71,7 @@ type InitialState = {
   key: string;
   totalLocations: number;
   currentLocation: Location | null;
-  meta: { coverUrl: string; author: string; title: string };
+  meta: { cover: string | ArrayBuffer | null | undefined, author: string, title: string, description: string, language: string, publisher: string, rights: string, };
   progress: number;
   locations: ePubCfi[];
   isLoading: boolean;
@@ -114,7 +114,7 @@ const initialState: InitialState = {
   key: '',
   totalLocations: 0,
   currentLocation: null,
-  meta: { coverUrl: '', author: '', title: '' },
+  meta: {cover: '', author: '', title: '', description: '', language: '', publisher: '', rights: '', },
   progress: 0,
   locations: [],
   isLoading: true,
@@ -205,7 +205,7 @@ export interface ReaderContextProps {
   setAtEnd: (atEnd: boolean) => void;
   setTotalLocations: (totalLocations: number) => void;
   setCurrentLocation: (location: Location) => void;
-  setMeta: (meta: { coverUrl: string; author: string; title: string }) => void;
+  setMeta: (meta: { cover: string | ArrayBuffer | null | undefined, author: string, title: string, description: string, language: string, publisher: string, rights: string, }) => void;
   setProgress: (progress: number) => void;
   setLocations: (locations: ePubCfi[]) => void;
   setIsLoading: (isLoading: boolean) => void;
@@ -239,10 +239,10 @@ export interface ReaderContextProps {
   getCurrentLocation: () => Location | null;
 
   /**
-   * Returns an object containing the coverUrl, author and title of the book
-   * @returns { coverUrl: string; author: string; title: string }
+   * Returns an object containing the book's metadata
+   * @returns { cover: string | ArrayBuffer | null | undefined, author: string, title: string, description: string, language: string, publisher: string, rights: string, }
    */
-  getMeta: () => { coverUrl: string; author: string; title: string };
+  getMeta: () => { cover: string | ArrayBuffer | null | undefined, author: string, title: string, description: string, language: string, publisher: string, rights: string, };
 
   /**
    * Search for a specific text in the book
@@ -325,9 +325,10 @@ export interface ReaderContextProps {
   currentLocation: Location | null;
 
   /**
-   * An object containing the coverUrl, author and title of the book
+   * An object containing the book's metadata
+   * { cover: string | ArrayBuffer | null | undefined, author: string, title: string, description: string, language: string, publisher: string, rights: string, }
    */
-  meta: { coverUrl: string; author: string; title: string };
+  meta: { cover: string | ArrayBuffer | null | undefined, author: string, title: string, description: string, language: string, publisher: string, rights: string, };
 
   /**
    * The progress of the book
@@ -375,7 +376,7 @@ const ReaderContext = createContext<ReaderContextProps>({
   goNext: () => {},
   getLocations: () => [],
   getCurrentLocation: () => null,
-  getMeta: () => ({ coverUrl: '', author: '', title: '' }),
+  getMeta: () => ({ cover: '', author: '', title: '', description: '', language: '', publisher: '', rights: '', }),
   search: () => {},
 
   changeTheme: () => {},
@@ -393,7 +394,7 @@ const ReaderContext = createContext<ReaderContextProps>({
   atEnd: false,
   totalLocations: 0,
   currentLocation: null,
-  meta: { coverUrl: '', author: '', title: '' },
+  meta: { cover: '', author: '', title: '', description: '', language: '', publisher: '', rights: '', },
   progress: 0,
   locations: [],
   isLoading: true,
@@ -451,7 +452,7 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const setMeta = useCallback(
-    (meta: { coverUrl: string; author: string; title: string }) => {
+    (meta: { cover: string | ArrayBuffer | null | undefined, author: string, title: string, description: string, language: string, publisher: string, rights: string, }) => {
       dispatch({ type: Types.SET_META, payload: meta });
     },
     []
