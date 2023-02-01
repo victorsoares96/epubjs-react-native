@@ -125,7 +125,7 @@ const { changeFontSize, goToLocation, ... } = useReader();
 `getMeta`              |          | Returns an object containing the book's metadata.
 
 The metadata object contains:
-- **cover** *(string, ArrayBuffer, null or undefined)*: A blob of the book's cover image `e.g.data:image/jpeg;base64,/9j/4AAQSkZJ...`  
+- **cover** *(string, ArrayBuffer, null or undefined)*: The book's cover image `e.g.data:image/jpeg;base64,/9j/4AAQSkZJ...`  
 - **author** *(string)*: The name of the book's creator/author `e.g. Herman Melville`
 - **title** *(string)*: The book's title `e.g. Moby-Dick`
 - **description** *(string)*: The book's description/summary.
