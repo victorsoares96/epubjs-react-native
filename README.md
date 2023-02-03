@@ -154,11 +154,7 @@ You can see the examples in these repositories:
 - [Examples running on Expo Project](example-expo/src/App.tsx)
 - [Examples running on Bare React Native Project](example-bare/src/App.tsx)
 
-## Contributing
-
-See the [contributing guide](CONTRIBUTING.md) to learn how to contribute to the repository and the development workflow.
-
-Did you like this project? Consider sponsoring the development of this project to keep it alive! ❤️
+Did you like this project? Consider [sponsoring](https://www.paypal.com/donate/?business=YNAUBS5LFN5KN&no_recurring=1&currency_code=USD) the development of this project to keep it alive! ❤️
 
 ## License
 
