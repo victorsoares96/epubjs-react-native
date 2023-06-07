@@ -1,5 +1,9 @@
 import React, { useContext, useEffect, useRef } from 'react';
-import { TouchableWithoutFeedback, I18nManager, View as RNView } from 'react-native';
+import {
+  TouchableWithoutFeedback,
+  I18nManager,
+  View as RNView,
+} from 'react-native';
 import {
   Directions,
   FlingGestureHandler,
