@@ -122,6 +122,17 @@ const { changeFontSize, goToLocation, ... } = useReader();
 | `getCurrentLocation` |          | Returns the current location of the book                                  |
 | `addMark`            |          | Add mark a specific cfi in the book                                       |
 | `removeMark`         |          | Remove mark a specific cfi in the book                                    |
+`getMeta`              |          | Returns an object containing the book's metadata.
+
+The metadata object contains:
+- **cover** *(string, ArrayBuffer, null or undefined)*: The book's cover image `e.g.data:image/jpeg;base64,/9j/4AAQSkZJ...`  
+- **author** *(string)*: The name of the book's creator/author `e.g. Herman Melville`
+- **title** *(string)*: The book's title `e.g. Moby-Dick`
+- **description** *(string)*: The book's description/summary.
+- **language** *(string)* : The book's language `e.g. en-US`
+- **publisher** *(string)*: The eBook's publisher `e.g. Harper & Brothers, Publishers`
+- **rights** *(string)*: The book's rights `e.g. This work is shared with the public using the Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0) license.`
+
 
 ##### States
 
@@ -134,6 +145,7 @@ const { changeFontSize, goToLocation, ... } = useReader();
 - `progress`: The progress of the book.
 - `isLoading`: Indicates if the book is loading.
 - `searchResults`: Search results.
+- `meta`: A object containing the book's metadata.
 
 #### Examples
 

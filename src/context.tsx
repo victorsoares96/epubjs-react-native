@@ -35,6 +35,7 @@ enum Types {
   SET_KEY = 'SET_KEY',
   SET_TOTAL_LOCATIONS = 'SET_TOTAL_LOCATIONS',
   SET_CURRENT_LOCATION = 'SET_CURRENT_LOCATION',
+  SET_META = 'SET_META',
   SET_PROGRESS = 'SET_PROGRESS',
   SET_LOCATIONS = 'SET_LOCATIONS',
   SET_IS_LOADING = 'SET_IS_LOADING',
@@ -51,6 +52,7 @@ type BookPayload = {
   [Types.SET_KEY]: string;
   [Types.SET_TOTAL_LOCATIONS]: number;
   [Types.SET_CURRENT_LOCATION]: Location;
+  [Types.SET_META]: { cover: string | ArrayBuffer | null | undefined, author: string, title: string, description: string, language: string, publisher: string, rights: string, };
   [Types.SET_PROGRESS]: number;
   [Types.SET_LOCATIONS]: ePubCfi[];
   [Types.SET_IS_LOADING]: boolean;
@@ -69,6 +71,7 @@ type InitialState = {
   key: string;
   totalLocations: number;
   currentLocation: Location | null;
+  meta: { cover: string | ArrayBuffer | null | undefined, author: string, title: string, description: string, language: string, publisher: string, rights: string, };
   progress: number;
   locations: ePubCfi[];
   isLoading: boolean;
@@ -111,6 +114,7 @@ const initialState: InitialState = {
   key: '',
   totalLocations: 0,
   currentLocation: null,
+  meta: {cover: '', author: '', title: '', description: '', language: '', publisher: '', rights: '', },
   progress: 0,
   locations: [],
   isLoading: true,
@@ -160,6 +164,11 @@ function bookReducer(state: InitialState, action: BookActions): InitialState {
         ...state,
         currentLocation: action.payload,
       };
+    case Types.SET_META:
+      return {
+        ...state,
+        meta: action.payload,
+      };
     case Types.SET_PROGRESS:
       return {
         ...state,
@@ -196,6 +205,7 @@ export interface ReaderContextProps {
   setAtEnd: (atEnd: boolean) => void;
   setTotalLocations: (totalLocations: number) => void;
   setCurrentLocation: (location: Location) => void;
+  setMeta: (meta: { cover: string | ArrayBuffer | null | undefined, author: string, title: string, description: string, language: string, publisher: string, rights: string, }) => void;
   setProgress: (progress: number) => void;
   setLocations: (locations: ePubCfi[]) => void;
   setIsLoading: (isLoading: boolean) => void;
@@ -227,6 +237,12 @@ export interface ReaderContextProps {
    * @returns {Location} {@link Location}
    */
   getCurrentLocation: () => Location | null;
+
+  /**
+   * Returns an object containing the book's metadata
+   * @returns { cover: string | ArrayBuffer | null | undefined, author: string, title: string, description: string, language: string, publisher: string, rights: string, }
+   */
+  getMeta: () => { cover: string | ArrayBuffer | null | undefined, author: string, title: string, description: string, language: string, publisher: string, rights: string, };
 
   /**
    * Search for a specific text in the book
@@ -309,6 +325,12 @@ export interface ReaderContextProps {
   currentLocation: Location | null;
 
   /**
+   * An object containing the book's metadata
+   * { cover: string | ArrayBuffer | null | undefined, author: string, title: string, description: string, language: string, publisher: string, rights: string, }
+   */
+  meta: { cover: string | ArrayBuffer | null | undefined, author: string, title: string, description: string, language: string, publisher: string, rights: string, };
+
+  /**
    * The progress of the book
    * @returns {number} {@link number}
    */
@@ -343,6 +365,7 @@ const ReaderContext = createContext<ReaderContextProps>({
   setAtEnd: () => {},
   setTotalLocations: () => {},
   setCurrentLocation: () => {},
+  setMeta: () => {},
   setProgress: () => {},
   setLocations: () => {},
   setIsLoading: () => {},
@@ -353,6 +376,7 @@ const ReaderContext = createContext<ReaderContextProps>({
   goNext: () => {},
   getLocations: () => [],
   getCurrentLocation: () => null,
+  getMeta: () => ({ cover: '', author: '', title: '', description: '', language: '', publisher: '', rights: '', }),
   search: () => {},
 
   changeTheme: () => {},
@@ -370,6 +394,7 @@ const ReaderContext = createContext<ReaderContextProps>({
   atEnd: false,
   totalLocations: 0,
   currentLocation: null,
+  meta: { cover: '', author: '', title: '', description: '', language: '', publisher: '', rights: '', },
   progress: 0,
   locations: [],
   isLoading: true,
@@ -426,6 +451,13 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
     dispatch({ type: Types.SET_CURRENT_LOCATION, payload: location });
   }, []);
 
+  const setMeta = useCallback(
+    (meta: { cover: string | ArrayBuffer | null | undefined, author: string, title: string, description: string, language: string, publisher: string, rights: string, }) => {
+      dispatch({ type: Types.SET_META, payload: meta });
+    },
+    []
+  );
+
   const setProgress = useCallback((progress: number) => {
     dispatch({ type: Types.SET_PROGRESS, payload: progress });
   }, []);
@@ -459,6 +491,8 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
   const getCurrentLocation = useCallback(() => state.currentLocation, [
     state.currentLocation,
   ]);
+
+  const getMeta = useCallback(() => state.meta, [state.meta]);
 
   const search = useCallback((query: string) => {
     book.current?.injectJavaScript(`
@@ -521,6 +555,7 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       setAtEnd,
       setTotalLocations,
       setCurrentLocation,
+      setMeta,
       setProgress,
       setLocations,
       setIsLoading,
@@ -531,6 +566,7 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       goNext,
       getLocations,
       getCurrentLocation,
+      getMeta,
       search,
 
       addMark,
@@ -548,6 +584,7 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       atEnd: state.atEnd,
       totalLocations: state.totalLocations,
       currentLocation: state.currentLocation,
+      meta: state.meta,
       progress: state.progress,
       locations: state.locations,
       isLoading: state.isLoading,
@@ -562,6 +599,7 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       changeFontSize,
       changeTheme,
       getCurrentLocation,
+      getMeta,
       getLocations,
       goNext,
       goPrevious,
@@ -572,6 +610,7 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       setAtEnd,
       setAtStart,
       setCurrentLocation,
+      setMeta,
       setIsLoading,
       setIsRendering,
       setKey,
@@ -582,6 +621,7 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       state.atEnd,
       state.atStart,
       state.currentLocation,
+      state.meta,
       state.isLoading,
       state.isRendering,
       state.key,
