@@ -1,5 +1,9 @@
 import React, { useContext, useEffect, useRef } from 'react';
-import { TouchableWithoutFeedback, View as RNView } from 'react-native';
+import {
+  TouchableWithoutFeedback,
+  I18nManager,
+  View as RNView,
+} from 'react-native';
 import {
   Directions,
   FlingGestureHandler,
@@ -49,6 +53,7 @@ export function View({
     registerBook,
     setTotalLocations,
     setCurrentLocation,
+    setMeta,
     setProgress,
     setLocations,
     setAtStart,
@@ -71,6 +76,11 @@ export function View({
     const { type } = parsedEvent;
 
     delete parsedEvent.type;
+
+    if (type === 'meta') {
+      const { metadata } = parsedEvent;
+      setMeta(metadata);
+    }
 
     if (type === 'onStarted') {
       setIsRendering(true);
@@ -213,7 +223,7 @@ export function View({
   return (
     <GestureHandlerRootView style={{ width, height }}>
       <FlingGestureHandler
-        direction={Directions.RIGHT}
+        direction={I18nManager.isRTL ? Directions.LEFT : Directions.RIGHT}
         onHandlerStateChange={({ nativeEvent }) => {
           if (nativeEvent.state === State.ACTIVE && enableSwipe) {
             goPrevious();
@@ -222,7 +232,7 @@ export function View({
         }}
       >
         <FlingGestureHandler
-          direction={Directions.LEFT}
+          direction={I18nManager.isRTL ? Directions.RIGHT : Directions.LEFT}
           onHandlerStateChange={({ nativeEvent }) => {
             if (nativeEvent.state === State.ACTIVE && enableSwipe) {
               goNext();
