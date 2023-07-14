@@ -150,7 +150,7 @@ export interface ReaderProps {
    * @param {string} locations
    * @returns {void} void
    */
-  onLocationsReady?: (epubKey: string, locations: Location[]) => void;
+  onLocationsReady?: (epubKey: string, locations: ePubCfi[]) => void;
   /**
    * Called once a text selection has occurred
    * @param {SelectedText} selectedText
