@@ -136,7 +136,7 @@ export interface ReaderProps {
    */
   onLocationChange?: (
     totalLocations: number,
-    currentLocation: number,
+    currentLocation: Location,
     progress: number
   ) => void;
   /**
