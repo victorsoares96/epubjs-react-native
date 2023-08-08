@@ -3,15 +3,19 @@ import type { Theme, ePubCfi } from '../types';
 import template from '../template';
 import type { SourceType } from '../utils/enums/source-type.enum';
 
-export function useInjectBookVariables() {
-  const injectBookVariables = useCallback(
+export function useInjectinjectWebviewVariables() {
+  const injectWebviewVariables = useCallback(
     ({
+      jzipJs,
+      epubJs,
       type,
       book,
       theme,
       enableSelection,
       locations,
     }: {
+      jzipJs: string;
+      epubJs: string;
       type: SourceType;
       book: string;
       theme: Theme;
@@ -19,6 +23,14 @@ export function useInjectBookVariables() {
       locations?: ePubCfi[];
     }) => {
       return template
+        .replace(
+          /<script id="jzip"><\/script>/,
+          `<script src="${jzipJs}"></script>`
+        )
+        .replace(
+          /<script id="epubjs"><\/script>/,
+          `<script src="${epubJs}"></script>`
+        )
         .replace(/const type = window.type;/, `const type = '${type}';`)
         .replace(/const file = window.book;/, `const file = '${book}';`)
         .replace(
@@ -36,6 +48,5 @@ export function useInjectBookVariables() {
     },
     []
   );
-
-  return { injectBookVariables };
+  return { injectWebviewVariables };
 }

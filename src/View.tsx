@@ -16,11 +16,13 @@ import type { ReaderProps } from './types';
 import { OpeningBook } from './utils/OpeningBook';
 
 export type ViewProps = Omit<ReaderProps, 'src' | 'fileSystem'> & {
-  template: string;
+  templateUri: string;
+  allowedUris: string;
 };
 
 export function View({
-  template,
+  templateUri,
+  allowedUris,
   onStarted = () => {},
   onReady = () => {},
   onDisplayError = () => {},
@@ -264,13 +266,15 @@ export function View({
             <TouchableWithoutFeedback onPress={handleDoublePress}>
               <WebView
                 ref={book}
-                source={{ html: template, baseUrl: 'file:///' }}
+                webviewDebuggingEnabled
+                source={{ uri: templateUri }}
                 showsVerticalScrollIndicator={false}
                 javaScriptEnabled
                 originWhitelist={['*']}
                 scrollEnabled={false}
                 mixedContentMode="compatibility"
                 onMessage={onMessage}
+                allowingReadAccessToURL={allowedUris}
                 allowUniversalAccessFromFileURLs
                 allowFileAccessFromFileURLs
                 allowFileAccess

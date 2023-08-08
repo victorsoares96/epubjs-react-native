@@ -1,8 +1,10 @@
 import React, { useContext, useEffect, useState } from 'react';
+import * as FileSystem from 'expo-file-system';
+import { FileSystemDownloadResult } from 'expo-file-system';
 import { LoadingFile } from './utils/LoadingFile';
 import type { ReaderProps } from './types';
 import { View } from './View';
-import { useInjectBookVariables } from './hooks/useInjectBookVariables';
+import { useInjectinjectWebviewVariables } from './hooks/useInjectWebviewVariables';
 import { ReaderContext, defaultTheme as initialTheme } from './context';
 import { isURL } from './utils/isURL';
 import { getSourceType } from './utils/getSourceType';
@@ -31,13 +33,45 @@ export function Reader({
   } = useFileSystem();
 
   const { setIsLoading, isLoading } = useContext(ReaderContext);
-  const { injectBookVariables } = useInjectBookVariables();
-
+  const { injectWebviewVariables } = useInjectinjectWebviewVariables();
   const [template, setTemplate] = useState<string | null>(null);
+  const [templateUrl, setTemplateUrl] = useState<string | null>(null);
+  const [allowedUris, setAllowedUris] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
       setIsLoading(true);
+
+      let jzipJsFileUri;
+      let epubJsFileUri;
+
+      const jzipDownloadResumable = FileSystem.createDownloadResumable(
+        'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.5/jszip.min.js',
+        FileSystem.documentDirectory + 'jszip.min.js',
+        {},
+        () => {}
+      );
+
+      try {
+        jzipJsFileUri = ((await jzipDownloadResumable.downloadAsync()) as FileSystemDownloadResult)
+          .uri;
+      } catch (e) {
+        throw new Error('failed to download jzip js file');
+      }
+
+      const epubjsDownloadResumable = FileSystem.createDownloadResumable(
+        'https://cdn.jsdelivr.net/npm/epubjs/dist/epub.min.js',
+        FileSystem.documentDirectory + 'epub.min.js',
+        {},
+        () => {}
+      );
+
+      try {
+        epubJsFileUri = ((await epubjsDownloadResumable.downloadAsync()) as FileSystemDownloadResult)
+          .uri;
+      } catch (e) {
+        throw new Error('failed to download epubjs js file');
+      }
 
       if (src) {
         const sourceType = getSourceType(src);
@@ -50,7 +84,9 @@ export function Reader({
         if (!isExternalSource) {
           if (sourceType === SourceType.BASE64) {
             setTemplate(
-              injectBookVariables({
+              injectWebviewVariables({
+                jzipJs: jzipJsFileUri,
+                epubJs: epubJsFileUri,
                 type: SourceType.BASE64,
                 book: src,
                 theme: defaultTheme,
@@ -62,7 +98,9 @@ export function Reader({
             setIsLoading(false);
           } else {
             setTemplate(
-              injectBookVariables({
+              injectWebviewVariables({
+                jzipJs: jzipJsFileUri,
+                epubJs: epubJsFileUri,
                 type: SourceType.BINARY,
                 book: src,
                 theme: defaultTheme,
@@ -84,7 +122,9 @@ export function Reader({
 
           if (sourceType === SourceType.OPF) {
             setTemplate(
-              injectBookVariables({
+              injectWebviewVariables({
+                jzipJs: jzipJsFileUri,
+                epubJs: epubJsFileUri,
                 type: sourceType,
                 book: src,
                 theme: defaultTheme,
@@ -95,14 +135,18 @@ export function Reader({
 
             setIsLoading(false);
           } else {
-            const { uri: bookFile } = await downloadFile(src, sourceName);
+            let { uri: bookFileUri } = await downloadFile(src, sourceName);
 
-            if (!bookFile) throw new Error("Couldn't download book");
+            if (!bookFileUri) throw new Error("Couldn't download book");
+
+            setAllowedUris(`${bookFileUri},${jzipJsFileUri},${epubJsFileUri}`);
 
             setTemplate(
-              injectBookVariables({
+              injectWebviewVariables({
+                jzipJs: jzipJsFileUri,
+                epubJs: epubJsFileUri,
                 type: sourceType,
-                book: bookFile,
+                book: bookFileUri,
                 theme: defaultTheme,
                 locations: initialLocations,
                 enableSelection: true,
@@ -118,10 +162,30 @@ export function Reader({
     defaultTheme,
     downloadFile,
     initialLocations,
-    injectBookVariables,
+    injectWebviewVariables,
     setIsLoading,
     src,
   ]);
+
+  useEffect(() => {
+    const saveTemplateFileToDoc = async () => {
+      try {
+        if (template) {
+          const content = template;
+
+          const fileUri = FileSystem.documentDirectory + 'index.html';
+          await FileSystem.writeAsStringAsync(fileUri, content);
+          setTemplateUrl(fileUri);
+        }
+      } catch (error) {
+        console.error('Error saving index.html file:', error);
+        throw new Error('Error saving index.html file:');
+      }
+    };
+    if (template) {
+      saveTemplateFileToDoc();
+    }
+  }, [template]);
 
   if (isLoading) {
     return renderLoadingFileComponent({
@@ -133,5 +197,13 @@ export function Reader({
   }
 
   if (!template) throw new Error('Template is not set');
-  return <View template={template} width={width} height={height} {...rest} />;
+  return (
+    <View
+      templateUri={templateUrl!}
+      allowedUris={allowedUris!}
+      width={width}
+      height={height}
+      {...rest}
+    />
+  );
 }
