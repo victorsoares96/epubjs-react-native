@@ -47,7 +47,7 @@ export function Reader({
 
       const jzipDownloadResumable = FileSystem.createDownloadResumable(
         'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.5/jszip.min.js',
-        FileSystem.documentDirectory + 'jszip.min.js',
+        `${FileSystem.documentDirectory}jszip.min.js`,
         {},
         () => {}
       );
@@ -61,7 +61,7 @@ export function Reader({
 
       const epubjsDownloadResumable = FileSystem.createDownloadResumable(
         'https://cdn.jsdelivr.net/npm/epubjs/dist/epub.min.js',
-        FileSystem.documentDirectory + 'epub.min.js',
+        `${FileSystem.documentDirectory}epub.min.js`,
         {},
         () => {}
       );
@@ -135,7 +135,7 @@ export function Reader({
 
             setIsLoading(false);
           } else {
-            let { uri: bookFileUri } = await downloadFile(src, sourceName);
+            const { uri: bookFileUri } = await downloadFile(src, sourceName);
 
             if (!bookFileUri) throw new Error("Couldn't download book");
 
@@ -173,7 +173,7 @@ export function Reader({
         if (template) {
           const content = template;
 
-          const fileUri = FileSystem.documentDirectory + 'index.html';
+          const fileUri = `${FileSystem.documentDirectory}'index.html'`;
           await FileSystem.writeAsStringAsync(fileUri, content);
           setTemplateUrl(fileUri);
         }
