@@ -59,13 +59,21 @@ export default `
       book.ready
         .then(function () {
           if (initialLocations) {
-            book.locations.load(initialLocations);
-          } else book.locations.generate(1600);
+            return book.locations.load(initialLocations);
+          }
 
+          book.locations.generate(1600).then(function () {
+            window.ReactNativeWebView.postMessage(JSON.stringify({
+              type: "onLocationsReady",
+              epubKey: book.key(),
+              locations: book.locations.save(),
+            }));
+          });
+        })
+        .then(function () {
           var displayed = rendition.display();
 
           displayed.then(function () {
-            var viewer = document.getElementById("viewer");
             var currentLocation = rendition.currentLocation();
 
             window.ReactNativeWebView.postMessage(JSON.stringify({
@@ -114,12 +122,6 @@ export default `
               })
             );
           });
-          
-          window.ReactNativeWebView.postMessage(JSON.stringify({
-            type: "onLocationsReady",
-            epubKey: book.key(),
-            locations: book.locations.save(),
-          }));
 
           book.loaded.navigation.then(function (toc) {
             window.ReactNativeWebView.postMessage(JSON.stringify({
