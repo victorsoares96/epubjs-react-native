@@ -82,7 +82,7 @@ export function Reader({
             throw new Error(`Invalid source name: ${src}`);
           }
 
-          if (sourceType === SourceType.OPF) {
+          if (sourceType === SourceType.OPF || sourceType === SourceType.EPUB) {
             setTemplate(
               injectBookVariables({
                 type: sourceType,
