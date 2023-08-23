@@ -3,8 +3,8 @@ import type { Theme, ePubCfi } from '../types';
 import template from '../template';
 import type { SourceType } from '../utils/enums/source-type.enum';
 
-export function useInjectinjectWebviewVariables() {
-  const injectWebviewVariables = useCallback(
+export function useInjectWebVieWVariables() {
+  const injectWebVieWVariables = useCallback(
     ({
       jzipJs,
       epubJs,
@@ -48,5 +48,5 @@ export function useInjectinjectWebviewVariables() {
     },
     []
   );
-  return { injectWebviewVariables };
+  return { injectWebVieWVariables };
 }
