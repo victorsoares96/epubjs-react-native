@@ -10,7 +10,7 @@ import { isURL } from './utils/isURL';
 import { getSourceType } from './utils/getSourceType';
 import { getSourceName } from './utils/getPathname';
 import { SourceType } from './utils/enums/source-type.enum';
-import { SafeAreaView, Text } from 'react-native';
+import { isFsUri } from './utils/isFsUri';
 
 // ...
 export function Reader({
@@ -79,13 +79,16 @@ export function Reader({
       if (src) {
         const sourceType = getSourceType(src);
         const isExternalSource = isURL(src);
+        const isSrcInFs = isFsUri(src);
 
         if (!sourceType) {
           throw new Error(`Invalid source type: ${src}`);
         }
 
         if (!isExternalSource) {
-          setAllowedUris(`${src}${jzipJsFileUri},${epubJsFileUri}`);
+          if (isSrcInFs) {
+            setAllowedUris(`${src}${jzipJsFileUri},${epubJsFileUri}`);
+          }
           if (sourceType === SourceType.BASE64) {
             setTemplate(
               injectWebVieWVariables({
@@ -201,12 +204,12 @@ export function Reader({
   }
 
   if (!templateUrl || !allowedUris) {
-    // throw new Error('Template not set');
-    return (
-      <SafeAreaView>
-        <Text>Setting Template and read permissions</Text>
-      </SafeAreaView>
-    );
+    return renderLoadingFileComponent({
+      fileSize,
+      downloadProgress,
+      downloadSuccess,
+      downloadError,
+    });
   }
   return (
     <View
