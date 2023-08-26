@@ -1,3 +1,7 @@
+/*
+    CDN url https://cdn.jsdelivr.net/npm/epubjs/dist/epub.min.js
+*/
+
 export default `
 !(function (t, e) {
   'object' == typeof exports && 'object' == typeof module
