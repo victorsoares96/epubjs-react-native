@@ -6,16 +6,16 @@ import type { SourceType } from '../utils/enums/source-type.enum';
 export function useInjectWebVieWVariables() {
   const injectWebVieWVariables = useCallback(
     ({
-      jzipJs,
-      epubJs,
+      jszip,
+      epubjs,
       type,
       book,
       theme,
       enableSelection,
       locations,
     }: {
-      jzipJs: string;
-      epubJs: string;
+      jszip: string;
+      epubjs: string;
       type: SourceType;
       book: string;
       theme: Theme;
@@ -24,12 +24,12 @@ export function useInjectWebVieWVariables() {
     }) => {
       return template
         .replace(
-          /<script id="jzip"><\/script>/,
-          `<script src="${jzipJs}"></script>`
+          /<script id="jszip"><\/script>/,
+          `<script src="${jszip}"></script>`
         )
         .replace(
           /<script id="epubjs"><\/script>/,
-          `<script src="${epubJs}"></script>`
+          `<script src="${epubjs}"></script>`
         )
         .replace(/const type = window.type;/, `const type = '${type}';`)
         .replace(/const file = window.book;/, `const file = '${book}';`)

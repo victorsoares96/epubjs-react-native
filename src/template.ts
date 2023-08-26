@@ -5,7 +5,7 @@ export default `
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>EPUB.js</title>
-    <script id="jzip"></script>
+    <script id="jszip"></script>
     <script id="epubjs"></script>
 
     <style type="text/css">

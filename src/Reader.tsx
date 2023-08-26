@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
 import * as FileSystem from 'expo-file-system';
-import { FileSystemDownloadResult } from 'expo-file-system';
 import { LoadingFile } from './utils/LoadingFile';
 import type { ReaderProps } from './types';
 import { View } from './View';
@@ -11,6 +10,8 @@ import { getSourceType } from './utils/getSourceType';
 import { getSourceName } from './utils/getPathname';
 import { SourceType } from './utils/enums/source-type.enum';
 import { isFsUri } from './utils/isFsUri';
+import jszip from './jszip';
+import epubjs from './epubjs';
 
 // ...
 export function Reader({
@@ -43,38 +44,22 @@ export function Reader({
     (async () => {
       setIsLoading(true);
 
-      let jzipJsFileUri;
-      let epubJsFileUri;
-
-      const jzipDownloadResumable = FileSystem.createDownloadResumable(
-        'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.5/jszip.min.js',
-        `${FileSystem.documentDirectory}jszip.min.js`,
-        {},
-        () => {}
-      );
+      let jszipFileUri = `${FileSystem.documentDirectory}jszip.min.js`;
+      let epubjsFileUri = `${FileSystem.documentDirectory}epub.min.js`;
 
       try {
-        jzipJsFileUri = ((await jzipDownloadResumable.downloadAsync()) as FileSystemDownloadResult)
-          .uri;
+        await FileSystem.writeAsStringAsync(jszipFileUri, jszip);
       } catch (e) {
-        throw new Error('failed to download jzip js file');
+        throw new Error('failed to write jszip js file');
       }
-
-      const epubjsDownloadResumable = FileSystem.createDownloadResumable(
-        'https://cdn.jsdelivr.net/npm/epubjs/dist/epub.min.js',
-        `${FileSystem.documentDirectory}epub.min.js`,
-        {},
-        () => {}
-      );
 
       try {
-        epubJsFileUri = ((await epubjsDownloadResumable.downloadAsync()) as FileSystemDownloadResult)
-          .uri;
+        await FileSystem.writeAsStringAsync(epubjsFileUri, epubjs);
       } catch (e) {
-        throw new Error('failed to download epubjs js file');
+        throw new Error('failed to write epubjs js file');
       }
 
-      setAllowedUris(`${jzipJsFileUri},${epubJsFileUri}`);
+      setAllowedUris(`${jszipFileUri},${epubjsFileUri}`);
 
       if (src) {
         const sourceType = getSourceType(src);
@@ -87,13 +72,13 @@ export function Reader({
 
         if (!isExternalSource) {
           if (isSrcInFs) {
-            setAllowedUris(`${src}${jzipJsFileUri},${epubJsFileUri}`);
+            setAllowedUris(`${src}${jszipFileUri},${epubjsFileUri}`);
           }
           if (sourceType === SourceType.BASE64) {
             setTemplate(
               injectWebVieWVariables({
-                jzipJs: jzipJsFileUri,
-                epubJs: epubJsFileUri,
+                jszip: jszipFileUri,
+                epubjs: epubjsFileUri,
                 type: SourceType.BASE64,
                 book: src,
                 theme: defaultTheme,
@@ -106,8 +91,8 @@ export function Reader({
           } else {
             setTemplate(
               injectWebVieWVariables({
-                jzipJs: jzipJsFileUri,
-                epubJs: epubJsFileUri,
+                jszip: jszipFileUri,
+                epubjs: epubjsFileUri,
                 type: SourceType.BINARY,
                 book: src,
                 theme: defaultTheme,
@@ -130,8 +115,8 @@ export function Reader({
           if (sourceType === SourceType.OPF) {
             setTemplate(
               injectWebVieWVariables({
-                jzipJs: jzipJsFileUri,
-                epubJs: epubJsFileUri,
+                jszip: jszipFileUri,
+                epubjs: epubjsFileUri,
                 type: sourceType,
                 book: src,
                 theme: defaultTheme,
@@ -146,12 +131,12 @@ export function Reader({
 
             if (!bookFileUri) throw new Error("Couldn't download book");
 
-            setAllowedUris(`${bookFileUri},${jzipJsFileUri},${epubJsFileUri}`);
+            setAllowedUris(`${bookFileUri},${jszipFileUri},${epubjsFileUri}`);
 
             setTemplate(
               injectWebVieWVariables({
-                jzipJs: jzipJsFileUri,
-                epubJs: epubJsFileUri,
+                jszip: jszipFileUri,
+                epubjs: epubjsFileUri,
                 type: sourceType,
                 book: bookFileUri,
                 theme: defaultTheme,
