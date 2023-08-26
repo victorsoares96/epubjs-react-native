@@ -74,6 +74,8 @@ export function Reader({
         throw new Error('failed to download epubjs js file');
       }
 
+      setAllowedUris(`${jzipJsFileUri},${epubJsFileUri}`);
+
       if (src) {
         const sourceType = getSourceType(src);
         const isExternalSource = isURL(src);
@@ -83,6 +85,7 @@ export function Reader({
         }
 
         if (!isExternalSource) {
+          setAllowedUris(`${src}${jzipJsFileUri},${epubJsFileUri}`);
           if (sourceType === SourceType.BASE64) {
             setTemplate(
               injectWebVieWVariables({
@@ -201,7 +204,7 @@ export function Reader({
     // throw new Error('Template not set');
     return (
       <SafeAreaView>
-        <Text>Template is not set</Text>
+        <Text>Setting Template and read permissions</Text>
       </SafeAreaView>
     );
   }
