@@ -44,8 +44,8 @@ export function Reader({
     (async () => {
       setIsLoading(true);
 
-      let jszipFileUri = `${FileSystem.documentDirectory}jszip.min.js`;
-      let epubjsFileUri = `${FileSystem.documentDirectory}epub.min.js`;
+      const jszipFileUri = `${FileSystem.documentDirectory}jszip.min.js`;
+      const epubjsFileUri = `${FileSystem.documentDirectory}epub.min.js`;
 
       try {
         await FileSystem.writeAsStringAsync(jszipFileUri, jszip);
@@ -170,7 +170,6 @@ export function Reader({
           setTemplateUrl(fileUri);
         }
       } catch (error) {
-        console.error('Error saving index.html file:', error);
         throw new Error('Error saving index.html file:');
       }
     };
@@ -198,8 +197,8 @@ export function Reader({
   }
   return (
     <View
-      templateUri={templateUrl!}
-      allowedUris={allowedUris!}
+      templateUri={templateUrl}
+      allowedUris={allowedUris}
       width={width}
       height={height}
       {...rest}
