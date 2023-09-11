@@ -266,7 +266,6 @@ export function View({
             <TouchableWithoutFeedback onPress={handleDoublePress}>
               <WebView
                 ref={book}
-                webviewDebuggingEnabled
                 source={{ uri: templateUri }}
                 showsVerticalScrollIndicator={false}
                 javaScriptEnabled
