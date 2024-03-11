@@ -560,9 +560,10 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
 
   const getLocations = useCallback(() => state.locations, [state.locations]);
 
-  const getCurrentLocation = useCallback(() => state.currentLocation, [
-    state.currentLocation,
-  ]);
+  const getCurrentLocation = useCallback(
+    () => state.currentLocation,
+    [state.currentLocation]
+  );
 
   const getMeta = useCallback(() => state.meta, [state.meta]);
 
