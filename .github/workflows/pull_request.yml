@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Use Node.js 16.x
         uses: actions/setup-node@v4
@@ -39,7 +39,7 @@ jobs:
     if: ${{ !contains(github.head_ref, 'renovate/') }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Use Node.js 16.x
         uses: actions/setup-node@v4
