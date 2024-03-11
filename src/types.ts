@@ -70,9 +70,7 @@ type FileSystem = {
     fromUrl: string,
     toFile: string
   ) => Promise<{ uri: string | null; mimeType: string | null }>;
-  getFileInfo: (
-    fileUri: string
-  ) => Promise<{
+  getFileInfo: (fileUri: string) => Promise<{
     uri: string;
     exists: boolean;
     isDirectory: boolean;
