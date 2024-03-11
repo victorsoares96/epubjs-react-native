@@ -1,5 +1,5 @@
 import * as React from 'react';
-import DocumentPicker from 'react-native-document-picker';
+import * as DocumentPicker from 'expo-document-picker';
 import {
   Alert,
   SafeAreaView,
@@ -44,13 +44,10 @@ export function Formats() {
                 {
                   text: 'Ok',
                   onPress: async () => {
-                    const [{ fileCopyUri }] = await DocumentPicker.pick({
-                      type: [DocumentPicker.types.allFiles],
-                      allowMultiSelection: false,
-                      copyTo: 'cachesDirectory',
-                    });
+                    const { assets } = await DocumentPicker.getDocumentAsync();
+                    const [{ uri }] = assets;
 
-                    if (fileCopyUri) setSrc(fileCopyUri);
+                    if (uri) setSrc(uri);
                   },
                 },
               ]
