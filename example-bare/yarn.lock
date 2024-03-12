@@ -1211,10 +1211,10 @@
   resolved "https://registry.yarnpkg.com/@epubjs-react-native/core/-/core-1.3.0.tgz#dd6410265098f5680cb7ac5396860b443358786f"
   integrity sha512-wyjifLuRxyDX0msm4G85RQ0OTe+ATYvLgkFxoR1kzznUgPOuoU3s4vBZMD1KwpcwlomxJoJXBOFS7nzuW7nhRw==
 
-"@epubjs-react-native/file-system@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@epubjs-react-native/file-system/-/file-system-1.0.0.tgz#9444ac26da0150f91d1e3dcf71f87c757cf58fee"
-  integrity sha512-yi3QicPRVtbwOTnDS5gS/bQ4DwgpX49dhQvZ3PIxteBVIrsMZQBW61HFhutKdk1BHLSlZO3oReFJ+SMCnHkbww==
+"@epubjs-react-native/file-system@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@epubjs-react-native/file-system/-/file-system-1.1.0.tgz#611c0fda7d62cf63b5a7ae13355b46dc0634eb70"
+  integrity sha512-T5aRI1KiwtRaq06rM0EQNOsv695vpPRcb/ATVMOa8JxQXa5hCA1Q/+PMkyNlLFs1gv6hHmFWjqYzpTorQGrQuQ==
 
 "@expo/bunyan@^4.0.0":
   version "4.0.0"
