@@ -9,7 +9,6 @@ body:
     attributes:
       value: |
         If you leave out sections there is a high likelihood your issue will be closed.
-        If you have a question or you think your issue might be caused by your application code, you can get help from the community on the [forums](https://forums.expo.dev/) or on [Discord](https://chat.expo.dev).
   - type: textarea
     attributes:
       label: Summary
@@ -25,13 +24,8 @@ body:
       options:
         - Android
         - iOS
-        - Web
     validations:
       required: false
-  - type: input
-    attributes:
-      label: SDK Version
-      description: What version of the Expo SDK are you using?
   - type: textarea
     attributes:
       label: Environment
