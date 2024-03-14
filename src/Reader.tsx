@@ -1,5 +1,4 @@
 import React, { useContext, useEffect, useState } from 'react';
-import * as FileSystem from 'expo-file-system';
 import { LoadingFile } from './utils/LoadingFile';
 import type { ReaderProps } from './types';
 import { View } from './View';
@@ -13,7 +12,6 @@ import { isFsUri } from './utils/isFsUri';
 import jszip from './jszip';
 import epubjs from './epubjs';
 
-// ...
 export function Reader({
   src,
   width,
@@ -32,6 +30,8 @@ export function Reader({
     progress: downloadProgress,
     success: downloadSuccess,
     error: downloadError,
+    documentDirectory,
+    writeAsStringAsync,
   } = useFileSystem();
 
   const { setIsLoading, isLoading } = useContext(ReaderContext);
@@ -44,17 +44,17 @@ export function Reader({
     (async () => {
       setIsLoading(true);
 
-      const jszipFileUri = `${FileSystem.documentDirectory}jszip.min.js`;
-      const epubjsFileUri = `${FileSystem.documentDirectory}epub.min.js`;
+      const jszipFileUri = `${documentDirectory}jszip.min.js`;
+      const epubjsFileUri = `${documentDirectory}epub.min.js`;
 
       try {
-        await FileSystem.writeAsStringAsync(jszipFileUri, jszip);
+        await writeAsStringAsync(jszipFileUri, jszip);
       } catch (e) {
         throw new Error('failed to write jszip js file');
       }
 
       try {
-        await FileSystem.writeAsStringAsync(epubjsFileUri, epubjs);
+        await writeAsStringAsync(epubjsFileUri, epubjs);
       } catch (e) {
         throw new Error('failed to write epubjs js file');
       }
@@ -152,11 +152,13 @@ export function Reader({
     })();
   }, [
     defaultTheme,
+    documentDirectory,
     downloadFile,
     initialLocations,
     injectWebVieWVariables,
     setIsLoading,
     src,
+    writeAsStringAsync,
   ]);
 
   useEffect(() => {
@@ -165,8 +167,8 @@ export function Reader({
         if (template) {
           const content = template;
 
-          const fileUri = `${FileSystem.documentDirectory}index.html`;
-          await FileSystem.writeAsStringAsync(fileUri, content);
+          const fileUri = `${documentDirectory}index.html`;
+          await writeAsStringAsync(fileUri, content);
           setTemplateUrl(fileUri);
         }
       } catch (error) {
@@ -176,7 +178,7 @@ export function Reader({
     if (template) {
       saveTemplateFileToDoc();
     }
-  }, [template]);
+  }, [documentDirectory, template, writeAsStringAsync]);
 
   if (isLoading) {
     return renderLoadingFileComponent({

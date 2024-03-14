@@ -66,6 +66,23 @@ type FileSystem = {
   size: number;
   error: string | null;
   success: boolean;
+  documentDirectory: string | null;
+  cacheDirectory: string | null;
+  bundleDirectory: string | null;
+  readAsStringAsync: (
+    fileUri: string,
+    options?: {
+      encoding?: 'utf8' | 'base64';
+    }
+  ) => Promise<string>;
+  writeAsStringAsync: (
+    fileUri: string,
+    contents: string,
+    options?: {
+      encoding?: 'utf8' | 'base64';
+    }
+  ) => Promise<void>;
+  deleteAsync: (fileUri: string) => Promise<void>;
   downloadFile: (
     fromUrl: string,
     toFile: string
