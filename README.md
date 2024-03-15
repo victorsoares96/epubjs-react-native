@@ -75,6 +75,7 @@ export default function App() {
 | `fileSystem`                 | `function`    | A function that returns a `FileSystem` object. Required.     |
 | `initialLocation`            | `ePubCfi`     | Can be an ePubCfi or chapter url. Optional.                  |
 | `enableSwipe`                | `boolean`     | Enable swipe actions. Default is `true`.                     |
+| `enableSelection`            | `boolean`     | Enable text selection feature on the book. Default is `true`.|
 | `onSwipeLeft`                | `function`    | Called when swipe left gesture is detected. Optional.        |
 | `onSwipeRight`               | `function`    | Called when swipe right gesture is detected. Optional.       |
 | `renderLoadingFileComponent` | `JSX.Element` | Render when the book is loading. Optional.                   |
