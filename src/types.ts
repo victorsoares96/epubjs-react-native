@@ -280,4 +280,17 @@ export interface ReaderProps {
   defaultTheme?: Theme;
 
   fileSystem(): FileSystem;
+
+  /**
+   * This will allow the sandbox content to run scripts, but currently makes the sandbox insecure.
+   *
+   * By default this option is `true` in *iOS* to fix an execution blocking issue related to the use of the `addMark()` function in iOS platform.
+   *
+   * You can get more information about this in the issue: https://github.com/victorsoares96/epubjs-react-native/issues/111
+   */
+  allowScriptedContent?: boolean;
+  /**
+   * Default is `true`
+   */
+  highlightOnSelect?: boolean;
 }
