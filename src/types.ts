@@ -237,8 +237,8 @@ export interface ReaderProps {
    */
   initialLocation?: string;
   /**
-   * Enable swipe actions
-   * @default true
+   * Enable swipe actions.
+   * Default is `true`
    */
   enableSwipe?: boolean;
   /**
@@ -262,9 +262,8 @@ export interface ReaderProps {
    */
   renderOpeningBookComponent?: () => JSX.Element;
   /**
-   * Enable text selection feature on the book
-   * @default false
-   * @description Recommend using this with `enableSwipe` disabled
+   * Enable text selection feature on the book.
+   * Default is `true`
    */
   enableSelection?: boolean;
 

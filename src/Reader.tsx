@@ -21,6 +21,7 @@ export function Reader({
   initialLocations,
   allowScriptedContent = Platform.OS === 'ios',
   highlightOnSelect = true,
+  enableSelection = true,
   renderLoadingFileComponent = (props) => (
     <LoadingFile {...props} width={width} height={height} />
   ),
@@ -86,7 +87,7 @@ export function Reader({
                 book: src,
                 theme: defaultTheme,
                 locations: initialLocations,
-                enableSelection: true,
+                enableSelection,
                 allowScriptedContent,
                 highlightOnSelect,
               })
@@ -102,7 +103,7 @@ export function Reader({
                 book: src,
                 theme: defaultTheme,
                 locations: initialLocations,
-                enableSelection: true,
+                enableSelection,
                 allowScriptedContent,
                 highlightOnSelect,
               })
@@ -128,7 +129,7 @@ export function Reader({
                 book: src,
                 theme: defaultTheme,
                 locations: initialLocations,
-                enableSelection: true,
+                enableSelection,
                 allowScriptedContent,
                 highlightOnSelect,
               })
@@ -150,7 +151,7 @@ export function Reader({
                 book: bookFileUri,
                 theme: defaultTheme,
                 locations: initialLocations,
-                enableSelection: true,
+                enableSelection,
                 allowScriptedContent,
                 highlightOnSelect,
               })
@@ -166,6 +167,7 @@ export function Reader({
     defaultTheme,
     documentDirectory,
     downloadFile,
+    enableSelection,
     highlightOnSelect,
     initialLocations,
     injectWebVieWVariables,
