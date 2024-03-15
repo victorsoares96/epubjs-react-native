@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
+import { Platform } from 'react-native';
 import { LoadingFile } from './utils/LoadingFile';
 import type { ReaderProps } from './types';
 import { View } from './View';
@@ -18,6 +19,8 @@ export function Reader({
   height,
   defaultTheme = initialTheme,
   initialLocations,
+  allowScriptedContent = Platform.OS === 'ios',
+  highlightOnSelect = true,
   renderLoadingFileComponent = (props) => (
     <LoadingFile {...props} width={width} height={height} />
   ),
@@ -84,6 +87,8 @@ export function Reader({
                 theme: defaultTheme,
                 locations: initialLocations,
                 enableSelection: true,
+                allowScriptedContent,
+                highlightOnSelect,
               })
             );
 
@@ -98,6 +103,8 @@ export function Reader({
                 theme: defaultTheme,
                 locations: initialLocations,
                 enableSelection: true,
+                allowScriptedContent,
+                highlightOnSelect,
               })
             );
 
@@ -122,6 +129,8 @@ export function Reader({
                 theme: defaultTheme,
                 locations: initialLocations,
                 enableSelection: true,
+                allowScriptedContent,
+                highlightOnSelect,
               })
             );
 
@@ -142,6 +151,8 @@ export function Reader({
                 theme: defaultTheme,
                 locations: initialLocations,
                 enableSelection: true,
+                allowScriptedContent,
+                highlightOnSelect,
               })
             );
 
@@ -151,9 +162,11 @@ export function Reader({
       }
     })();
   }, [
+    allowScriptedContent,
     defaultTheme,
     documentDirectory,
     downloadFile,
+    highlightOnSelect,
     initialLocations,
     injectWebVieWVariables,
     setIsLoading,

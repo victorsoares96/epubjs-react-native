@@ -13,6 +13,8 @@ export function useInjectWebVieWVariables() {
       theme,
       enableSelection,
       locations,
+      allowScriptedContent,
+      highlightOnSelect,
     }: {
       jszip: string;
       epubjs: string;
@@ -21,6 +23,8 @@ export function useInjectWebVieWVariables() {
       theme: Theme;
       enableSelection: boolean;
       locations?: ePubCfi[];
+      allowScriptedContent?: boolean;
+      highlightOnSelect?: boolean;
     }) => {
       return template
         .replace(
@@ -44,6 +48,14 @@ export function useInjectWebVieWVariables() {
         .replace(
           /const enableSelection = window.enable_selection;/,
           `const enableSelection = ${enableSelection};`
+        )
+        .replace(
+          /allowScriptedContent: allowScriptedContent/,
+          `allowScriptedContent: ${allowScriptedContent}`
+        )
+        .replace(
+          /const highlightOnSelect = highlightOnSelect/,
+          `const highlightOnSelect = ${highlightOnSelect}`
         );
     },
     []

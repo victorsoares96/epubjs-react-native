@@ -27,7 +27,7 @@ yarn add @epubjs-react-native/file-system react-native-fs react-native-webview r
 #### Expo Installation
 
 ```sh
-expo install @epubjs-react-native/expo-file-system react-native-fs react-native-webview react-native-gesture-handler
+npx expo install @epubjs-react-native/expo-file-system react-native-fs react-native-webview react-native-gesture-handler
 ```
 
 #### If you develop for iOS use this command for install CocoaPods deps (if you use an expo managed project you don't need this)
@@ -96,6 +96,8 @@ export default function App() {
 | `onFinish`                   | `function`    | Called when the book is on the final page. Optional.         |
 | `onLayout`                   | `function`    | Called when book layout is change. Optional.                 |
 | `defaultTheme`               | `object`      | Theme object. Optional.                                      |
+| `allowScriptedContent`       | `boolean`     | Allow run scripted content on sandbox. *Default is false on Android and true in iOS* |
+| `highlightOnSelect`          | `boolean`     | Highlight text on select. Default is true.                   |
 
 ## Hooks
 
@@ -125,7 +127,7 @@ const { changeFontSize, goToLocation, ... } = useReader();
 `getMeta`              |          | Returns an object containing the book's metadata.
 
 The metadata object contains:
-- **cover** *(string, ArrayBuffer, null or undefined)*: The book's cover image `e.g.data:image/jpeg;base64,/9j/4AAQSkZJ...`  
+- **cover** *(string, ArrayBuffer, null or undefined)*: The book's cover image `e.g.data:image/jpeg;base64,/9j/4AAQSkZJ...`
 - **author** *(string)*: The name of the book's creator/author `e.g. Herman Melville`
 - **title** *(string)*: The book's title `e.g. Moby-Dick`
 - **description** *(string)*: The book's description/summary.
