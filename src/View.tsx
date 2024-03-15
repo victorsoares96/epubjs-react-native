@@ -50,6 +50,7 @@ export function View({
   renderOpeningBookComponent = () => (
     <OpeningBook width={width} height={height} />
   ),
+  onPressExternalLink,
 }: ViewProps) {
   const {
     registerBook,
@@ -277,6 +278,14 @@ export function View({
                 allowUniversalAccessFromFileURLs
                 allowFileAccessFromFileURLs
                 allowFileAccess
+                javaScriptCanOpenWindowsAutomatically
+                onOpenWindow={(event) => {
+                  event.preventDefault();
+
+                  if (onPressExternalLink) {
+                    onPressExternalLink(event.nativeEvent.targetUrl);
+                  }
+                }}
                 onShouldStartLoadWithRequest={(request) => {
                   if (
                     !isRendering &&
@@ -287,6 +296,15 @@ export function View({
                       request.url.replace(request.mainDocumentURL, '')
                     );
                   }
+
+                  if (
+                    (request.url.includes('mailto:') ||
+                      request.url.includes('tel:')) &&
+                    onPressExternalLink
+                  ) {
+                    onPressExternalLink(request.url);
+                  }
+
                   return true;
                 }}
                 style={{

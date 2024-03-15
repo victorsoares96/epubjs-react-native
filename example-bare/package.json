@@ -9,7 +9,7 @@
     "web": "expo start --web"
   },
   "dependencies": {
-    "@epubjs-react-native/core": "^1.4.0-beta.1",
+    "@epubjs-react-native/core": "^1.4.0-beta.34",
     "@epubjs-react-native/file-system": "^1.1.2",
     "@react-navigation/native": "^6.1.15",
     "@react-navigation/native-stack": "^6.9.24",

@@ -22,6 +22,7 @@ export function Reader({
   allowScriptedContent = Platform.OS === 'ios',
   highlightOnSelect = true,
   enableSelection = true,
+  onPressExternalLink,
   renderLoadingFileComponent = (props) => (
     <LoadingFile {...props} width={width} height={height} />
   ),
@@ -37,6 +38,7 @@ export function Reader({
     documentDirectory,
     writeAsStringAsync,
   } = useFileSystem();
+  const allowPopups = onPressExternalLink ? true : rest.allowPopups;
 
   const { setIsLoading, isLoading } = useContext(ReaderContext);
   const { injectWebVieWVariables } = useInjectWebVieWVariables();
@@ -90,6 +92,7 @@ export function Reader({
                 enableSelection,
                 allowScriptedContent,
                 highlightOnSelect,
+                allowPopups,
               })
             );
 
@@ -106,6 +109,7 @@ export function Reader({
                 enableSelection,
                 allowScriptedContent,
                 highlightOnSelect,
+                allowPopups,
               })
             );
 
@@ -132,6 +136,7 @@ export function Reader({
                 enableSelection,
                 allowScriptedContent,
                 highlightOnSelect,
+                allowPopups,
               })
             );
 
@@ -154,6 +159,7 @@ export function Reader({
                 enableSelection,
                 allowScriptedContent,
                 highlightOnSelect,
+                allowPopups,
               })
             );
 
@@ -163,6 +169,7 @@ export function Reader({
       }
     })();
   }, [
+    allowPopups,
     allowScriptedContent,
     defaultTheme,
     documentDirectory,
@@ -218,6 +225,7 @@ export function Reader({
       allowedUris={allowedUris}
       width={width}
       height={height}
+      onPressExternalLink={onPressExternalLink}
       {...rest}
     />
   );
