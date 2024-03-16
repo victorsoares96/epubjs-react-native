@@ -14,7 +14,7 @@ export function OpenExternalLink() {
           width={width}
           height={height}
           fileSystem={useFileSystem}
-          initialLocation="epubcfi(/6/14!/4/2/2[I_sect1_d1e191]/1:0)"
+          initialLocation="pr01s04.xhtml"
           allowPopups
           onPressExternalLink={(url) => {
             Linking.openURL(url);
