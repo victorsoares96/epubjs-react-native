@@ -168,6 +168,7 @@ export function Reader({
         }
       }
     })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     allowPopups,
     allowScriptedContent,
@@ -180,7 +181,8 @@ export function Reader({
     injectWebVieWVariables,
     setIsLoading,
     src,
-    writeAsStringAsync,
+    // ! Causing unknown loop
+    // writeAsStringAsync,
   ]);
 
   useEffect(() => {
