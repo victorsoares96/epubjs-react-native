@@ -15,7 +15,6 @@ export function OpenExternalLink() {
           height={height}
           fileSystem={useFileSystem}
           initialLocation="pr01s04.xhtml"
-          allowPopups
           onPressExternalLink={(url) => {
             Linking.openURL(url);
           }}
