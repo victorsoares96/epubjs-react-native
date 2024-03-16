@@ -15,6 +15,7 @@ export function useInjectWebVieWVariables() {
       locations,
       allowScriptedContent,
       highlightOnSelect,
+      allowPopups,
     }: {
       jszip: string;
       epubjs: string;
@@ -25,6 +26,7 @@ export function useInjectWebVieWVariables() {
       locations?: ePubCfi[];
       allowScriptedContent?: boolean;
       highlightOnSelect?: boolean;
+      allowPopups?: boolean;
     }) => {
       return template
         .replace(
@@ -56,7 +58,8 @@ export function useInjectWebVieWVariables() {
         .replace(
           /const highlightOnSelect = highlightOnSelect/,
           `const highlightOnSelect = ${highlightOnSelect}`
-        );
+        )
+        .replace(/allowPopups: allowPopups/, `allowPopups: ${allowPopups}`);
     },
     []
   );

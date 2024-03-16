@@ -8,6 +8,7 @@ import {
   CustomThemes,
   InitialLocation,
   Search,
+  OpenExternalLink,
 } from './examples';
 
 const { Navigator, Screen } = createNativeStackNavigator();
@@ -58,6 +59,12 @@ export const examples = [
     description: 'Search terms in the book.',
     route: 'Search',
     component: Search,
+  },
+  {
+    title: 'Open External Link',
+    description: 'Handle opening external links in epub',
+    route: 'OpenExternalLink',
+    component: OpenExternalLink,
   },
 ];
 

@@ -99,6 +99,8 @@ export default function App() {
 | `defaultTheme`               | `object`      | Theme object. Optional.                                      |
 | `allowScriptedContent`       | `boolean`     | Allow run scripted content on sandbox. *Default is false on Android and true in iOS* |
 | `highlightOnSelect`          | `boolean`     | Highlight text on select. Default is true.                   |
+| `allowPopups`                | `boolean`     | Epubjs is rendering the epub-content inside and iframe which defaults to sandbox="allow-same-origin", to enable opening links or running javascript in an epub, you will need to pass this param. |
+| `onPressExternalLink`        | `function`    | Function that is invoked when external link is pressed. When used, the `allowPopups` property is automatically enabled |
 
 ## Hooks
 

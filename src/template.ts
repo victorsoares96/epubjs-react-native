@@ -53,6 +53,7 @@ export default `
       rendition = book.renderTo("viewer", {
         width: "100%",
         height: "100%",
+        allowPopups: allowPopups,
         allowScriptedContent: allowScriptedContent
       });
 

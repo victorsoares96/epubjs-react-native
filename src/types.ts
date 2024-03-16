@@ -288,8 +288,21 @@ export interface ReaderProps {
    * You can get more information about this in the issue: https://github.com/victorsoares96/epubjs-react-native/issues/111
    */
   allowScriptedContent?: boolean;
+
   /**
    * Default is `true`
    */
   highlightOnSelect?: boolean;
+
+  /**
+   * Epubjs is rendering the epub-content inside and iframe which defaults to sandbox="allow-same-origin", to enable opening links or running javascript in an epub, you will need to pass this param.
+   */
+  allowPopups?: boolean;
+
+  /**
+   * Function that is invoked when external link is pressed.
+   *
+   * When used, the `allowPopups` property is automatically enabled
+   */
+  onPressExternalLink?: (url: string) => void;
 }
