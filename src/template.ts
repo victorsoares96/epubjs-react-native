@@ -211,7 +211,6 @@ export default `
           });
         }
 
-        contents.window.getSelection().removeAllRanges();
         book.getRange(cfiRange).then(function (range) {
           if (range) {
             window.ReactNativeWebView.postMessage(JSON.stringify({
