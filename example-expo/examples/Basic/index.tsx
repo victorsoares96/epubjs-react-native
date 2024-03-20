@@ -20,7 +20,7 @@ export default function Page() {
         height={height * 0.7}
         fileSystem={useFileSystem}
         initialLocation="epubcfi(/6/14!/4/2/14/2[c001p0006]/1:348)"
-        highlightOnSelect={false}
+        // highlightOnSelect={false}
         /* onPress={() =>
           addMark('highlight', 'epubcfi(/6/14!/4/2/14/2[c001p0006]/1:348)')
         } */

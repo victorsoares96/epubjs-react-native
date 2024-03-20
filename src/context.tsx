@@ -591,25 +591,20 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
 
   const addMark = useCallback(
     (
-      _type: Mark,
+      type: Mark,
       cfiRange: string,
-      _data?: any,
+      data?: any,
       _callback?: () => void,
-      _className?: string,
-      _styles?: any
+      className?: string,
+      styles?: any
     ) => {
-      // const defaultStyles = { fill: 'yellow' };
+      const defaultStyles = { fill: 'yellow' };
 
-      book.current?.injectJavaScript(
-        `rendition.annotations.highlight(${cfiRange}, {}, function(){}, '', {}); true;`
-      );
-      /* book.current?.injectJavaScript(`
-      rendition.annotations.add('${type}', '${cfiRange}', ${JSON.stringify(
+      book.current?.injectJavaScript(`
+      rendition.annotations.add('${type}', ${JSON.stringify(cfiRange)}, ${JSON.stringify(
         data ?? {}
-      )}, ${JSON.stringify(
-        callback ? callback() : () => {}
-      )}, '${className}', ${JSON.stringify(styles ?? defaultStyles)}); true
-    `); */
+      )}, () => {}, '${className}', ${JSON.stringify(styles ?? defaultStyles)}); true
+    `);
     },
     []
   );
