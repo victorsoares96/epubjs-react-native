@@ -594,18 +594,16 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       type: Mark,
       cfiRange: string,
       data?: any,
-      callback?: () => void,
+      _callback?: () => void,
       className?: string,
       styles?: any
     ) => {
       const defaultStyles = { fill: 'yellow' };
 
       book.current?.injectJavaScript(`
-      rendition.annotations.add('${type}', '${cfiRange}', ${JSON.stringify(
+      rendition.annotations.add('${type}', ${JSON.stringify(cfiRange)}, ${JSON.stringify(
         data ?? {}
-      )}, ${JSON.stringify(
-        callback ? callback() : () => {}
-      )}, '${className}', ${JSON.stringify(styles ?? defaultStyles)}); true
+      )}, () => {}, '${className}', ${JSON.stringify(styles ?? defaultStyles)}); true
     `);
     },
     []
