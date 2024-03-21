@@ -10,9 +10,10 @@ import type {
   ePubCfi,
   FontSize,
   Location,
-  Mark,
+  AnnotationType,
   SearchResult,
   Theme,
+  Annotation,
 } from './types';
 
 type ActionMap<M extends { [index: string]: any }> = {
@@ -41,6 +42,7 @@ enum Types {
   SET_IS_LOADING = 'SET_IS_LOADING',
   SET_IS_RENDERING = 'SET_IS_RENDERING',
   SET_SEARCH_RESULTS = 'SET_SEARCH_RESULTS',
+  SET_ANNOTATIONS = 'SET_ANNOTATIONS',
 }
 
 type BookPayload = {
@@ -66,6 +68,7 @@ type BookPayload = {
   [Types.SET_IS_LOADING]: boolean;
   [Types.SET_IS_RENDERING]: boolean;
   [Types.SET_SEARCH_RESULTS]: SearchResult[];
+  [Types.SET_ANNOTATIONS]: any[];
 };
 
 type BookActions = ActionMap<BookPayload>[keyof ActionMap<BookPayload>];
@@ -93,6 +96,7 @@ type InitialState = {
   isLoading: boolean;
   isRendering: boolean;
   searchResults: SearchResult[];
+  annotations: any[];
 };
 
 export const defaultTheme: Theme = {
@@ -144,6 +148,7 @@ const initialState: InitialState = {
   isLoading: true,
   isRendering: true,
   searchResults: [],
+  annotations: [],
 };
 
 function bookReducer(state: InitialState, action: BookActions): InitialState {
@@ -217,6 +222,11 @@ function bookReducer(state: InitialState, action: BookActions): InitialState {
       return {
         ...state,
         searchResults: action.payload,
+      };
+    case Types.SET_ANNOTATIONS:
+      return {
+        ...state,
+        annotations: action.payload,
       };
     default:
       return state;
@@ -315,9 +325,10 @@ export interface ReaderContextProps {
 
   /**
    * Add Mark a specific cfi in the book
+   * @deprecated Please use `addAnnotation()` instead
    */
   addMark: (
-    type: Mark,
+    type: AnnotationType,
     cfiRange: ePubCfi,
     data?: any,
     callback?: () => void,
@@ -327,8 +338,27 @@ export interface ReaderContextProps {
 
   /**
    * Remove Mark a specific cfi in the book
+   * @deprecated Please use `removeAnnotation()` instead
    */
-  removeMark: (cfiRange: ePubCfi, type: Mark) => void;
+  removeMark: (cfiRange: ePubCfi, type: AnnotationType) => void;
+
+  /**
+   * Add annotation in the book
+   */
+  addAnnotation: <Data = unknown>(
+    type: AnnotationType,
+    cfiRange: ePubCfi,
+    color: string,
+    opacity?: number,
+    data?: Data
+  ) => void;
+
+  /**
+   * Remove annotation in the book
+   */
+  removeAnnotation: (type: AnnotationType, cfiRange: ePubCfi) => void;
+
+  setAnnotations: (annotations: Annotation[]) => void;
 
   setKey: (key: string) => void;
 
@@ -405,6 +435,8 @@ export interface ReaderContextProps {
   searchResults: SearchResult[];
 
   setSearchResults: (results: SearchResult[]) => void;
+
+  removeSelection: () => void;
 }
 
 const ReaderContext = createContext<ReaderContextProps>({
@@ -466,6 +498,12 @@ const ReaderContext = createContext<ReaderContextProps>({
 
   searchResults: [],
   setSearchResults: () => {},
+
+  removeSelection: () => {},
+
+  addAnnotation: () => {},
+  removeAnnotation: () => {},
+  setAnnotations: () => {},
 });
 
 function ReaderProvider({ children }: { children: React.ReactNode }) {
@@ -591,7 +629,7 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
 
   const addMark = useCallback(
     (
-      type: Mark,
+      type: AnnotationType,
       cfiRange: string,
       data?: any,
       _callback?: () => void,
@@ -609,14 +647,75 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
     []
   );
 
-  const removeMark = useCallback((cfiRange: string, type: Mark) => {
+  const removeMark = useCallback((cfiRange: string, type: AnnotationType) => {
     book.current?.injectJavaScript(`
       rendition.annotations.remove('${cfiRange}', '${type}'); true
     `);
   }, []);
 
+  const addAnnotation = useCallback(
+    (
+      type: AnnotationType,
+      cfiRange: string,
+      color: string,
+      opacity = 0.3,
+      data?: unknown
+    ) => {
+      let style = {};
+
+      if (type === 'highlight') {
+        style = { 'fill': color, 'fill-opacity': opacity };
+      }
+
+      if (type === 'underline') {
+        style = {
+          'stroke': color,
+          'stroke-opacity': opacity,
+        };
+      }
+      book.current?.injectJavaScript(`
+        const annotation = rendition.annotations.add('${type}', ${JSON.stringify(cfiRange)}, ${JSON.stringify(
+          data ?? {}
+        )}, () => {}, '', ${JSON.stringify(style)});
+
+        window.ReactNativeWebView.postMessage(JSON.stringify({
+          type: 'onAddAnnotation',
+          annotation: JSON.stringify(annotation)
+        })); true
+    `);
+    },
+    []
+  );
+
+  const removeAnnotation = useCallback(
+    (type: AnnotationType, cfiRange: string) => {
+      book.current?.injectJavaScript(`
+      rendition.annotations.remove('${cfiRange}', '${type}');
+
+      const annotations = rendition.annotations.each();
+      window.ReactNativeWebView.postMessage(JSON.stringify({
+        type: 'onChangeAnnotations',
+        annotations: JSON.stringify(annotations)
+      })); true
+    `);
+    },
+    []
+  );
+
+  const setAnnotations = useCallback((annotations: Annotation[]) => {
+    dispatch({ type: Types.SET_ANNOTATIONS, payload: annotations });
+  }, []);
+
   const setKey = useCallback((key: string) => {
     dispatch({ type: Types.SET_KEY, payload: key });
+  }, []);
+
+  const removeSelection = useCallback(() => {
+    book.current?.injectJavaScript(`
+      const getSelections = () => rendition.getContents().map(contents => contents.window.getSelection());
+      const clearSelection = () => getSelections().forEach(s => s.removeAllRanges());
+      clearSelection();
+    `);
   }, []);
 
   const contextValue = useMemo(
@@ -663,6 +762,12 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
 
       searchResults: state.searchResults,
       setSearchResults,
+
+      removeSelection,
+
+      addAnnotation,
+      removeAnnotation,
+      setAnnotations,
     }),
     [
       addMark,
@@ -689,6 +794,10 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       setProgress,
       setSearchResults,
       setTotalLocations,
+      removeSelection,
+      addAnnotation,
+      removeAnnotation,
+      setAnnotations,
       state.atEnd,
       state.atStart,
       state.currentLocation,

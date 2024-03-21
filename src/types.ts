@@ -25,7 +25,15 @@ export type Location = {
   };
 };
 
-export type Mark = 'highlight' | 'underline';
+export type AnnotationType = 'mark' | 'highlight' | 'underline';
+
+export type Annotation<Data = unknown> = {
+  type: AnnotationType;
+  data: Data;
+  cfiRange: ePubCfi;
+  color: string;
+  sectionIndex: number;
+};
 
 export type FontSize = string;
 
@@ -305,4 +313,22 @@ export interface ReaderProps {
    * When used, the `allowPopups` property is automatically enabled
    */
   onPressExternalLink?: (url: string) => void;
+
+  /**
+   * An array of objects which will be shown when selecting text. An empty array will suppress the menu.
+   * These will appear after a long press to select text.
+   * @platform ios, android
+   */
+  menuItems?: Array<{
+    key?: string;
+    label: string;
+    /**
+     * To keep text selection set the function return to `false`
+     */
+    action: (cfiRange: string, text: string) => boolean;
+  }>;
+
+  onAddAnnotation?: (annotation: Annotation) => void;
+
+  onChangeAnnotations?: (annotations: Annotation[]) => void;
 }

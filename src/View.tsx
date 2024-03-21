@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import {
   TouchableWithoutFeedback,
   I18nManager,
@@ -51,6 +51,9 @@ export function View({
     <OpeningBook width={width} height={height} />
   ),
   onPressExternalLink,
+  menuItems,
+  onAddAnnotation = () => {},
+  onChangeAnnotations = () => {},
 }: ViewProps) {
   const {
     registerBook,
@@ -70,8 +73,14 @@ export function View({
     setKey,
     setSearchResults,
     theme,
+    removeSelection,
+    setAnnotations,
   } = useContext(ReaderContext);
   const book = useRef<WebView>(null);
+  const [selectedText, setSelectedText] = useState<{
+    cfiRange: string;
+    text: string;
+  }>({ cfiRange: '', text: '' });
 
   const onMessage = (event: WebViewMessageEvent) => {
     const parsedEvent = JSON.parse(event.nativeEvent.data);
@@ -153,6 +162,7 @@ export function View({
     if (type === 'onSelected') {
       const { cfiRange, text } = parsedEvent;
 
+      setSelectedText({ cfiRange, text });
       return onSelected(text, cfiRange);
     }
 
@@ -196,6 +206,33 @@ export function View({
       const { toc } = parsedEvent;
 
       return onNavigationLoaded(toc);
+    }
+
+    if (type === 'onAddAnnotation') {
+      let annotation = JSON.parse(parsedEvent.annotation);
+      let color = '';
+
+      if (annotation.type === 'highlight') {
+        color = annotation.styles.fill;
+      }
+
+      if (annotation.type === 'underline') {
+        color = annotation.styles.stroke;
+      }
+
+      annotation = {
+        ...annotation,
+        color,
+      };
+
+      setAnnotations(annotation);
+
+      return onAddAnnotation(annotation);
+    }
+
+    if (type === 'onChangeAnnotations') {
+      console.log(parsedEvent);
+      return onChangeAnnotations(parsedEvent.annotations);
     }
 
     return () => {};
@@ -274,6 +311,24 @@ export function View({
                 scrollEnabled={false}
                 mixedContentMode="compatibility"
                 onMessage={onMessage}
+                menuItems={menuItems?.map((item, key) => ({
+                  label: item.label,
+                  key: key.toString(),
+                }))}
+                onCustomMenuSelection={(event) => {
+                  menuItems?.forEach((item) => {
+                    if (event.nativeEvent.label === item.label) {
+                      const removeSelectionMenu = item.action(
+                        selectedText.cfiRange,
+                        selectedText.text
+                      );
+
+                      if (removeSelectionMenu) {
+                        removeSelection();
+                      }
+                    }
+                  });
+                }}
                 allowingReadAccessToURL={allowedUris}
                 allowUniversalAccessFromFileURLs
                 allowFileAccessFromFileURLs

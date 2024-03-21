@@ -25,6 +25,9 @@ export function useReader() {
     isLoading,
     key,
     searchResults,
+    addAnnotation,
+    removeAnnotation,
+    removeSelection,
   } = useContext(ReaderContext);
 
   return {
@@ -40,6 +43,9 @@ export function useReader() {
     search,
     addMark,
     removeMark,
+    addAnnotation,
+    removeAnnotation,
+    removeSelection,
     theme,
     atStart,
     atEnd,
@@ -74,5 +80,8 @@ export function useReader() {
     | 'isLoading'
     | 'key'
     | 'searchResults'
+    | 'addAnnotation'
+    | 'removeAnnotation'
+    | 'removeSelection'
   >;
 }
