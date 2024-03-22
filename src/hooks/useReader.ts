@@ -13,8 +13,6 @@ export function useReader() {
     getCurrentLocation,
     getMeta,
     search,
-    addMark,
-    removeMark,
     theme,
     atStart,
     atEnd,
@@ -41,8 +39,6 @@ export function useReader() {
     getCurrentLocation,
     getMeta,
     search,
-    addMark,
-    removeMark,
     addAnnotation,
     removeAnnotation,
     removeSelection,
@@ -68,8 +64,6 @@ export function useReader() {
     | 'getCurrentLocation'
     | 'getMeta'
     | 'search'
-    | 'addMark'
-    | 'removeMark'
     | 'theme'
     | 'atStart'
     | 'atEnd'

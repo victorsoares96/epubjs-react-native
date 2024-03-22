@@ -16,10 +16,32 @@ function Book() {
       menuItems={[
         {
           label: 'Highlight',
-          action: (cfiRange, text) => {
-            addAnnotation('highlight', cfiRange, 'red', 0.3, {
-              foo: 'bar',
-            });
+          action: (cfiRange) => {
+            addAnnotation(
+              'highlight',
+              cfiRange,
+              { foo: 'bar' },
+              { color: '#4c12a1', opacity: 0.3 }
+            );
+            return true;
+          },
+        },
+        {
+          label: 'Underline',
+          action: (cfiRange) => {
+            addAnnotation(
+              'underline',
+              cfiRange,
+              { foo: 'bar' },
+              { color: '#4c12a1', opacity: 0.5 }
+            );
+            return true;
+          },
+        },
+        {
+          label: 'Mark',
+          action: (cfiRange) => {
+            addAnnotation('mark', cfiRange, { foo: 'bar' });
             return true;
           },
         },

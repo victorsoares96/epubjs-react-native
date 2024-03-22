@@ -323,39 +323,52 @@ export interface ReaderContextProps {
    */
   changeFontSize: (size: FontSize) => void;
 
-  /**
-   * Add Mark a specific cfi in the book
-   * @deprecated Please use `addAnnotation()` instead
-   */
-  addMark: (
-    type: AnnotationType,
-    cfiRange: ePubCfi,
-    data?: any,
-    callback?: () => void,
-    className?: string,
-    styles?: any
-  ) => void;
-
-  /**
-   * Remove Mark a specific cfi in the book
-   * @deprecated Please use `removeAnnotation()` instead
-   */
-  removeMark: (cfiRange: ePubCfi, type: AnnotationType) => void;
-
-  /**
-   * Add annotation in the book
-   */
   addAnnotation: <Data = unknown>(
     type: AnnotationType,
     cfiRange: ePubCfi,
-    color: string,
-    opacity?: number,
-    data?: Data
+    data?: Data,
+    styles?: {
+      /**
+       * Change the annotation color.
+       * Only for `highlight` and `underline` type.
+       *
+       * Example: `green` or `#4c12a1`. Default is `yellow`
+       */
+      color?: string;
+      /**
+       * Change the annotation opacity.
+       * Only for `highlight` and `underline` type.
+       *
+       * Example: `0.5`. Default is `0.3`
+       */
+      opacity?: number;
+      /**
+       * Only for `mark` annotation type. Define icon width.
+       *
+       * Default is: `20px`
+       */
+      width?: string;
+      /**
+       * Only for `mark` annotation type. Define icon height.
+       *
+       * Default is: `20px`
+       */
+      height?: string;
+      /**
+       * Only for `mark` annotation type. Define icon margin.
+       */
+      margin?: string;
+    },
+    /**
+     * Only for `mark` annotation type. Only accepts icon in base64.
+     *
+     * Example: `data:image/svg+xml;base64,PHN2ZyB2ZXJ...`
+     *
+     * Default is an balloon.
+     */
+    icon?: string
   ) => void;
 
-  /**
-   * Remove annotation in the book
-   */
   removeAnnotation: (type: AnnotationType, cfiRange: ePubCfi) => void;
 
   setAnnotations: (annotations: Annotation[]) => void;
@@ -470,9 +483,6 @@ const ReaderContext = createContext<ReaderContextProps>({
   changeTheme: () => {},
   changeFontFamily: () => {},
   changeFontSize: () => {},
-
-  addMark: () => {},
-  removeMark: () => {},
 
   setKey: () => {},
   key: '',
@@ -627,50 +637,33 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
     dispatch({ type: Types.SET_SEARCH_RESULTS, payload: results });
   }, []);
 
-  const addMark = useCallback(
-    (
-      type: AnnotationType,
-      cfiRange: string,
-      data?: any,
-      _callback?: () => void,
-      className?: string,
-      styles?: any
-    ) => {
-      const defaultStyles = { fill: 'yellow' };
-
-      book.current?.injectJavaScript(`
-      rendition.annotations.add('${type}', ${JSON.stringify(cfiRange)}, ${JSON.stringify(
-        data ?? {}
-      )}, () => {}, '${className}', ${JSON.stringify(styles ?? defaultStyles)}); true
-    `);
-    },
-    []
-  );
-
-  const removeMark = useCallback((cfiRange: string, type: AnnotationType) => {
-    book.current?.injectJavaScript(`
-      rendition.annotations.remove('${cfiRange}', '${type}'); true
-    `);
-  }, []);
-
   const addAnnotation = useCallback(
     (
       type: AnnotationType,
       cfiRange: string,
-      color: string,
-      opacity = 0.3,
-      data?: unknown
+      data?: unknown,
+      styles?: {
+        color?: string;
+        opacity?: number;
+        width?: string;
+        height?: string;
+        margin?: string;
+      },
+      _icon?: string
     ) => {
       let style = {};
 
       if (type === 'highlight') {
-        style = { 'fill': color, 'fill-opacity': opacity };
+        style = {
+          'fill': styles?.color || 'yellow',
+          'fill-opacity': styles?.opacity || 0.3,
+        };
       }
 
       if (type === 'underline') {
         style = {
-          'stroke': color,
-          'stroke-opacity': opacity,
+          'stroke': styles?.color || 'yellow',
+          'stroke-opacity': styles?.opacity || 0.3,
         };
       }
 
@@ -684,8 +677,6 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
             type: 'onAddAnnotation',
             annotation: JSON.stringify(annotation)
           }));
-
-          // const annotations = rendition.annotations?.each();
         } catch (error) {
           alert(JSON.stringify(error?.message));
         }
@@ -697,14 +688,18 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
   const removeAnnotation = useCallback(
     (type: AnnotationType, cfiRange: string) => {
       book.current?.injectJavaScript(`
-      rendition.annotations.remove('${cfiRange}', '${type}');
+        try {
+          rendition.annotations.remove('${cfiRange}', '${type}');
 
-      const annotations = rendition.annotations.each();
-      window.ReactNativeWebView.postMessage(JSON.stringify({
-        type: 'onChangeAnnotations',
-        annotations: JSON.stringify(annotations)
-      })); true
-    `);
+          /*const annotations = rendition.annotations.each();
+          window.ReactNativeWebView.postMessage(JSON.stringify({
+            type: 'onChangeAnnotations',
+            annotations: JSON.stringify(annotations)
+          }));*/
+        } catch (error) {
+          alert(JSON.stringify(error?.message));
+        }
+      `);
     },
     []
   );
@@ -719,9 +714,13 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
 
   const removeSelection = useCallback(() => {
     book.current?.injectJavaScript(`
-      const getSelections = () => rendition.getContents().map(contents => contents.window.getSelection());
-      const clearSelection = () => getSelections().forEach(s => s.removeAllRanges());
-      clearSelection();
+      try {
+        const getSelections = () => rendition.getContents().map(contents => contents.window.getSelection());
+        const clearSelection = () => getSelections().forEach(s => s.removeAllRanges());
+        clearSelection();
+      } catch (error) {
+        alert(JSON.stringify(error?.message));
+      }
     `);
   }, []);
 
@@ -745,9 +744,6 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       getCurrentLocation,
       getMeta,
       search,
-
-      addMark,
-      removeMark,
 
       setKey,
       key: state.key,
@@ -777,7 +773,6 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       setAnnotations,
     }),
     [
-      addMark,
       changeFontFamily,
       changeFontSize,
       changeTheme,
@@ -788,7 +783,6 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       goPrevious,
       goToLocation,
       registerBook,
-      removeMark,
       search,
       setAtEnd,
       setAtStart,
