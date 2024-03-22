@@ -673,15 +673,22 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
           'stroke-opacity': opacity,
         };
       }
-      book.current?.injectJavaScript(`
-        const annotation = rendition.annotations.add('${type}', ${JSON.stringify(cfiRange)}, ${JSON.stringify(
-          data ?? {}
-        )}, () => {}, '', ${JSON.stringify(style)});
 
-        window.ReactNativeWebView.postMessage(JSON.stringify({
-          type: 'onAddAnnotation',
-          annotation: JSON.stringify(annotation)
-        })); true
+      book.current?.injectJavaScript(`
+        try {
+          const annotation = rendition.annotations.add('${type}', ${JSON.stringify(cfiRange)}, ${JSON.stringify(
+            data ?? {}
+          )}, () => {}, '', ${JSON.stringify(style)});
+
+          window.ReactNativeWebView.postMessage(JSON.stringify({
+            type: 'onAddAnnotation',
+            annotation: JSON.stringify(annotation)
+          }));
+
+          // const annotations = rendition.annotations?.each();
+        } catch (error) {
+          alert(JSON.stringify(error?.message));
+        }
     `);
     },
     []

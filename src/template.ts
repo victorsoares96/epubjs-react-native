@@ -36,7 +36,6 @@ export default `
       const theme = window.theme;
       const initialLocations = window.locations;
       const enableSelection = window.enable_selection;
-      const highlightOnSelect = highlightOnSelect;
 
       if (!file) {
         alert('Failed load book');
@@ -205,11 +204,11 @@ export default `
       });
 
       rendition.on("selected", function (cfiRange, contents) {
-        if (highlightOnSelect) {
+        /*if (highlightOnSelect) {
           rendition.annotations.add("highlight", cfiRange, {}, (e) => {
             console.log("highlight clicked", e.target);
           });
-        }
+        }*/
 
         book.getRange(cfiRange).then(function (range) {
           if (range) {

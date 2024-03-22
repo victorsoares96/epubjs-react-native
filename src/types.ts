@@ -298,11 +298,6 @@ export interface ReaderProps {
   allowScriptedContent?: boolean;
 
   /**
-   * Default is `true`
-   */
-  highlightOnSelect?: boolean;
-
-  /**
    * Epubjs is rendering the epub-content inside and iframe which defaults to sandbox="allow-same-origin", to enable opening links or running javascript in an epub, you will need to pass this param.
    */
   allowPopups?: boolean;

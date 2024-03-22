@@ -12,7 +12,6 @@ function Book() {
       width={width}
       height={height}
       fileSystem={useFileSystem}
-      highlightOnSelect={false}
       onAddAnnotation={(annotation) => console.log(annotation)}
       menuItems={[
         {
@@ -24,7 +23,7 @@ function Book() {
             return true;
           },
         },
-        {
+        /* {
           label: '👍',
           action: (cfiRange, text) => {
             addAnnotation('underline', cfiRange, 'red', undefined, {
@@ -92,7 +91,7 @@ function Book() {
             console.log({ cfiRange, text, value: 'amei' });
             return true;
           },
-        },
+        }, */
       ]}
     />
   );
