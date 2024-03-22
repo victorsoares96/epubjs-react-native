@@ -14,6 +14,7 @@ import type {
   SearchResult,
   Theme,
   Annotation,
+  AnnotationStyles,
 } from './types';
 
 type ActionMap<M extends { [index: string]: any }> = {
@@ -327,49 +328,41 @@ export interface ReaderContextProps {
     type: AnnotationType,
     cfiRange: ePubCfi,
     data?: Data,
-    styles?: {
-      /**
-       * Change the annotation color.
-       * Only for `highlight` and `underline` type.
-       *
-       * Example: `green` or `#4c12a1`. Default is `yellow`
-       */
-      color?: string;
-      /**
-       * Change the annotation opacity.
-       * Only for `highlight` and `underline` type.
-       *
-       * Example: `0.5`. Default is `0.3`
-       */
-      opacity?: number;
-      /**
-       * Only for `mark` annotation type. Define icon width.
-       *
-       * Default is: `20px`
-       */
-      width?: string;
-      /**
-       * Only for `mark` annotation type. Define icon height.
-       *
-       * Default is: `20px`
-       */
-      height?: string;
-      /**
-       * Only for `mark` annotation type. Define icon margin.
-       */
-      margin?: string;
-    },
+    styles?: AnnotationStyles,
     /**
-     * Only for `mark` annotation type. Only accepts icon in base64.
+     * The name of the css class defined in the applied theme that will be used as the icon for the markup.
+     * Example of how the class should be defined in the theme file:
+     * ```html
+     * <style type="text/css">
+     *  [ref="epubjs-mk-heart"] {
+     *    background: url("data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPScxLj4...") no-repeat;
+     *    width: 20px;
+     *    height: 20px;
+     *    cursor: pointer;
+     *    margin-left: 0;
+     *  }
+     * </style>
+     * ```
      *
-     * Example: `data:image/svg+xml;base64,PHN2ZyB2ZXJ...`
      *
-     * Default is an balloon.
+     * And how it should be defined:
+     *
+     *
+     * ```js
+     * addAnnotation('mark', 'epubCfi(20/14...)', {}, undefined, 'epubjs-mk-heart');
+     * ```
      */
-    icon?: string
+    iconClass?: string
   ) => void;
 
-  removeAnnotation: (type: AnnotationType, cfiRange: ePubCfi) => void;
+  removeAnnotation: (annotation: Annotation) => void;
+
+  /**
+   * Remove all annotations matching with provided cfi
+   */
+  removeAnnotationByCfi: (cfiRange: ePubCfi) => void;
+
+  removeAnnotations: (type?: AnnotationType) => void;
 
   setAnnotations: (annotations: Annotation[]) => void;
 
@@ -513,6 +506,8 @@ const ReaderContext = createContext<ReaderContextProps>({
 
   addAnnotation: () => {},
   removeAnnotation: () => {},
+  removeAnnotationByCfi: () => {},
+  removeAnnotations: () => {},
   setAnnotations: () => {},
 });
 
@@ -649,7 +644,7 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
         height?: string;
         margin?: string;
       },
-      _icon?: string
+      iconClass = ''
     ) => {
       let style = {};
 
@@ -667,15 +662,41 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
         };
       }
 
+      if (type === 'mark') {
+        // eslint-disable-next-line no-param-reassign
+        iconClass = iconClass || 'epubjs-mk-balloon';
+      }
+
       book.current?.injectJavaScript(`
         try {
           const annotation = rendition.annotations.add('${type}', ${JSON.stringify(cfiRange)}, ${JSON.stringify(
             data ?? {}
-          )}, () => {}, '', ${JSON.stringify(style)});
+          )}, () => {}, ${JSON.stringify(iconClass)}, ${JSON.stringify(style)});
 
           window.ReactNativeWebView.postMessage(JSON.stringify({
             type: 'onAddAnnotation',
             annotation: JSON.stringify(annotation)
+          }));
+
+          let annotations = Object.values(rendition.annotations._annotations);
+          annotations = annotations.map(annotation => ({
+            type: annotation.type,
+            data: annotation.data,
+            cfiRange: annotation.cfiRange,
+            sectionIndex: annotation.sectionIndex,
+            container: annotation.mark.container,
+            element: annotation.mark.element,
+            range: annotation.mark.range,
+            iconClass: annotation.data?.iconClass,
+            styles: {
+              color: annotation.mark.attributes?.fill || annotation.mark.attributes?.stroke,
+              opacity: annotation.mark.attributes?.['fill-opacity'] || annotation.mark.attributes?.['stroke-opacity'],
+            }
+          })).map(annotation => ({ ...annotation, styles: { ...annotation, opacity: Number(annotation.styles?.opacity) } }));
+
+          window.ReactNativeWebView.postMessage(JSON.stringify({
+            type: 'onChangeAnnotations',
+            annotations: JSON.stringify(annotations)
           }));
         } catch (error) {
           alert(JSON.stringify(error?.message));
@@ -685,24 +706,107 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
     []
   );
 
-  const removeAnnotation = useCallback(
-    (type: AnnotationType, cfiRange: string) => {
-      book.current?.injectJavaScript(`
+  const removeAnnotation = useCallback((annotation: Annotation) => {
+    book.current?.injectJavaScript(`
         try {
-          rendition.annotations.remove('${cfiRange}', '${type}');
+          rendition.annotations.remove('${annotation.cfiRange}', '${annotation.type}');
 
-          /*const annotations = rendition.annotations.each();
+          let annotations = Object.values(rendition.annotations._annotations);
+          annotations = annotations.map(annotation => ({
+            type: annotation.type,
+            data: annotation.data,
+            cfiRange: annotation.cfiRange,
+            sectionIndex: annotation.sectionIndex,
+            container: annotation.mark.container,
+            element: annotation.mark.element,
+            range: annotation.mark.range,
+            iconClass: annotation.data?.iconClass,
+            styles: {
+              color: annotation.mark.attributes?.fill || annotation.mark.attributes?.stroke,
+              opacity: annotation.mark.attributes?.['fill-opacity'] || annotation.mark.attributes?.['stroke-opacity'],
+            }
+          })).map(annotation => ({ ...annotation, styles: { ...annotation, opacity: Number(annotation.styles?.opacity) } }));
+
           window.ReactNativeWebView.postMessage(JSON.stringify({
             type: 'onChangeAnnotations',
             annotations: JSON.stringify(annotations)
-          }));*/
+          }));
         } catch (error) {
           alert(JSON.stringify(error?.message));
         }
       `);
-    },
-    []
-  );
+  }, []);
+
+  const removeAnnotationByCfi = useCallback((cfiRange: string) => {
+    book.current?.injectJavaScript(`
+      try {
+        ['highlight', 'underline', 'mark'].forEach(type => {
+          rendition.annotations.remove('${cfiRange}', type);
+        });
+
+        let annotations = Object.values(rendition.annotations._annotations);
+        annotations = annotations.map(annotation => ({
+          type: annotation.type,
+          data: annotation.data,
+          cfiRange: annotation.cfiRange,
+          sectionIndex: annotation.sectionIndex,
+          container: annotation.mark.container,
+          element: annotation.mark.element,
+          range: annotation.mark.range,
+          iconClass: annotation.data?.iconClass,
+          styles: {
+            color: annotation.mark.attributes?.fill || annotation.mark.attributes?.stroke,
+            opacity: annotation.mark.attributes?.['fill-opacity'] || annotation.mark.attributes?.['stroke-opacity'],
+          }
+        })).map(annotation => ({ ...annotation, styles: { ...annotation, opacity: Number(annotation.styles?.opacity) } }));
+
+        window.ReactNativeWebView.postMessage(JSON.stringify({
+          type: 'onChangeAnnotations',
+          annotations: JSON.stringify(annotations)
+        }));
+      } catch (error) {
+        alert(JSON.stringify(error?.message));
+      }
+    `);
+  }, []);
+
+  const removeAnnotations = useCallback((type?: AnnotationType) => {
+    book.current?.injectJavaScript(`
+        try {
+          let annotations = Object.values(rendition.annotations._annotations);
+
+          if (typeof ${type} === 'string') {
+            annotations = annotations.filter(annotation => annotation.type === ${type});
+          }
+
+          annotations.forEach(annotation => {
+            rendition.annotations.remove(annotation.cfiRange, annotation.type);
+          });
+
+          annotations = Object.values(rendition.annotations._annotations);
+          annotations = annotations.map(annotation => ({
+            type: annotation.type,
+            data: annotation.data,
+            cfiRange: annotation.cfiRange,
+            sectionIndex: annotation.sectionIndex,
+            container: annotation.mark.container,
+            element: annotation.mark.element,
+            range: annotation.mark.range,
+            styles: {
+              color: annotation.mark.attributes?.fill || annotation.mark.attributes?.stroke,
+              opacity: annotation.mark.attributes?.['fill-opacity'] || annotation.mark.attributes?.['stroke-opacity'],
+            }
+          })).map(annotation => ({ ...annotation, styles: { ...annotation, opacity: Number(annotation.styles?.opacity) } }));
+
+          window.ReactNativeWebView.postMessage(JSON.stringify({
+            type: 'onChangeAnnotations',
+            annotations: JSON.stringify(annotations)
+          }));
+        } catch (error) {
+          alert(JSON.stringify(error?.message));
+        }
+      `);
+  }, []);
 
   const setAnnotations = useCallback((annotations: Annotation[]) => {
     dispatch({ type: Types.SET_ANNOTATIONS, payload: annotations });
@@ -770,6 +874,8 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
 
       addAnnotation,
       removeAnnotation,
+      removeAnnotationByCfi,
+      removeAnnotations,
       setAnnotations,
     }),
     [
@@ -798,6 +904,8 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       removeSelection,
       addAnnotation,
       removeAnnotation,
+      removeAnnotationByCfi,
+      removeAnnotations,
       setAnnotations,
       state.atEnd,
       state.atStart,

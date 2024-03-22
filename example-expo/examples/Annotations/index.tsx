@@ -13,6 +13,7 @@ function Book() {
       height={height}
       fileSystem={useFileSystem}
       onAddAnnotation={(annotation) => console.log(annotation)}
+      onChangeAnnotations={(annotations) => console.log(annotations)}
       menuItems={[
         {
           label: 'Highlight',
@@ -41,7 +42,13 @@ function Book() {
         {
           label: 'Mark',
           action: (cfiRange) => {
-            addAnnotation('mark', cfiRange, { foo: 'bar' });
+            addAnnotation(
+              'mark',
+              cfiRange,
+              { foo: 'bar' },
+              undefined,
+              'epubjs-mk-heart'
+            );
             return true;
           },
         },

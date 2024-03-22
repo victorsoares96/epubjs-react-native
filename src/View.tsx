@@ -211,28 +211,30 @@ export function View({
     if (type === 'onAddAnnotation') {
       let annotation = JSON.parse(parsedEvent.annotation);
       let color = '';
+      let opacity = 0;
 
       if (annotation.type === 'highlight') {
         color = annotation.styles.fill;
+        opacity = Number(annotation.styles['fill-opacity']);
       }
 
       if (annotation.type === 'underline') {
         color = annotation.styles.stroke;
+        opacity = Number(annotation.styles['stroke-opacity']);
       }
 
       annotation = {
         ...annotation,
-        color,
+        styles: { color, opacity },
       };
-
-      setAnnotations(annotation);
 
       return onAddAnnotation(annotation);
     }
 
     if (type === 'onChangeAnnotations') {
-      console.log(parsedEvent);
-      return onChangeAnnotations(parsedEvent.annotations);
+      const annotations = JSON.parse(parsedEvent.annotations);
+      setAnnotations(annotations);
+      return onChangeAnnotations(annotations);
     }
 
     return () => {};

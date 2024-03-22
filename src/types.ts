@@ -27,12 +27,47 @@ export type Location = {
 
 export type AnnotationType = 'mark' | 'highlight' | 'underline';
 
+export type AnnotationStyles = {
+  /**
+   * Change the annotation color.
+   * Only for `highlight` and `underline` type.
+   *
+   * Example: `green` or `#4c12a1`. Default is `yellow`
+   */
+  color?: string;
+  /**
+   * Change the annotation opacity.
+   * Only for `highlight` and `underline` type.
+   *
+   * Example: `0.5`. Default is `0.3`
+   */
+  opacity?: number;
+  /**
+   * Only for `mark` annotation type. Define icon width.
+   *
+   * Default is: `20px`
+   */
+};
+
+export type AnnotationRange = {
+  collapsed: boolean;
+  commonAncestorContainer: HTMLElement;
+  endContainer: HTMLElement;
+  endOffset: number;
+  startContainer: HTMLElement;
+  startOffset: number;
+};
+
 export type Annotation<Data = unknown> = {
   type: AnnotationType;
   data: Data;
   cfiRange: ePubCfi;
-  color: string;
   sectionIndex: number;
+  container: HTMLDivElement;
+  element: SVGGElement;
+  range: AnnotationRange;
+  iconClass?: string;
+  styles?: AnnotationStyles;
 };
 
 export type FontSize = string;

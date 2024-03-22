@@ -4573,7 +4573,7 @@ export default `
               ? (e = t.highlight(i, n, o, a, h))
               : "underline" === s
                 ? (e = t.underline(i, n, o, a, h))
-                : "mark" === s && (e = t.mark(i, n, o)),
+                : "mark" === s && (e = t.mark(i, n, o, a, h)),
             (this.mark = e),
             this.emit(l.c.ANNOTATION.ATTACH, e),
             e
@@ -5658,39 +5658,40 @@ export default `
             u
           );
         }
-        mark(t, e = {}, i) {
+        mark(t, e = {}, i, n = "epubjs-mk", s = {}) {
           if (!this.contents) return;
           if (t in this.marks) {
             return this.marks[t];
           }
-          let n = this.contents.range(t);
-          if (!n) return;
-          let s = n.commonAncestorContainer,
-            r = 1 === s.nodeType ? s : s.parentNode,
-            o = (i) => {
+          let r = this.contents.range(t);
+          if (!r) return;
+          let o = r.commonAncestorContainer,
+            a = 1 === o.nodeType ? o : o.parentNode,
+            l = (i) => {
               this.emit(h.c.VIEWS.MARK_CLICKED, t, e);
             };
-          n.collapsed && 1 === s.nodeType
-            ? ((n = new Range()), n.selectNodeContents(s))
-            : n.collapsed && ((n = new Range()), n.selectNodeContents(r));
-          let a = this.document.createElement("a");
+          r.collapsed && 1 === o.nodeType
+            ? ((r = new Range()), r.selectNodeContents(o))
+            : r.collapsed && ((r = new Range()), r.selectNodeContents(a));
+          let c = this.document.createElement("a");
           return (
-            a.setAttribute("ref", "epubjs-mk"),
-            (a.style.position = "absolute"),
-            (a.dataset.epubcfi = t),
+            c.setAttribute("ref", n),
+            (c.style = s),
+            (c.style.position = "absolute"),
+            (c.dataset.epubcfi = t),
             e &&
               Object.keys(e).forEach((t) => {
-                a.dataset[t] = e[t];
+                c.dataset[t] = e[t];
               }),
             i &&
-              (a.addEventListener("click", i),
-              a.addEventListener("touchstart", i)),
-            a.addEventListener("click", o),
-            a.addEventListener("touchstart", o),
-            this.placeMark(a, n),
-            this.element.appendChild(a),
-            (this.marks[t] = { element: a, range: n, listeners: [o, i] }),
-            r
+              (c.addEventListener("click", i),
+              c.addEventListener("touchstart", i)),
+            c.addEventListener("click", l),
+            c.addEventListener("touchstart", l),
+            this.placeMark(c, r),
+            this.element.appendChild(c),
+            (this.marks[t] = { element: c, range: r, listeners: [l, i] }),
+            a
           );
         }
         placeMark(t, e) {
