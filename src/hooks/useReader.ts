@@ -24,6 +24,7 @@ export function useReader() {
     key,
     searchResults,
     addAnnotation,
+    updateAnnotationData,
     removeAnnotation,
     removeSelection,
   } = useContext(ReaderContext);
@@ -40,6 +41,7 @@ export function useReader() {
     getMeta,
     search,
     addAnnotation,
+    updateAnnotationData,
     removeAnnotation,
     removeSelection,
     theme,
@@ -75,6 +77,7 @@ export function useReader() {
     | 'key'
     | 'searchResults'
     | 'addAnnotation'
+    | 'updateAnnotationData'
     | 'removeAnnotation'
     | 'removeSelection'
   >;

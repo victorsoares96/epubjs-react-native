@@ -49,23 +49,12 @@ export type AnnotationStyles = {
    */
 };
 
-export type AnnotationRange = {
-  collapsed: boolean;
-  commonAncestorContainer: HTMLElement;
-  endContainer: HTMLElement;
-  endOffset: number;
-  startContainer: HTMLElement;
-  startOffset: number;
-};
-
 export type Annotation<Data = unknown> = {
   type: AnnotationType;
   data: Data;
   cfiRange: ePubCfi;
   sectionIndex: number;
-  container: HTMLDivElement;
-  element: SVGGElement;
-  range: AnnotationRange;
+  text: string;
   iconClass?: string;
   styles?: AnnotationStyles;
 };
@@ -216,12 +205,6 @@ export interface ReaderProps {
    */
   onSelected?: (selectedText: string, cfiRange: ePubCfi) => void;
   /**
-   * Called when marked text is pressed
-   * @param {SelectedText} selectedText
-   * @returns {void} void
-   */
-  onMarkPressed?: (selectedText: string, cfiRange: ePubCfi) => void;
-  /**
    * Called when screen orientation change is detected
    * @param {string} orientation
    * @returns {void} void
@@ -361,4 +344,9 @@ export interface ReaderProps {
   onAddAnnotation?: (annotation: Annotation) => void;
 
   onChangeAnnotations?: (annotations: Annotation[]) => void;
+
+  /**
+   * Called when annotation is pressed
+   */
+  onPressAnnotation?: (annotation: Annotation) => void;
 }

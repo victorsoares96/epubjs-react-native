@@ -220,12 +220,6 @@ export default `
       });
 
       rendition.on("selected", function (cfiRange, contents) {
-        /*if (highlightOnSelect) {
-          rendition.annotations.add("highlight", cfiRange, {}, (e) => {
-            console.log("highlight clicked", e.target);
-          });
-        }*/
-
         book.getRange(cfiRange).then(function (range) {
           if (range) {
             window.ReactNativeWebView.postMessage(JSON.stringify({
@@ -238,15 +232,26 @@ export default `
       });
 
       rendition.on("markClicked", function (cfiRange, contents) {
-        book.getRange(cfiRange).then(function (range) {
-          if (range) {
-            window.ReactNativeWebView.postMessage(JSON.stringify({
-              type: 'onMarkPressed',
-              cfiRange: cfiRange,
-              text: range.toString(),
-            }));
-          }
-        });
+        const annotations = Object.values(rendition.annotations._annotations);
+        const annotation = annotations.find(item => item.cfiRange === cfiRange);
+
+        if (annotation) {
+          window.ReactNativeWebView.postMessage(JSON.stringify({
+            type: 'onPressAnnotation',
+            annotation: {
+              type: annotation.type,
+              data: annotation.data,
+              cfiRange: annotation.cfiRange,
+              sectionIndex: annotation.sectionIndex,
+              text: annotation.mark.range.toString(),
+              iconClass: annotation.data?.iconClass,
+              styles: {
+                color: annotation.mark.attributes?.fill || annotation.mark.attributes?.stroke,
+                opacity: Number(annotation.mark.attributes?.['fill-opacity'] || annotation.mark.attributes?.['stroke-opacity']),
+              }
+            }
+          }));
+        }
       });
 
       rendition.on("resized", function (layout) {

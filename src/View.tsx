@@ -12,7 +12,7 @@ import {
 } from 'react-native-gesture-handler';
 import { WebView, WebViewMessageEvent } from 'react-native-webview';
 import { defaultTheme as initialTheme, ReaderContext } from './context';
-import type { ReaderProps } from './types';
+import type { Annotation, ReaderProps } from './types';
 import { OpeningBook } from './utils/OpeningBook';
 
 export type ViewProps = Omit<ReaderProps, 'src' | 'fileSystem'> & {
@@ -32,7 +32,7 @@ export function View({
   onSearch = () => {},
   onLocationsReady = () => {},
   onSelected = () => {},
-  onMarkPressed = () => {},
+  onPressAnnotation = () => {},
   onOrientationChange = () => {},
   onLayout = () => {},
   onNavigationLoaded = () => {},
@@ -166,12 +166,6 @@ export function View({
       return onSelected(text, cfiRange);
     }
 
-    if (type === 'onMarkPressed') {
-      const { cfiRange, text } = parsedEvent;
-
-      return onMarkPressed(cfiRange, text);
-    }
-
     if (type === 'onOrientationChange') {
       const { orientation } = parsedEvent;
 
@@ -210,23 +204,16 @@ export function View({
 
     if (type === 'onAddAnnotation') {
       let annotation = JSON.parse(parsedEvent.annotation);
-      let color = '';
-      let opacity = 0;
-
-      if (annotation.type === 'highlight') {
-        color = annotation.styles.fill;
-        opacity = Number(annotation.styles['fill-opacity']);
-      }
-
-      if (annotation.type === 'underline') {
-        color = annotation.styles.stroke;
-        opacity = Number(annotation.styles['stroke-opacity']);
-      }
 
       annotation = {
-        ...annotation,
-        styles: { color, opacity },
-      };
+        type: annotation.type,
+        data: annotation.data,
+        cfiRange: annotation.cfiRange,
+        sectionIndex: annotation.sectionIndex,
+        text: annotation.text,
+        iconClass: annotation?.iconClass,
+        styles: annotation?.styles,
+      } as Annotation;
 
       return onAddAnnotation(annotation);
     }
@@ -235,6 +222,12 @@ export function View({
       const annotations = JSON.parse(parsedEvent.annotations);
       setAnnotations(annotations);
       return onChangeAnnotations(annotations);
+    }
+
+    if (type === 'onPressAnnotation') {
+      const { annotation } = parsedEvent;
+
+      return onPressAnnotation(annotation);
     }
 
     return () => {};

@@ -12,23 +12,25 @@ function Book() {
       width={width}
       height={height}
       fileSystem={useFileSystem}
-      onAddAnnotation={(annotation) => console.log(annotation)}
-      onChangeAnnotations={(annotations) => console.log(annotations)}
+      onAddAnnotation={(annotation) =>
+        console.log('onAddAnnotation', annotation)
+      }
+      onPressAnnotation={(annotation) =>
+        console.log('onPressAnnotation', annotation)
+      }
+      onChangeAnnotations={(annotations) =>
+        console.log('onChangeAnnotations', annotations)
+      }
       menuItems={[
         {
           label: 'Highlight',
           action: (cfiRange) => {
-            addAnnotation(
-              'highlight',
-              cfiRange,
-              { foo: 'bar' },
-              { color: '#4c12a1', opacity: 0.3 }
-            );
+            addAnnotation('highlight', cfiRange);
             return true;
           },
         },
         {
-          label: 'Underline',
+          label: 'Add Note',
           action: (cfiRange) => {
             addAnnotation(
               'underline',
@@ -40,87 +42,18 @@ function Book() {
           },
         },
         {
-          label: 'Mark',
+          label: 'Mark with 💚',
           action: (cfiRange) => {
             addAnnotation(
               'mark',
               cfiRange,
-              { foo: 'bar' },
+              undefined,
               undefined,
               'epubjs-mk-heart'
             );
             return true;
           },
         },
-        /* {
-          label: '👍',
-          action: (cfiRange, text) => {
-            addAnnotation('underline', cfiRange, 'red', undefined, {
-              foo: 'bar',
-            });
-            return true;
-          },
-        },
-        {
-          label: '💚',
-          action: (cfiRange, text) => {
-            removeAnnotation('highlight', cfiRange);
-            return true;
-          },
-        },
-        {
-          label: '🥰',
-          action: (cfiRange, text) => {
-            addAnnotation('underline', cfiRange, '#4c12a1');
-            return true;
-          },
-        },
-        {
-          label: '🥱',
-          action: (cfiRange, text) => {
-            return true;
-          },
-        },
-        {
-          label: '😂',
-          action: (cfiRange, text) => {
-            return true;
-          },
-        },
-        {
-          label: '🤬',
-          action: (cfiRange, text) => {
-            return true;
-          },
-        },
-        {
-          label: '🔴',
-          action: (cfiRange, text) => {
-            console.log({ cfiRange, text, value: 'amei' });
-            return true;
-          },
-        },
-        {
-          label: '🔵',
-          action: (cfiRange, text) => {
-            console.log({ cfiRange, text, value: 'amei' });
-            return true;
-          },
-        },
-        {
-          label: '🟡',
-          action: (cfiRange, text) => {
-            console.log({ cfiRange, text, value: 'amei' });
-            return true;
-          },
-        },
-        {
-          label: '🟢',
-          action: (cfiRange, text) => {
-            console.log({ cfiRange, text, value: 'amei' });
-            return true;
-          },
-        }, */
       ]}
     />
   );
