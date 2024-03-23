@@ -2,6 +2,7 @@
   "dependencies": {
     "@epubjs-react-native/core": "^1.4.0-staging.11",
     "@epubjs-react-native/expo-file-system": "^1.1.2",
+    "@gorhom/bottom-sheet": "^4",
     "@react-navigation/native": "^6.1.15",
     "@react-navigation/native-stack": "^6.9.24",
     "expo": "^50.0.1",
@@ -10,9 +11,12 @@
     "react-dom": "18.2.0",
     "react-native": "0.73.6",
     "react-native-fs": "^2.20.0",
-    "react-native-gesture-handler": "~2.15.0",
+    "react-native-gesture-handler": "~2.14.0",
+    "react-native-paper": "^5.12.3",
+    "react-native-reanimated": "~3.6.2",
     "react-native-safe-area-context": "4.9.0",
     "react-native-screens": "~3.29.0",
+    "react-native-vector-icons": "^10.0.3",
     "react-native-web": "~0.19.6",
     "react-native-webview": "13.8.1"
   },

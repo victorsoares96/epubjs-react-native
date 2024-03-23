@@ -50,7 +50,7 @@ export type AnnotationStyles = {
   thickness?: number;
 };
 
-export type Annotation<Data = unknown> = {
+export type Annotation<Data = any> = {
   type: AnnotationType;
   data: Data;
   cfiRange: ePubCfi;

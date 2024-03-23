@@ -27,6 +27,7 @@ export function useReader() {
     updateAnnotationData,
     removeAnnotation,
     removeSelection,
+    annotations,
   } = useContext(ReaderContext);
 
   return {
@@ -54,6 +55,7 @@ export function useReader() {
     isLoading,
     key,
     searchResults,
+    annotations,
   } as Pick<
     ReaderContextProps,
     | 'changeFontSize'
@@ -80,5 +82,6 @@ export function useReader() {
     | 'updateAnnotationData'
     | 'removeAnnotation'
     | 'removeSelection'
+    | 'annotations'
   >;
 }

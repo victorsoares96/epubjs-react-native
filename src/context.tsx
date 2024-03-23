@@ -448,6 +448,8 @@ export interface ReaderContextProps {
   setSearchResults: (results: SearchResult[]) => void;
 
   removeSelection: () => void;
+
+  annotations: Annotation[];
 }
 
 const ReaderContext = createContext<ReaderContextProps>({
@@ -515,6 +517,7 @@ const ReaderContext = createContext<ReaderContextProps>({
   removeAnnotationByCfi: () => {},
   removeAnnotations: () => {},
   setAnnotations: () => {},
+  annotations: [],
 });
 
 function ReaderProvider({ children }: { children: React.ReactNode }) {
@@ -724,25 +727,32 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
 
   const updateAnnotationData = useCallback(
     (annotation: Annotation, data?: unknown) => {
+      console.log('received annotation', annotation);
       book.current?.injectJavaScript(`
         try {
           const annotations = Object.values(rendition.annotations._annotations);
 
-          const annotation = annotations.find(item => item.cfiRange === ${annotation.cfiRange});
+          alert(JSON.stringify(annotations));
+
+          const annotation = annotations.find(item => item.cfiRange === ${JSON.stringify(annotation.cfiRange)});
+
+          alert(JSON.stringify(annotation));
+
+          if (!annotation) return;
 
           annotation?.update(${JSON.stringify(data)});
 
-          annotations = annotations.map(annotation => ({
-            type: annotation.type,
-            data: annotation.data,
-            cfiRange: annotation.cfiRange,
-            sectionIndex: annotation.sectionIndex,
-            text: annotation.mark.range.toString(),
-            iconClass: annotation.data?.iconClass,
+          annotations = annotations.map(item => ({
+            type: item.type,
+            data: item.data,
+            cfiRange: item.cfiRange,
+            sectionIndex: item.sectionIndex,
+            text: item.mark.range.toString(),
+            iconClass: item.data?.iconClass,
             styles: {
-              color: annotation.mark.attributes?.fill || annotation.mark.attributes?.stroke,
-              opacity: Number(annotation.mark.attributes?.['fill-opacity'] || annotation.mark.attributes?.['stroke-opacity']),
-              thickness: Number(annotation.mark.attributes?.['stroke-width']),
+              color: item.mark.attributes?.fill || item.mark.attributes?.stroke,
+              opacity: Number(item.mark.attributes?.['fill-opacity'] || item.mark.attributes?.['stroke-opacity']),
+              thickness: Number(item.mark.attributes?.['stroke-width']),
             }
           }));
 
@@ -761,9 +771,10 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
   const removeAnnotation = useCallback((annotation: Annotation) => {
     book.current?.injectJavaScript(`
         try {
-          rendition.annotations.remove('${annotation.cfiRange}', '${annotation.type}');
+          rendition.annotations.remove(${JSON.stringify(annotation.cfiRange)}, ${JSON.stringify(annotation.type)});
 
           let annotations = Object.values(rendition.annotations._annotations);
+
           annotations = annotations.map(annotation => ({
             type: annotation.type,
             data: annotation.data,
@@ -927,6 +938,7 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       removeAnnotationByCfi,
       removeAnnotations,
       setAnnotations,
+      annotations: state.annotations,
     }),
     [
       changeFontFamily,
@@ -970,6 +982,7 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       state.searchResults,
       state.theme,
       state.totalLocations,
+      state.annotations,
     ]
   );
   return (
