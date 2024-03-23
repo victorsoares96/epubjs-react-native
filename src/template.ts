@@ -248,6 +248,7 @@ export default `
               styles: {
                 color: annotation.mark.attributes?.fill || annotation.mark.attributes?.stroke,
                 opacity: Number(annotation.mark.attributes?.['fill-opacity'] || annotation.mark.attributes?.['stroke-opacity']),
+                thickness: Number(annotation.mark.attributes?.['stroke-width']),
               }
             }
           }));

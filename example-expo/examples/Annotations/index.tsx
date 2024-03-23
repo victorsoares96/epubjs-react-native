@@ -36,7 +36,7 @@ function Book() {
               'underline',
               cfiRange,
               { foo: 'bar' },
-              { color: '#4c12a1', opacity: 0.5 }
+              { color: '#4c12a1', opacity: 0.5, thickness: 2 }
             );
             return true;
           },

@@ -43,10 +43,11 @@ export type AnnotationStyles = {
    */
   opacity?: number;
   /**
-   * Only for `mark` annotation type. Define icon width.
+   * Only for `underline` annotation type. Define underline thickness.
    *
-   * Default is: `20px`
+   * Default is: `1px`
    */
+  thickness?: number;
 };
 
 export type Annotation<Data = unknown> = {

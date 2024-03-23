@@ -646,9 +646,7 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       styles?: {
         color?: string;
         opacity?: number;
-        width?: string;
-        height?: string;
-        margin?: string;
+        thickness?: number;
       },
       iconClass = ''
     ) => {
@@ -665,6 +663,7 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
         style = {
           'stroke': styles?.color || 'yellow',
           'stroke-opacity': styles?.opacity || 0.3,
+          'stroke-width': styles?.thickness || 1,
         };
       }
 
@@ -691,6 +690,7 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
               styles: {
                 color: annotation.mark.attributes?.fill || annotation.mark.attributes?.stroke,
                 opacity: Number(annotation.mark.attributes?.['fill-opacity'] || annotation.mark.attributes?.['stroke-opacity']),
+                thickness: Number(annotation.mark.attributes?.['stroke-width']),
               }
             })
           }));
@@ -706,6 +706,7 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
             styles: {
               color: annotation.mark.attributes?.fill || annotation.mark.attributes?.stroke,
               opacity: Number(annotation.mark.attributes?.['fill-opacity'] || annotation.mark.attributes?.['stroke-opacity']),
+              thickness: Number(annotation.mark.attributes?.['stroke-width']),
             }
           }));
 
@@ -722,14 +723,14 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
   );
 
   const updateAnnotationData = useCallback(
-    (annotation: Annotation, _data?: unknown) => {
+    (annotation: Annotation, data?: unknown) => {
       book.current?.injectJavaScript(`
         try {
           const annotations = Object.values(rendition.annotations._annotations);
 
           const annotation = annotations.find(item => item.cfiRange === ${annotation.cfiRange});
 
-          alert(JSON.stringify(annotation?.update))
+          annotation?.update(${JSON.stringify(data)});
 
           annotations = annotations.map(annotation => ({
             type: annotation.type,
@@ -741,6 +742,7 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
             styles: {
               color: annotation.mark.attributes?.fill || annotation.mark.attributes?.stroke,
               opacity: Number(annotation.mark.attributes?.['fill-opacity'] || annotation.mark.attributes?.['stroke-opacity']),
+              thickness: Number(annotation.mark.attributes?.['stroke-width']),
             }
           }));
 
@@ -772,6 +774,7 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
             styles: {
               color: annotation.mark.attributes?.fill || annotation.mark.attributes?.stroke,
               opacity: Number(annotation.mark.attributes?.['fill-opacity'] || annotation.mark.attributes?.['stroke-opacity']),
+              thickness: Number(annotation.mark.attributes?.['stroke-width']),
             }
           }));
 
@@ -803,6 +806,7 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
           styles: {
             color: annotation.mark.attributes?.fill || annotation.mark.attributes?.stroke,
             opacity: Number(annotation.mark.attributes?.['fill-opacity'] || annotation.mark.attributes?.['stroke-opacity']),
+            thickness: Number(annotation.mark.attributes?.['stroke-width']),
           }
         }));
 
@@ -839,6 +843,7 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
             styles: {
               color: annotation.mark.attributes?.fill || annotation.mark.attributes?.stroke,
               opacity: Number(annotation.mark.attributes?.['fill-opacity'] || annotation.mark.attributes?.['stroke-opacity']),
+              thickness: Number(annotation.mark.attributes?.['stroke-width']),
             }
           }));
 
