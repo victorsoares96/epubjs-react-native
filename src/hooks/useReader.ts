@@ -24,7 +24,7 @@ export function useReader() {
     key,
     searchResults,
     addAnnotation,
-    updateAnnotationData,
+    updateAnnotation,
     removeAnnotation,
     removeSelection,
     annotations,
@@ -42,7 +42,7 @@ export function useReader() {
     getMeta,
     search,
     addAnnotation,
-    updateAnnotationData,
+    updateAnnotation,
     removeAnnotation,
     removeSelection,
     theme,
@@ -79,7 +79,7 @@ export function useReader() {
     | 'key'
     | 'searchResults'
     | 'addAnnotation'
-    | 'updateAnnotationData'
+    | 'updateAnnotation'
     | 'removeAnnotation'
     | 'removeSelection'
     | 'annotations'

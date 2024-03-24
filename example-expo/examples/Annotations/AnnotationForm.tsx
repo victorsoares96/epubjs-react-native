@@ -18,7 +18,7 @@ function AnnotationForm({ annotation, selection, onClose }: Props) {
   const [observation, setObservation] = React.useState('');
   const [color, setColor] = React.useState(COLORS[0]);
 
-  const { addAnnotation, updateAnnotationData } = useReader();
+  const { addAnnotation, updateAnnotation } = useReader();
 
   useEffect(() => {
     if (annotation) {
@@ -86,7 +86,7 @@ function AnnotationForm({ annotation, selection, onClose }: Props) {
                 'underline',
                 selection.cfiRange,
                 { text: selection.text, observation },
-                { color }
+                { color, opacity: 0.5 }
               );
 
               setObservation('');
@@ -109,10 +109,14 @@ function AnnotationForm({ annotation, selection, onClose }: Props) {
               borderRadius: 12,
             }}
             onPress={() => {
-              updateAnnotationData(annotation, {
-                ...(annotation.data as object),
-                observation,
-              });
+              updateAnnotation(
+                annotation,
+                {
+                  ...annotation.data,
+                  observation,
+                },
+                { ...annotation.styles, color }
+              );
 
               onClose();
               setObservation('');

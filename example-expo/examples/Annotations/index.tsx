@@ -34,11 +34,12 @@ function Book() {
         height={height}
         fileSystem={useFileSystem}
         onAddAnnotation={(annotation) => {
-          if (annotation.data.isTemp) {
+          if (annotation.type === 'highlight') {
             setTempMark(annotation);
           }
         }}
         onPressAnnotation={(annotation) => {
+          if (annotation.type !== 'underline') return;
           setSelectedAnnotation(annotation);
           bottomSheetRef.current.snapToIndex(0);
         }}
@@ -57,7 +58,7 @@ function Book() {
             label: 'Add Note',
             action: (cfiRange, text) => {
               setSelection({ cfiRange, text });
-              addAnnotation('highlight', cfiRange, { isTemp: true });
+              addAnnotation('highlight', cfiRange);
               bottomSheetRef.current.snapToIndex(0);
               return true;
             },

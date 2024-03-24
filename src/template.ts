@@ -243,13 +243,13 @@ export default `
               data: annotation.data,
               cfiRange: annotation.cfiRange,
               sectionIndex: annotation.sectionIndex,
-              text: annotation.mark.range.toString(),
+              text: annotation.mark?.range?.toString() || rendition.getRange(annotation.cfiRange).toString(),
               iconClass: annotation.data?.iconClass,
-              styles: {
+              styles: annotation.type !== 'mark' ? {
                 color: annotation.mark.attributes?.fill || annotation.mark.attributes?.stroke,
                 opacity: Number(annotation.mark.attributes?.['fill-opacity'] || annotation.mark.attributes?.['stroke-opacity']),
                 thickness: Number(annotation.mark.attributes?.['stroke-width']),
-              }
+              } : undefined
             }
           }));
         }

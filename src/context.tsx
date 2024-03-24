@@ -355,9 +355,10 @@ export interface ReaderContextProps {
     iconClass?: string
   ) => void;
 
-  updateAnnotationData: <Data = unknown>(
+  updateAnnotation: (
     annotation: Annotation,
-    data: Data
+    data?: object,
+    styles?: AnnotationStyles
   ) => void;
 
   removeAnnotation: (annotation: Annotation) => void;
@@ -512,7 +513,7 @@ const ReaderContext = createContext<ReaderContextProps>({
   removeSelection: () => {},
 
   addAnnotation: () => {},
-  updateAnnotationData: () => {},
+  updateAnnotation: () => {},
   removeAnnotation: () => {},
   removeAnnotationByCfi: () => {},
   removeAnnotations: () => {},
@@ -688,7 +689,7 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
               data: annotation.data,
               cfiRange: annotation.cfiRange,
               sectionIndex: annotation.sectionIndex,
-              text: annotation.mark.range.toString(),
+              text: annotation.mark?.range?.toString() || rendition.getRange(annotation.cfiRange).toString(),
               iconClass: annotation.data?.iconClass,
               styles: {
                 color: annotation.mark.attributes?.fill || annotation.mark.attributes?.stroke,
@@ -704,13 +705,13 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
             data: annotation.data,
             cfiRange: annotation.cfiRange,
             sectionIndex: annotation.sectionIndex,
-            text: annotation.mark.range.toString(),
+            text: annotation.mark?.range?.toString() || rendition.getRange(annotation.cfiRange).toString(),
             iconClass: annotation.data?.iconClass,
-            styles: {
+            styles: annotation.type !== 'mark' ? {
               color: annotation.mark.attributes?.fill || annotation.mark.attributes?.stroke,
               opacity: Number(annotation.mark.attributes?.['fill-opacity'] || annotation.mark.attributes?.['stroke-opacity']),
               thickness: Number(annotation.mark.attributes?.['stroke-width']),
-            }
+            } : undefined
           }));
 
           window.ReactNativeWebView.postMessage(JSON.stringify({
@@ -725,40 +726,60 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
     []
   );
 
-  const updateAnnotationData = useCallback(
-    (annotation: Annotation, data?: unknown) => {
-      console.log('received annotation', annotation);
+  const updateAnnotation = useCallback(
+    (annotation: Annotation, data = {}, styles?: AnnotationStyles) => {
+      const cssStyles: { [key: string]: unknown } = {};
+
+      if (styles?.color) {
+        if (annotation.type === 'highlight') {
+          cssStyles.fill = styles.color;
+        }
+
+        if (annotation.type === 'underline') {
+          cssStyles.stroke = styles.color;
+        }
+      }
+
+      if (styles?.opacity) {
+        if (annotation.type === 'highlight') {
+          cssStyles['fill-opacity'] = styles.opacity;
+        }
+
+        if (annotation.type === 'underline') {
+          cssStyles['stroke-opacity'] = styles.opacity;
+        }
+      }
+
+      if (styles?.thickness) {
+        if (annotation.type === 'underline') {
+          cssStyles['stroke-width'] = styles.thickness;
+        }
+      }
+
       book.current?.injectJavaScript(`
         try {
           const annotations = Object.values(rendition.annotations._annotations);
 
-          alert(JSON.stringify(annotations));
+          let annotation = annotations.find(item => item.cfiRange === ${JSON.stringify(annotation.cfiRange)});
 
-          const annotation = annotations.find(item => item.cfiRange === ${JSON.stringify(annotation.cfiRange)});
-
-          alert(JSON.stringify(annotation));
-
-          if (!annotation) return;
-
-          annotation?.update(${JSON.stringify(data)});
-
-          annotations = annotations.map(item => ({
-            type: item.type,
-            data: item.data,
-            cfiRange: item.cfiRange,
-            sectionIndex: item.sectionIndex,
-            text: item.mark.range.toString(),
-            iconClass: item.data?.iconClass,
-            styles: {
-              color: item.mark.attributes?.fill || item.mark.attributes?.stroke,
-              opacity: Number(item.mark.attributes?.['fill-opacity'] || item.mark.attributes?.['stroke-opacity']),
-              thickness: Number(item.mark.attributes?.['stroke-width']),
-            }
-          }));
+          annotation?.update(${JSON.stringify(data)}, ${JSON.stringify(cssStyles)});
+          rendition.views().forEach(view => view.pane ? view.pane.render() : null);
 
           window.ReactNativeWebView.postMessage(JSON.stringify({
             type: 'onChangeAnnotations',
-            annotations: JSON.stringify(annotations)
+            annotations: JSON.stringify(annotations.map(item => ({
+              type: item.type,
+              data: item.data,
+              cfiRange: item.cfiRange,
+              sectionIndex: item.sectionIndex,
+              text: annotation.mark?.range?.toString() || rendition.getRange(item.cfiRange).toString(),
+              iconClass: annotation.data?.iconClass,
+              styles: annotation.type !== 'mark' ? {
+                color: annotation.mark.attributes?.fill || annotation.mark.attributes?.stroke,
+                opacity: Number(annotation.mark.attributes?.['fill-opacity'] || annotation.mark.attributes?.['stroke-opacity']),
+                thickness: Number(annotation.mark.attributes?.['stroke-width']),
+              } : undefined
+            })))
           }));
         } catch (error) {
           alert(JSON.stringify(error?.message));
@@ -780,13 +801,13 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
             data: annotation.data,
             cfiRange: annotation.cfiRange,
             sectionIndex: annotation.sectionIndex,
-            text: annotation.mark.range.toString(),
+            text: annotation.mark?.range?.toString() || rendition.getRange(annotation.cfiRange).toString(),
             iconClass: annotation.data?.iconClass,
-            styles: {
+            styles: annotation.type !== 'mark' ? {
               color: annotation.mark.attributes?.fill || annotation.mark.attributes?.stroke,
               opacity: Number(annotation.mark.attributes?.['fill-opacity'] || annotation.mark.attributes?.['stroke-opacity']),
               thickness: Number(annotation.mark.attributes?.['stroke-width']),
-            }
+            } : undefined
           }));
 
           window.ReactNativeWebView.postMessage(JSON.stringify({
@@ -812,13 +833,13 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
           data: annotation.data,
           cfiRange: annotation.cfiRange,
           sectionIndex: annotation.sectionIndex,
-          text: annotation.mark.range.toString(),
+          text: annotation.mark?.range?.toString() || rendition.getRange(annotation.cfiRange).toString(),
           iconClass: annotation.data?.iconClass,
-          styles: {
+          styles: annotation.type !== 'mark' ? {
             color: annotation.mark.attributes?.fill || annotation.mark.attributes?.stroke,
             opacity: Number(annotation.mark.attributes?.['fill-opacity'] || annotation.mark.attributes?.['stroke-opacity']),
             thickness: Number(annotation.mark.attributes?.['stroke-width']),
-          }
+          } : undefined
         }));
 
         window.ReactNativeWebView.postMessage(JSON.stringify({
@@ -850,12 +871,13 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
             data: annotation.data,
             cfiRange: annotation.cfiRange,
             sectionIndex: annotation.sectionIndex,
-            text: annotation.mark.range.toString(),
-            styles: {
+            text: annotation.mark?.range?.toString() || rendition.getRange(annotation.cfiRange).toString(),
+            iconClass: annotation.data?.iconClass,
+            styles: annotation.type !== 'mark' ? {
               color: annotation.mark.attributes?.fill || annotation.mark.attributes?.stroke,
               opacity: Number(annotation.mark.attributes?.['fill-opacity'] || annotation.mark.attributes?.['stroke-opacity']),
               thickness: Number(annotation.mark.attributes?.['stroke-width']),
-            }
+            } : undefined
           }));
 
           window.ReactNativeWebView.postMessage(JSON.stringify({
@@ -933,7 +955,7 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       removeSelection,
 
       addAnnotation,
-      updateAnnotationData,
+      updateAnnotation,
       removeAnnotation,
       removeAnnotationByCfi,
       removeAnnotations,
@@ -965,7 +987,7 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       setTotalLocations,
       removeSelection,
       addAnnotation,
-      updateAnnotationData,
+      updateAnnotation,
       removeAnnotation,
       removeAnnotationByCfi,
       removeAnnotations,

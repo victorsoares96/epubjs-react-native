@@ -13,7 +13,7 @@ function AnnotationsList({ annotations, onClose }: Props) {
   return (
     <View style={{ width: '100%', marginVertical: 20 }}>
       {annotations
-        .filter((annotation) => !annotation.data.isTemp)
+        .filter((annotation) => annotation.type === 'underline')
         .map((annotation) => (
           <View
             key={annotation.cfiRange}
@@ -43,10 +43,22 @@ function AnnotationsList({ annotations, onClose }: Props) {
                   onClose();
                 }}
               >
-                <Text style={{ fontWeight: '600', marginLeft: 5 }}>
+                <Text
+                  style={{
+                    fontWeight: '600',
+                    marginLeft: 5,
+                  }}
+                >
                   {annotation.data?.observation}
                 </Text>
-                <Text style={{ fontStyle: 'italic' }}>
+                <Text
+                  style={{
+                    fontStyle: 'italic',
+                    flexWrap: 'wrap',
+                    maxWidth: 220,
+                  }}
+                  numberOfLines={2}
+                >
                   &quot;{annotation.text}&quot;
                 </Text>
               </TouchableOpacity>

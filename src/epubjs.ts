@@ -4582,8 +4582,11 @@ export default `
             (this.className = s),
             (this.styles = o);
         }
-        update(t) {
-          this.data = t;
+        update(t = {}, e = {}) {
+          this.data && (this.data = t),
+            this.styles &&
+              ((this.mark.attributes = { ...this.mark.attributes, ...e }),
+              (this.mark.styles = { ...this.mark.styles, ...e }));
         }
         attach(t) {
           let e,
