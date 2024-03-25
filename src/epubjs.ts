@@ -4581,29 +4581,53 @@ export default `
             (this.styles = o);
         }
         update(t = {}, e = {}) {
-          this.data && (this.data = t),
-            this.styles || (this.styles = {}),
-            null != e &&
-              e.stroke &&
-              ((this.mark.attributes.stroke = e.stroke),
-              (this.styles.stroke = e.stroke)),
-            null != e &&
-              e["stroke-opacity"] &&
-              ((this.mark.attributes["stroke-opacity"] = e["stroke-opacity"]),
-              (this.styles["stroke-opacity"] = e["stroke-opacity"])),
-            null != e &&
-              e["stroke-width"] &&
-              ((this.mark.attributes["stroke-width"] = e["stroke-width"]),
-              (this.styles["stroke-width"] = e["stroke-width"])),
-            null != e &&
-              e.fill &&
-              ((this.mark.attributes.fill = e.fill),
-              (this.mark.attributes.background = "red"),
-              (this.styles.fill = e.fill)),
-            null != e &&
-              e["fill-opacity"] &&
-              ((this.mark.attributes["fill-opacity"] = e["fill-opacity"]),
-              (this.styles["fill-opacity"] = e["fill-opacity"]));
+          var i, n, r, s, o, a, h, l, c, u;
+          (this.data && (this.data = t),
+          this.styles || (this.styles = {}),
+          null != e && e.stroke) &&
+            (null !== (i = this.mark) &&
+              void 0 !== i &&
+              null !== (n = i.attributes) &&
+              void 0 !== n &&
+              n.stroke &&
+              (this.mark.attributes.stroke = e.stroke),
+            (this.styles.stroke = e.stroke));
+          null != e &&
+            e["stroke-opacity"] &&
+            (null !== (r = this.mark) &&
+              void 0 !== r &&
+              null !== (s = r.attributes) &&
+              void 0 !== s &&
+              s["stroke-opacity"] &&
+              (this.mark.attributes["stroke-opacity"] = e["stroke-opacity"]),
+            (this.styles["stroke-opacity"] = e["stroke-opacity"]));
+          null != e &&
+            e["stroke-width"] &&
+            (null !== (o = this.mark) &&
+              void 0 !== o &&
+              null !== (a = o.attributes) &&
+              void 0 !== a &&
+              a["stroke-width"] &&
+              (this.mark.attributes["stroke-width"] = e["stroke-width"]),
+            (this.styles["stroke-width"] = e["stroke-width"]));
+          null != e &&
+            e.fill &&
+            (null !== (h = this.mark) &&
+              void 0 !== h &&
+              null !== (l = h.attributes) &&
+              void 0 !== l &&
+              l.fill &&
+              (this.mark.attributes.fill = e.fill),
+            (this.styles.fill = e.fill));
+          null != e &&
+            e["fill-opacity"] &&
+            (null !== (c = this.mark) &&
+              void 0 !== c &&
+              null !== (u = c.attributes) &&
+              void 0 !== u &&
+              u["fill-opacity"] &&
+              (this.mark.attributes["fill-opacity"] = e["fill-opacity"]),
+            (this.styles["fill-opacity"] = e["fill-opacity"]));
         }
         attach(t) {
           let e,

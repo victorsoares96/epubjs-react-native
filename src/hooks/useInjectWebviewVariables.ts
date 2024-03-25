@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import type { Annotation, Theme, ePubCfi } from '../types';
+import type { Theme, ePubCfi } from '../types';
 import template from '../template';
 import type { SourceType } from '../utils/enums/source-type.enum';
 
@@ -15,7 +15,6 @@ export function useInjectWebVieWVariables() {
       locations,
       allowScriptedContent,
       allowPopups,
-      annotations = [],
     }: {
       jszip: string;
       epubjs: string;
@@ -26,7 +25,6 @@ export function useInjectWebVieWVariables() {
       locations?: ePubCfi[];
       allowScriptedContent?: boolean;
       allowPopups?: boolean;
-      annotations?: Annotation[];
     }) => {
       return template
         .replace(
@@ -55,11 +53,7 @@ export function useInjectWebVieWVariables() {
           /allowScriptedContent: allowScriptedContent/,
           `allowScriptedContent: ${allowScriptedContent}`
         )
-        .replace(/allowPopups: allowPopups/, `allowPopups: ${allowPopups}`)
-        .replace(
-          /const initialAnnotations = \[\];/,
-          `const initialAnnotations = ${JSON.stringify(annotations)};`
-        );
+        .replace(/allowPopups: allowPopups/, `allowPopups: ${allowPopups}`);
     },
     []
   );

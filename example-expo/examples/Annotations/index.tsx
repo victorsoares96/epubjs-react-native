@@ -34,13 +34,22 @@ function Book() {
         width={width}
         height={height}
         fileSystem={useFileSystem}
+        initialLocation="introduction_001.xhtml"
         initialAnnotations={[
           {
-            cfiRange: 'epubcfi(/6/8!/4/2/4,/1:0,/1:26)',
+            cfiRange: 'epubcfi(/6/10!/4/2/4,/1:0,/1:319)',
+            data: {},
+            sectionIndex: 4,
+            styles: { color: '#23CE6B' },
+            text: 'The pale Usher—threadbare in coat, heart, body, and brain; I see him now. He was ever dusting his old lexicons and grammars, with a queer handkerchief, mockingly embellished with all the gay flags of all the known nations of the world. He loved to dust his old grammars; it somehow mildly reminded him of his mortality.',
+            type: 'highlight',
+          },
+          {
+            cfiRange: 'epubcfi(/6/22!/4/2/4,/1:80,/1:88)',
             data: {},
             sectionIndex: 3,
             styles: { color: '#23CE6B', opacity: 0.3, thickness: null },
-            text: 'This text is a combination',
+            text: 'landlord',
             type: 'highlight',
           },
         ]}

@@ -16,6 +16,7 @@ import type {
   Annotation,
   AnnotationStyles,
 } from './types';
+import * as webViewInjectFunctions from './utils/webViewInjectFunctions';
 
 type ActionMap<M extends { [index: string]: any }> = {
   [Key in keyof M]: M[Key] extends undefined
@@ -324,10 +325,10 @@ export interface ReaderContextProps {
    */
   changeFontSize: (size: FontSize) => void;
 
-  addAnnotation: <Data = unknown>(
+  addAnnotation: (
     type: AnnotationType,
     cfiRange: ePubCfi,
-    data?: Data,
+    data?: object,
     styles?: AnnotationStyles,
     /**
      * The name of the css class defined in the applied theme that will be used as the icon for the markup.
@@ -371,6 +372,8 @@ export interface ReaderContextProps {
   removeAnnotations: (type?: AnnotationType) => void;
 
   setAnnotations: (annotations: Annotation[]) => void;
+
+  setInitialAnnotations: (annotations: Annotation[]) => void;
 
   setKey: (key: string) => void;
 
@@ -518,6 +521,7 @@ const ReaderContext = createContext<ReaderContextProps>({
   removeAnnotationByCfi: () => {},
   removeAnnotations: () => {},
   setAnnotations: () => {},
+  setInitialAnnotations: () => {},
   annotations: [],
 });
 
@@ -646,7 +650,7 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
     (
       type: AnnotationType,
       cfiRange: string,
-      data?: unknown,
+      data?: object,
       styles?: {
         color?: string;
         opacity?: number;
@@ -654,244 +658,105 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       },
       iconClass = ''
     ) => {
-      let style = {};
+      webViewInjectFunctions.injectJavaScript(
+        book,
+        `
+          ${webViewInjectFunctions.addAnnotation(type, cfiRange, data, iconClass, styles)}
 
-      if (type === 'highlight') {
-        style = {
-          'fill': styles?.color || 'yellow',
-          'fill-opacity': styles?.opacity || 0.3,
-        };
-      }
-
-      if (type === 'underline') {
-        style = {
-          'stroke': styles?.color || 'yellow',
-          'stroke-opacity': styles?.opacity || 0.3,
-          'stroke-width': styles?.thickness || 1,
-        };
-      }
-
-      if (type === 'mark') {
-        // eslint-disable-next-line no-param-reassign
-        iconClass = iconClass || 'epubjs-mk-balloon';
-      }
-
-      book.current?.injectJavaScript(`
-        try {
-          const annotation = rendition.annotations.add('${type}', ${JSON.stringify(cfiRange)}, ${JSON.stringify(
-            data ?? {}
-          )}, () => {}, ${JSON.stringify(iconClass)}, ${JSON.stringify(style)});
-
-          window.ReactNativeWebView.postMessage(JSON.stringify({
-            type: 'onAddAnnotation',
-            annotation: JSON.stringify({
-              type: annotation.type,
-              data: annotation.data,
-              cfiRange: annotation.cfiRange,
-              sectionIndex: annotation.sectionIndex,
-              text: annotation.mark?.range?.toString() || rendition.getRange(annotation.cfiRange).toString(),
-              iconClass: annotation.data?.iconClass,
-              styles: {
-                color: annotation.mark.attributes?.fill || annotation.mark.attributes?.stroke,
-                opacity: Number(annotation.mark.attributes?.['fill-opacity'] || annotation.mark.attributes?.['stroke-opacity']),
-                thickness: Number(annotation.mark.attributes?.['stroke-width']),
-              }
-            })
-          }));
-
-          let annotations = Object.values(rendition.annotations._annotations);
-          annotations = annotations.map(annotation => ({
-            type: annotation.type,
-            data: annotation.data,
-            cfiRange: annotation.cfiRange,
-            sectionIndex: annotation.sectionIndex,
-            text: annotation.mark?.range?.toString() || rendition.getRange(annotation.cfiRange).toString(),
-            iconClass: annotation.data?.iconClass,
-            styles: annotation.type !== 'mark' ? {
-              color: annotation.mark.attributes?.fill || annotation.mark.attributes?.stroke,
-              opacity: Number(annotation.mark.attributes?.['fill-opacity'] || annotation.mark.attributes?.['stroke-opacity']),
-              thickness: Number(annotation.mark.attributes?.['stroke-width']),
-            } : undefined
-          }));
-
-          window.ReactNativeWebView.postMessage(JSON.stringify({
-            type: 'onChangeAnnotations',
-            annotations: JSON.stringify(annotations)
-          }));
-        } catch (error) {
-          alert(JSON.stringify(error?.message));
-        }
-    `);
+          ${webViewInjectFunctions.onChangeAnnotations()}
+        `
+      );
     },
     []
   );
 
   const updateAnnotation = useCallback(
     (annotation: Annotation, data = {}, styles?: AnnotationStyles) => {
-      const cssStyles: { [key: string]: unknown } = {};
-
-      if (styles?.color) {
-        if (annotation.type === 'highlight') {
-          cssStyles.fill = styles.color;
-        }
-
-        if (annotation.type === 'underline') {
-          cssStyles.stroke = styles.color;
-        }
-      }
-
-      if (styles?.opacity) {
-        if (annotation.type === 'highlight') {
-          cssStyles['fill-opacity'] = styles.opacity;
-        }
-
-        if (annotation.type === 'underline') {
-          cssStyles['stroke-opacity'] = styles.opacity;
-        }
-      }
-
-      if (styles?.thickness) {
-        if (annotation.type === 'underline') {
-          cssStyles['stroke-width'] = styles.thickness;
-        }
-      }
-
-      book.current?.injectJavaScript(`
-        try {
-          const annotations = Object.values(rendition.annotations._annotations);
-
-          let annotation = annotations.find(item => item.cfiRange === ${JSON.stringify(annotation.cfiRange)});
-
-          annotation?.update(${JSON.stringify(data)}, ${JSON.stringify(cssStyles)});
-          rendition.views().forEach(view => view.pane ? view.pane.render() : null);
-
-          window.ReactNativeWebView.postMessage(JSON.stringify({
-            type: 'onChangeAnnotations',
-            annotations: JSON.stringify(annotations.map(item => ({
-              type: item.type,
-              data: item.data,
-              cfiRange: item.cfiRange,
-              sectionIndex: item.sectionIndex,
-              text: annotation.mark?.range?.toString() || rendition.getRange(item.cfiRange).toString(),
-              iconClass: annotation.data?.iconClass,
-              styles: annotation.type !== 'mark' ? {
-                color: annotation.mark.attributes?.fill || annotation.mark.attributes?.stroke,
-                opacity: Number(annotation.mark.attributes?.['fill-opacity'] || annotation.mark.attributes?.['stroke-opacity']),
-                thickness: Number(annotation.mark.attributes?.['stroke-width']),
-              } : undefined
-            })))
-          }));
-        } catch (error) {
-          alert(JSON.stringify(error?.message));
-        }
-    `);
+      webViewInjectFunctions.injectJavaScript(
+        book,
+        webViewInjectFunctions.updateAnnotation(annotation, data, styles)
+      );
     },
     []
   );
 
   const removeAnnotation = useCallback((annotation: Annotation) => {
-    book.current?.injectJavaScript(`
-        try {
-          rendition.annotations.remove(${JSON.stringify(annotation.cfiRange)}, ${JSON.stringify(annotation.type)});
+    webViewInjectFunctions.injectJavaScript(
+      book,
+      `
+        rendition.annotations.remove(${JSON.stringify(annotation.cfiRange)}, ${JSON.stringify(annotation.type)});
 
-          let annotations = Object.values(rendition.annotations._annotations);
-
-          annotations = annotations.map(annotation => ({
-            type: annotation.type,
-            data: annotation.data,
-            cfiRange: annotation.cfiRange,
-            sectionIndex: annotation.sectionIndex,
-            text: annotation.mark?.range?.toString() || rendition.getRange(annotation.cfiRange).toString(),
-            iconClass: annotation.data?.iconClass,
-            styles: annotation.type !== 'mark' ? {
-              color: annotation.mark.attributes?.fill || annotation.mark.attributes?.stroke,
-              opacity: Number(annotation.mark.attributes?.['fill-opacity'] || annotation.mark.attributes?.['stroke-opacity']),
-              thickness: Number(annotation.mark.attributes?.['stroke-width']),
-            } : undefined
-          }));
-
-          window.ReactNativeWebView.postMessage(JSON.stringify({
-            type: 'onChangeAnnotations',
-            annotations: JSON.stringify(annotations)
-          }));
-        } catch (error) {
-          alert(JSON.stringify(error?.message));
-        }
-      `);
+        ${webViewInjectFunctions.onChangeAnnotations()}
+    `
+    );
   }, []);
 
   const removeAnnotationByCfi = useCallback((cfiRange: string) => {
-    book.current?.injectJavaScript(`
-      try {
+    webViewInjectFunctions.injectJavaScript(
+      book,
+      `
         ['highlight', 'underline', 'mark'].forEach(type => {
           rendition.annotations.remove('${cfiRange}', type);
         });
 
-        let annotations = Object.values(rendition.annotations._annotations);
-        annotations = annotations.map(annotation => ({
-          type: annotation.type,
-          data: annotation.data,
-          cfiRange: annotation.cfiRange,
-          sectionIndex: annotation.sectionIndex,
-          text: annotation.mark?.range?.toString() || rendition.getRange(annotation.cfiRange).toString(),
-          iconClass: annotation.data?.iconClass,
-          styles: annotation.type !== 'mark' ? {
-            color: annotation.mark.attributes?.fill || annotation.mark.attributes?.stroke,
-            opacity: Number(annotation.mark.attributes?.['fill-opacity'] || annotation.mark.attributes?.['stroke-opacity']),
-            thickness: Number(annotation.mark.attributes?.['stroke-width']),
-          } : undefined
-        }));
-
-        window.ReactNativeWebView.postMessage(JSON.stringify({
-          type: 'onChangeAnnotations',
-          annotations: JSON.stringify(annotations)
-        }));
-      } catch (error) {
-        alert(JSON.stringify(error?.message));
-      }
-    `);
+        ${webViewInjectFunctions.onChangeAnnotations()}
+    `
+    );
   }, []);
 
   const removeAnnotations = useCallback((type?: AnnotationType) => {
-    book.current?.injectJavaScript(`
-        try {
-          let annotations = Object.values(rendition.annotations._annotations);
+    webViewInjectFunctions.injectJavaScript(
+      book,
+      `
+        let annotations = Object.values(rendition.annotations._annotations);
 
-          if (typeof ${type} === 'string') {
-            annotations = annotations.filter(annotation => annotation.type === ${type});
-          }
-
-          annotations.forEach(annotation => {
-            rendition.annotations.remove(annotation.cfiRange, annotation.type);
-          });
-
-          annotations = Object.values(rendition.annotations._annotations);
-          annotations = annotations.map(annotation => ({
-            type: annotation.type,
-            data: annotation.data,
-            cfiRange: annotation.cfiRange,
-            sectionIndex: annotation.sectionIndex,
-            text: annotation.mark?.range?.toString() || rendition.getRange(annotation.cfiRange).toString(),
-            iconClass: annotation.data?.iconClass,
-            styles: annotation.type !== 'mark' ? {
-              color: annotation.mark.attributes?.fill || annotation.mark.attributes?.stroke,
-              opacity: Number(annotation.mark.attributes?.['fill-opacity'] || annotation.mark.attributes?.['stroke-opacity']),
-              thickness: Number(annotation.mark.attributes?.['stroke-width']),
-            } : undefined
-          }));
-
-          window.ReactNativeWebView.postMessage(JSON.stringify({
-            type: 'onChangeAnnotations',
-            annotations: JSON.stringify(annotations)
-          }));
-        } catch (error) {
-          alert(JSON.stringify(error?.message));
+        if (typeof ${type} === 'string') {
+          annotations = annotations.filter(annotation => annotation.type === ${type});
         }
-      `);
+
+        annotations.forEach(annotation => {
+          rendition.annotations.remove(annotation.cfiRange, annotation.type);
+        });
+
+        ${webViewInjectFunctions.onChangeAnnotations()}
+      `
+    );
   }, []);
 
   const setAnnotations = useCallback((annotations: Annotation[]) => {
     dispatch({ type: Types.SET_ANNOTATIONS, payload: annotations });
+  }, []);
+
+  const setInitialAnnotations = useCallback((annotations: Annotation[]) => {
+    console.log('setInitialAnnotations', annotations);
+    annotations.forEach((annotation) => {
+      webViewInjectFunctions.injectJavaScript(
+        book,
+        webViewInjectFunctions.addAnnotation(
+          annotation.type,
+          annotation.cfiRange,
+          annotation.data,
+          annotation.iconClass,
+          annotation.styles,
+          true
+        )
+      );
+    });
+
+    webViewInjectFunctions.injectJavaScript(
+      book,
+      `
+        const xinitialAnnotations = ${Object.values(annotations)};
+        alert(xinitialAnnotations);
+        alert(JSON.stringify(xinitialAnnotations));
+        alert(JSON.parse(xinitialAnnotations));
+
+        /*window.ReactNativeWebView.postMessage(JSON.stringify({
+          type: 'onSetInitialAnnotations',
+          annotations: JSON.stringify(${webViewInjectFunctions.mapArrayObjectsToAnnotations('initialAnnotations')})
+        }));*/
+      `
+    );
   }, []);
 
   const setKey = useCallback((key: string) => {
@@ -899,15 +764,14 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const removeSelection = useCallback(() => {
-    book.current?.injectJavaScript(`
-      try {
+    webViewInjectFunctions.injectJavaScript(
+      book,
+      `
         const getSelections = () => rendition.getContents().map(contents => contents.window.getSelection());
         const clearSelection = () => getSelections().forEach(s => s.removeAllRanges());
         clearSelection();
-      } catch (error) {
-        alert(JSON.stringify(error?.message));
-      }
-    `);
+    `
+    );
   }, []);
 
   const contextValue = useMemo(
@@ -960,6 +824,7 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       removeAnnotationByCfi,
       removeAnnotations,
       setAnnotations,
+      setInitialAnnotations,
       annotations: state.annotations,
     }),
     [
@@ -992,6 +857,7 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       removeAnnotationByCfi,
       removeAnnotations,
       setAnnotations,
+      setInitialAnnotations,
       state.atEnd,
       state.atStart,
       state.currentLocation,

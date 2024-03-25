@@ -26,7 +26,6 @@ export function Reader({
     <LoadingFile {...props} width={width} height={height} />
   ),
   fileSystem: useFileSystem,
-  initialAnnotations,
   ...rest
 }: ReaderProps) {
   const {
@@ -92,7 +91,6 @@ export function Reader({
                 enableSelection,
                 allowScriptedContent,
                 allowPopups,
-                annotations: initialAnnotations,
               })
             );
 
@@ -109,7 +107,6 @@ export function Reader({
                 enableSelection,
                 allowScriptedContent,
                 allowPopups,
-                annotations: initialAnnotations,
               })
             );
 
@@ -136,7 +133,6 @@ export function Reader({
                 enableSelection,
                 allowScriptedContent,
                 allowPopups,
-                annotations: initialAnnotations,
               })
             );
 
@@ -159,7 +155,6 @@ export function Reader({
                 enableSelection,
                 allowScriptedContent,
                 allowPopups,
-                annotations: initialAnnotations,
               })
             );
 

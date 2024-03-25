@@ -54,6 +54,7 @@ export function View({
   menuItems,
   onAddAnnotation = () => {},
   onChangeAnnotations = () => {},
+  initialAnnotations,
 }: ViewProps) {
   const {
     registerBook,
@@ -75,6 +76,7 @@ export function View({
     theme,
     removeSelection,
     setAnnotations,
+    setInitialAnnotations,
   } = useContext(ReaderContext);
   const book = useRef<WebView>(null);
   const [selectedText, setSelectedText] = useState<{
@@ -108,6 +110,10 @@ export function View({
       setTotalLocations(totalLocations);
       setCurrentLocation(currentLocation);
       setProgress(progress);
+
+      if (initialAnnotations) {
+        setInitialAnnotations(initialAnnotations);
+      }
 
       if (initialLocation) {
         goToLocation(initialLocation);
@@ -203,7 +209,7 @@ export function View({
     }
 
     if (type === 'onAddAnnotation') {
-      let annotation = JSON.parse(parsedEvent.annotation);
+      let { annotation } = parsedEvent;
 
       annotation = {
         type: annotation.type,
@@ -225,6 +231,7 @@ export function View({
     }
 
     if (type === 'onSetInitialAnnotations') {
+      console.log('eita', parsedEvent);
       const annotations = JSON.parse(parsedEvent.annotations);
       setAnnotations(annotations);
       return () => {};
