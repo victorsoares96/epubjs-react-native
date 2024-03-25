@@ -350,4 +350,6 @@ export interface ReaderProps {
    * Called when annotation is pressed
    */
   onPressAnnotation?: (annotation: Annotation) => void;
+
+  initialAnnotations?: Annotation[];
 }

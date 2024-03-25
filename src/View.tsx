@@ -224,6 +224,12 @@ export function View({
       return onChangeAnnotations(annotations);
     }
 
+    if (type === 'onSetInitialAnnotations') {
+      const annotations = JSON.parse(parsedEvent.annotations);
+      setAnnotations(annotations);
+      return () => {};
+    }
+
     if (type === 'onPressAnnotation') {
       const { annotation } = parsedEvent;
 

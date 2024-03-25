@@ -1,7 +1,3 @@
-/*
-    CDN url https://cdn.jsdelivr.net/npm/epubjs/dist/epub.min.js
-*/
-
 export default `
 !(function (t, e) {
   "object" == typeof exports && "object" == typeof module
@@ -147,10 +143,10 @@ export default `
           return I;
         }),
         i.d(e, "parse", function () {
-          return R;
+          return k;
         }),
         i.d(e, "qs", function () {
-          return k;
+          return R;
         }),
         i.d(e, "qsa", function () {
           return A;
@@ -429,7 +425,7 @@ export default `
       function I(t) {
         return Object.prototype.toString.call(t).slice(8, -1);
       }
-      function R(t, e, i) {
+      function k(t, e, i) {
         var r;
         return (
           (r = "undefined" == typeof DOMParser || i ? n.DOMParser : DOMParser),
@@ -437,7 +433,7 @@ export default `
           new r().parseFromString(t, e)
         );
       }
-      function k(t, e) {
+      function R(t, e) {
         var i;
         if (!t) throw new Error("No Element Provided");
         return void 0 !== t.querySelector
@@ -4176,6 +4172,8 @@ export default `
               h.setAttribute("y", a.top - i.top + r.top),
               h.setAttribute("height", a.height),
               h.setAttribute("width", a.width),
+              h.setAttribute("fill", this.attributes.fill),
+              h.setAttribute("fill-opacity", this.attributes["fill-opacity"]),
               t.appendChild(h);
           }
           this.element.appendChild(t);
@@ -4584,9 +4582,28 @@ export default `
         }
         update(t = {}, e = {}) {
           this.data && (this.data = t),
-            this.styles &&
-              ((this.mark.attributes = { ...this.mark.attributes, ...e }),
-              (this.mark.styles = { ...this.mark.styles, ...e }));
+            this.styles || (this.styles = {}),
+            null != e &&
+              e.stroke &&
+              ((this.mark.attributes.stroke = e.stroke),
+              (this.styles.stroke = e.stroke)),
+            null != e &&
+              e["stroke-opacity"] &&
+              ((this.mark.attributes["stroke-opacity"] = e["stroke-opacity"]),
+              (this.styles["stroke-opacity"] = e["stroke-opacity"])),
+            null != e &&
+              e["stroke-width"] &&
+              ((this.mark.attributes["stroke-width"] = e["stroke-width"]),
+              (this.styles["stroke-width"] = e["stroke-width"])),
+            null != e &&
+              e.fill &&
+              ((this.mark.attributes.fill = e.fill),
+              (this.mark.attributes.background = "red"),
+              (this.styles.fill = e.fill)),
+            null != e &&
+              e["fill-opacity"] &&
+              ((this.mark.attributes["fill-opacity"] = e["fill-opacity"]),
+              (this.styles["fill-opacity"] = e["fill-opacity"]));
         }
         attach(t) {
           let e,
@@ -7771,8 +7788,8 @@ export default `
                     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/",
                   C = /^~~local_forage_type~([^~]+)~/,
                   I = "__lfsc__:".length,
-                  R = I + "arbf".length,
-                  k = Object.prototype.toString;
+                  k = I + "arbf".length,
+                  R = Object.prototype.toString;
                 function A(t) {
                   var e,
                     i,
@@ -7817,11 +7834,11 @@ export default `
                   serialize: function (t, e) {
                     var i = "";
                     if (
-                      (t && (i = k.call(t)),
+                      (t && (i = R.call(t)),
                       t &&
                         ("[object ArrayBuffer]" === i ||
                           (t.buffer &&
-                            "[object ArrayBuffer]" === k.call(t.buffer))))
+                            "[object ArrayBuffer]" === R.call(t.buffer))))
                     ) {
                       var n,
                         r = "__lfsc__:";
@@ -7877,8 +7894,8 @@ export default `
                   deserialize: function (t) {
                     if ("__lfsc__:" !== t.substring(0, I)) return JSON.parse(t);
                     var e,
-                      i = t.substring(R),
-                      n = t.substring(I, R);
+                      i = t.substring(k),
+                      n = t.substring(I, k);
                     if ("blob" === n && C.test(i)) {
                       var r = i.match(C);
                       (e = r[1]), (i = i.substring(r[0].length));
@@ -10461,15 +10478,15 @@ export default `
           }
         },
         I = i(29),
-        R = i(76),
-        k = i.n(R);
+        k = i(76),
+        R = i.n(k);
       var A = class {
           constructor() {
             (this.zip = void 0), (this.urlCache = {}), this.checkRequirements();
           }
           checkRequirements() {
             try {
-              this.zip = new k.a();
+              this.zip = new R.a();
             } catch (t) {
               throw new Error("JSZip lib not loaded");
             }
@@ -11286,16 +11303,16 @@ export default `
       }
       function C() {}
       function I(t, e) {
-        (this._node = t), (this._refresh = e), R(this);
+        (this._node = t), (this._refresh = e), k(this);
       }
-      function R(t) {
+      function k(t) {
         var e = t._node._inc || t._node.ownerDocument._inc;
         if (t._inc != e) {
           var i = t._refresh(t._node);
           at(t, "length", i.length), a(i, t), (t._inc = e);
         }
       }
-      function k() {}
+      function R() {}
       function A(t, e) {
         for (var i = t.length; i--; ) if (t[i] === e) return i;
       }
@@ -11515,15 +11532,15 @@ export default `
             return e.push("\\x3c!--", t.data, "--\\x3e");
           case b:
             var I = t.publicId,
-              R = t.systemId;
+              k = t.systemId;
             if ((e.push("<!DOCTYPE ", t.name), I))
               e.push(" PUBLIC ", I),
-                R && "." != R && e.push(" ", R),
+                k && "." != k && e.push(" ", k),
                 e.push(">");
-            else if (R && "." != R) e.push(" SYSTEM ", R, ">");
+            else if (k && "." != k) e.push(" SYSTEM ", k, ">");
             else {
-              var k = t.internalSubset;
-              k && e.push(" [", k, "]"), e.push(">");
+              var R = t.internalSubset;
+              R && e.push(" [", R, "]"), e.push(">");
             }
             return;
           case m:
@@ -11550,10 +11567,10 @@ export default `
           },
         }),
         (I.prototype.item = function (t) {
-          return R(this), this[t];
+          return k(this), this[t];
         }),
         h(I, C),
-        (k.prototype = {
+        (R.prototype = {
           length: 0,
           item: C.prototype.item,
           getNamedItem: function (t) {
@@ -11662,7 +11679,7 @@ export default `
               switch (((r.ownerDocument = e), r.nodeType)) {
                 case c:
                   var a = i.attributes,
-                    h = (r.attributes = new k()),
+                    h = (r.attributes = new R()),
                     l = a.length;
                   h._ownerElement = r;
                   for (var d = 0; d < l; d++)
@@ -11807,7 +11824,7 @@ export default `
               (e.tagName = t),
               (e.localName = t),
               (e.childNodes = new C()),
-              ((e.attributes = new k())._ownerElement = e),
+              ((e.attributes = new R())._ownerElement = e),
               e
             );
           },
@@ -11854,7 +11871,7 @@ export default `
           createElementNS: function (t, e) {
             var i = new H(),
               n = e.split(":"),
-              r = (i.attributes = new k());
+              r = (i.attributes = new R());
             return (
               (i.childNodes = new C()),
               (i.ownerDocument = this),
@@ -12059,7 +12076,7 @@ export default `
         if (Object.defineProperty) {
           Object.defineProperty(I.prototype, "length", {
             get: function () {
-              return R(this), this.$$length;
+              return k(this), this.$$length;
             },
           }),
             Object.defineProperty(P.prototype, "textContent", {
@@ -13437,14 +13454,14 @@ export default `
                       case "/":
                         var C = t.indexOf(">", _ + 3),
                           I = t.substring(_ + 2, C).replace(/[ \\t\\n\\r]+$/g, ""),
-                          R = E.pop();
+                          k = E.pop();
                         C < 0
                           ? ((I = t.substring(_ + 2).replace(/[\\s<].*/, "")),
                             s.error(
                               "end tag name: " +
                                 I +
                                 " is not complete:" +
-                                R.tagName,
+                                k.tagName,
                             ),
                             (C = _ + 1 + I.length))
                           : I.match(/\\s</) &&
@@ -13453,23 +13470,23 @@ export default `
                               "end tag name: " + I + " maybe not complete",
                             ),
                             (C = _ + 1 + I.length));
-                        var k = R.localNSMap,
-                          A = R.tagName == I;
+                        var R = k.localNSMap,
+                          A = k.tagName == I;
                         if (
                           A ||
-                          (R.tagName &&
-                            R.tagName.toLowerCase() == I.toLowerCase())
+                          (k.tagName &&
+                            k.tagName.toLowerCase() == I.toLowerCase())
                         ) {
-                          if ((r.endElement(R.uri, R.localName, I), k))
-                            for (var L in k) r.endPrefixMapping(L);
+                          if ((r.endElement(k.uri, k.localName, I), R))
+                            for (var L in R) r.endPrefixMapping(L);
                           A ||
                             s.fatalError(
                               "end tag name: " +
                                 I +
                                 " is not match the current start tagName:" +
-                                R.tagName,
+                                k.tagName,
                             );
-                        } else E.push(R);
+                        } else E.push(k);
                         C++;
                         break;
                       case "?":
@@ -13890,7 +13907,7 @@ export default `
           N,
           _,
           O = function (t) {
-            if (t === f && k) return k;
+            if (t === f && R) return R;
             if (!b && t in I) return I[t];
             switch (t) {
               case "keys":
@@ -13907,9 +13924,9 @@ export default `
           T = e + " Iterator",
           C = !1,
           I = t.prototype,
-          R = I[w] || I["@@iterator"] || (f && I[f]),
-          k = (!b && R) || O(f),
-          A = ("Array" == e && I.entries) || R;
+          k = I[w] || I["@@iterator"] || (f && I[f]),
+          R = (!b && k) || O(f),
+          A = ("Array" == e && I.entries) || k;
         if (
           (A &&
             (S = h(A.call(new t()))) !== Object.prototype &&
@@ -13919,20 +13936,20 @@ export default `
             r && (p[T] = x)),
           m &&
             "values" == f &&
-            R &&
-            "values" !== R.name &&
+            k &&
+            "values" !== k.name &&
             (!r && v
               ? u(I, "name", "values")
               : ((C = !0),
-                (k = function () {
-                  return R.call(this);
+                (R = function () {
+                  return k.call(this);
                 }))),
           f)
         )
           if (
             ((N = {
               values: O("values"),
-              keys: g ? k : O("keys"),
+              keys: g ? R : O("keys"),
               entries: O("entries"),
             }),
             E)
@@ -13940,7 +13957,7 @@ export default `
             for (_ in N) (b || C || !(_ in I)) && d(I, _, N[_]);
           else n({ target: e, proto: !0, forced: b || C }, N);
         return (
-          (r && !E) || I[w] === k || d(I, w, k, { name: f }), (p[e] = k), N
+          (r && !E) || I[w] === R || d(I, w, R, { name: f }), (p[e] = R), N
         );
       };
     },

@@ -11,7 +11,7 @@ import { useFileSystem } from '@epubjs-react-native/expo-file-system';
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import AnnotationsList from './AnnotationsList';
-import AnnotationForm from './AnnotationForm';
+import AnnotationForm, { COLORS } from './AnnotationForm';
 
 function Book() {
   const { width, height } = useWindowDimensions();
@@ -26,6 +26,7 @@ function Book() {
 
   const bottomSheetRef = React.useRef<BottomSheet>(null);
   const snapPoints = React.useMemo(() => ['50%', '75%', '100%'], []);
+
   return (
     <GestureHandlerRootView>
       <Reader
@@ -33,13 +34,23 @@ function Book() {
         width={width}
         height={height}
         fileSystem={useFileSystem}
+        initialAnnotations={[
+          {
+            cfiRange: 'epubcfi(/6/8!/4/2/4,/1:0,/1:26)',
+            data: {},
+            sectionIndex: 3,
+            styles: { color: '#23CE6B', opacity: 0.3, thickness: null },
+            text: 'This text is a combination',
+            type: 'highlight',
+          },
+        ]}
         onAddAnnotation={(annotation) => {
-          if (annotation.type === 'highlight') {
+          console.log('onAddAnnotation', annotation);
+          if (annotation.type === 'highlight' && annotation.data?.isTemp) {
             setTempMark(annotation);
           }
         }}
         onPressAnnotation={(annotation) => {
-          if (annotation.type !== 'underline') return;
           setSelectedAnnotation(annotation);
           bottomSheetRef.current.snapToIndex(0);
         }}
@@ -48,9 +59,29 @@ function Book() {
         }}
         menuItems={[
           {
-            label: 'Highlight',
+            label: '🟡',
             action: (cfiRange) => {
-              addAnnotation('highlight', cfiRange);
+              addAnnotation('highlight', cfiRange, undefined, {
+                color: COLORS[2],
+              });
+              return true;
+            },
+          },
+          {
+            label: '🔴',
+            action: (cfiRange) => {
+              addAnnotation('highlight', cfiRange, undefined, {
+                color: COLORS[0],
+              });
+              return true;
+            },
+          },
+          {
+            label: '🟢',
+            action: (cfiRange) => {
+              addAnnotation('highlight', cfiRange, undefined, {
+                color: COLORS[3],
+              });
               return true;
             },
           },
@@ -58,21 +89,8 @@ function Book() {
             label: 'Add Note',
             action: (cfiRange, text) => {
               setSelection({ cfiRange, text });
-              addAnnotation('highlight', cfiRange);
+              addAnnotation('highlight', cfiRange, { isTemp: true });
               bottomSheetRef.current.snapToIndex(0);
-              return true;
-            },
-          },
-          {
-            label: 'Mark with 💚',
-            action: (cfiRange) => {
-              addAnnotation(
-                'mark',
-                cfiRange,
-                undefined,
-                undefined,
-                'epubjs-mk-heart'
-              );
               return true;
             },
           },

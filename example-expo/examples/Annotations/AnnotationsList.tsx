@@ -13,7 +13,7 @@ function AnnotationsList({ annotations, onClose }: Props) {
   return (
     <View style={{ width: '100%', marginVertical: 20 }}>
       {annotations
-        .filter((annotation) => annotation.type === 'underline')
+        .filter((annotation) => !annotation?.data?.isTemp)
         .map((annotation) => (
           <View
             key={annotation.cfiRange}
@@ -37,31 +37,64 @@ function AnnotationsList({ annotations, onClose }: Props) {
                   borderWidth: 1,
                 }}
               />
-              <TouchableOpacity
-                onPress={() => {
-                  goToLocation(annotation.cfiRange);
-                  onClose();
-                }}
-              >
-                <Text
-                  style={{
-                    fontWeight: '600',
-                    marginLeft: 5,
+
+              {annotation.type === 'highlight' && (
+                <TouchableOpacity
+                  onPress={() => {
+                    goToLocation(annotation.cfiRange);
+                    onClose();
                   }}
                 >
-                  {annotation.data?.observation}
-                </Text>
-                <Text
-                  style={{
-                    fontStyle: 'italic',
-                    flexWrap: 'wrap',
-                    maxWidth: 220,
+                  <Text
+                    style={{
+                      fontWeight: '600',
+                      marginLeft: 5,
+                    }}
+                  >
+                    {annotation.cfiRange}
+                  </Text>
+
+                  <Text
+                    style={{
+                      fontStyle: 'italic',
+                      flexWrap: 'wrap',
+                      maxWidth: 220,
+                    }}
+                    numberOfLines={2}
+                  >
+                    &quot;{annotation.text}&quot;
+                  </Text>
+                </TouchableOpacity>
+              )}
+
+              {annotation.type !== 'highlight' && (
+                <TouchableOpacity
+                  onPress={() => {
+                    goToLocation(annotation.cfiRange);
+                    onClose();
                   }}
-                  numberOfLines={2}
                 >
-                  &quot;{annotation.text}&quot;
-                </Text>
-              </TouchableOpacity>
+                  <Text
+                    style={{
+                      fontWeight: '600',
+                      marginLeft: 5,
+                    }}
+                  >
+                    {annotation.data?.observation}
+                  </Text>
+
+                  <Text
+                    style={{
+                      fontStyle: 'italic',
+                      flexWrap: 'wrap',
+                      maxWidth: 220,
+                    }}
+                    numberOfLines={2}
+                  >
+                    &quot;{annotation.text}&quot;
+                  </Text>
+                </TouchableOpacity>
+              )}
             </View>
 
             <TouchableOpacity
@@ -71,7 +104,20 @@ function AnnotationsList({ annotations, onClose }: Props) {
                 borderRadius: 10,
               }}
               onPress={() => {
-                removeAnnotation(annotation);
+                /**
+                 * Required for the "add note" scenario, as an "underline" and "mark" type annotation is created in it and both work as one...
+                 */
+                if (annotation.data?.key) {
+                  const withMarkAnnotations = annotations.filter(
+                    ({ data }) => data.key === annotation.data.key
+                  );
+
+                  withMarkAnnotations.forEach((item) => {
+                    removeAnnotation(item);
+                  });
+                } else {
+                  removeAnnotation(annotation);
+                }
                 onClose();
               }}
             >

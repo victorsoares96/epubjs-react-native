@@ -52,6 +52,7 @@ export default `
       const theme = window.theme;
       const initialLocations = window.locations;
       const enableSelection = window.enable_selection;
+      const initialAnnotations = [];
 
       if (!file) {
         alert('Failed load book');
@@ -106,6 +107,42 @@ export default `
 
           displayed.then(function () {
             var currentLocation = rendition.currentLocation();
+
+            if (initialAnnotations.length > 0) {
+              try {
+                let xannotations = [];
+
+                initialAnnotations.forEach(annotation => {
+                  const xannotation = rendition.annotations.add(annotation.type, annotation.cfiRange, annotation?.data || {}, () => {}, annotation?.iconClass || '', annotation?.styles);
+                  xannotations.push(xannotation);
+                });
+
+                alert(JSON.stringify(xannotations));
+
+                xannotations = xannotations.map(annotation => ({
+                  type: annotation.type,
+                  data: annotation.data,
+                  cfiRange: annotation.cfiRange,
+                  sectionIndex: annotation.sectionIndex,
+                  text: annotation.mark?.range?.toString() || rendition.getRange(annotation.cfiRange).toString(),
+                  iconClass: annotation.data?.iconClass,
+                  styles: annotation.type !== 'mark' ? {
+                    color: annotation.mark.attributes?.fill || annotation.mark.attributes?.stroke,
+                    opacity: Number(annotation.mark.attributes?.['fill-opacity'] || annotation.mark.attributes?.['stroke-opacity']),
+                    thickness: Number(annotation.mark.attributes?.['stroke-width']),
+                  } : undefined
+                }));
+
+                window.ReactNativeWebView.postMessage(JSON.stringify({
+                  type: 'onSetInitialAnnotations',
+                  annotations: JSON.stringify(xannotations)
+                }));
+
+                xannotations = [];
+              } catch (error) {
+                alert(error?.message);
+              }
+            }
 
             window.ReactNativeWebView.postMessage(JSON.stringify({
               type: "onReady",

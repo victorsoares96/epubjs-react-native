@@ -12,13 +12,13 @@ interface Props {
   onClose: () => void;
 }
 
-const COLORS = ['#C20114', '#39A2AE', '#CBA135', '#23CE6B', '#090C02'];
+export const COLORS = ['#C20114', '#39A2AE', '#CBA135', '#23CE6B', '#090C02'];
 
 function AnnotationForm({ annotation, selection, onClose }: Props) {
   const [observation, setObservation] = React.useState('');
   const [color, setColor] = React.useState(COLORS[0]);
 
-  const { addAnnotation, updateAnnotation } = useReader();
+  const { addAnnotation, updateAnnotation, annotations } = useReader();
 
   useEffect(() => {
     if (annotation) {
@@ -35,22 +35,30 @@ function AnnotationForm({ annotation, selection, onClose }: Props) {
     <View style={styles.container}>
       <Text style={styles.title}>Annotations</Text>
 
-      <BottomSheetTextInput
-        value={observation}
-        style={styles.input}
-        multiline
-        placeholder="Type an annotation here..."
-        onChangeText={(text) => setObservation(text)}
-      />
+      {annotation?.type !== 'highlight' && (
+        <BottomSheetTextInput
+          value={observation}
+          style={styles.input}
+          multiline
+          placeholder="Type an annotation here..."
+          onChangeText={(text) => setObservation(text)}
+        />
+      )}
 
       <View
         style={{
           flexDirection: 'row',
           justifyContent: 'space-between',
           width: '100%',
+          marginTop: 10,
         }}
       >
-        <View style={{ flexDirection: 'row', alignSelf: 'flex-start' }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignSelf: 'flex-start',
+          }}
+        >
           {COLORS.map((item) => (
             <TouchableOpacity
               key={item}
@@ -82,12 +90,18 @@ function AnnotationForm({ annotation, selection, onClose }: Props) {
               borderRadius: 12,
             }}
             onPress={() => {
+              const key = Date.now();
               addAnnotation(
                 'underline',
                 selection.cfiRange,
-                { text: selection.text, observation },
-                { color, opacity: 0.5 }
+                { key, text: selection.text, observation },
+                { color, opacity: 0.8 }
               );
+              addAnnotation('mark', selection.cfiRange, {
+                key,
+                text: selection.text,
+                observation,
+              });
 
               setObservation('');
               onClose();
@@ -109,14 +123,34 @@ function AnnotationForm({ annotation, selection, onClose }: Props) {
               borderRadius: 12,
             }}
             onPress={() => {
-              updateAnnotation(
-                annotation,
-                {
-                  ...annotation.data,
-                  observation,
-                },
-                { ...annotation.styles, color }
-              );
+              /**
+               * Required for the "add note" scenario, as an "underline" and "mark" type annotation is created in it and both work as one...
+               */
+              if (annotation.data?.key) {
+                const withMarkAnnotations = annotations.filter(
+                  ({ data }) => data.key === annotation.data.key
+                );
+
+                withMarkAnnotations.forEach((item) => {
+                  updateAnnotation(
+                    item,
+                    {
+                      ...item.data,
+                      observation,
+                    },
+                    { ...item.styles, color }
+                  );
+                });
+              } else {
+                updateAnnotation(
+                  annotation,
+                  {
+                    ...annotation.data,
+                    observation,
+                  },
+                  { ...annotation.styles, color }
+                );
+              }
 
               onClose();
               setObservation('');
@@ -140,7 +174,6 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 64,
     marginTop: 8,
-    marginBottom: 10,
     borderRadius: 10,
     fontSize: 16,
     lineHeight: 20,
