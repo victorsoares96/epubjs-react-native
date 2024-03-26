@@ -3,4 +3,3 @@ lib/
 *.js
 epubjs.ts
 jszip.ts
-epubjs copy.ts
