@@ -4570,9 +4570,11 @@ export default `
           cb: r,
           className: s,
           styles: o,
+          cfiRangeText: a,
         }) {
           (this.type = t),
             (this.cfiRange = e),
+            (this.cfiRangeText = a),
             (this.data = i),
             (this.sectionIndex = n),
             (this.mark = void 0),
@@ -4633,19 +4635,20 @@ export default `
           let e,
             {
               cfiRange: i,
-              data: n,
-              type: r,
-              mark: s,
-              cb: o,
-              className: a,
-              styles: h,
+              cfiRangeText: n,
+              data: r,
+              type: s,
+              mark: o,
+              cb: a,
+              className: h,
+              styles: c,
             } = this;
           return (
-            "highlight" === r
-              ? (e = t.highlight(i, n, o, a, h))
-              : "underline" === r
-                ? (e = t.underline(i, n, o, a, h))
-                : "mark" === r && (e = t.mark(i, n, o, a, h)),
+            "highlight" === s
+              ? (e = t.highlight(i, r, a, h, c, n))
+              : "underline" === s
+                ? (e = t.underline(i, r, a, h, c, n))
+                : "mark" === s && (e = t.mark(i, r, a, h, c, n)),
             (this.mark = e),
             this.emit(l.c.ANNOTATION.ATTACH, e),
             e
@@ -4680,38 +4683,51 @@ export default `
               this.rendition.hooks.render.register(this.inject.bind(this)),
               this.rendition.hooks.unloaded.register(this.clear.bind(this));
           }
-          add(t, e, i, n, r, s) {
-            let o = encodeURI(e + t),
-              h = new a.a(e).spinePos,
-              l = new p({
+          add(t, e, i, n, r, s, o) {
+            let h = encodeURI(e + t),
+              l = new a.a(e).spinePos,
+              c = new p({
                 type: t,
                 cfiRange: e,
                 data: i,
-                sectionIndex: h,
+                sectionIndex: l,
                 cb: n,
                 className: r,
                 styles: s,
+                cfiRangeText: o,
               });
             return (
-              (this._annotations[o] = l),
-              h in this._annotationsBySectionIndex
-                ? this._annotationsBySectionIndex[h].push(o)
-                : (this._annotationsBySectionIndex[h] = [o]),
+              (this._annotations[h] = c),
+              "highlight" === t && this.highlights.push(c),
+              "underline" === t && this.underlines.push(c),
+              "mark" === t && this.marks.push(c),
+              l in this._annotationsBySectionIndex
+                ? this._annotationsBySectionIndex[l].push(h)
+                : (this._annotationsBySectionIndex[l] = [h]),
               this.rendition.views().forEach((t) => {
-                l.sectionIndex === t.index && l.attach(t);
+                c.sectionIndex === t.index && c.attach(t);
               }),
-              l
+              c
             );
           }
           remove(t, e) {
             let i = encodeURI(t + e);
             if (i in this._annotations) {
-              let t = this._annotations[i];
-              if (e && t.type !== e) return;
-              this.rendition.views().forEach((e) => {
-                this._removeFromAnnotationBySectionIndex(t.sectionIndex, i),
-                  t.sectionIndex === e.index && t.detach(e);
+              let n = this._annotations[i];
+              if (e && n.type !== e) return;
+              this.rendition.views().forEach((t) => {
+                this._removeFromAnnotationBySectionIndex(n.sectionIndex, i),
+                  n.sectionIndex === t.index && n.detach(t);
               }),
+                (this.highlights = this.highlights.filter(
+                  (i) => i.type !== e && i.cfiRange !== t,
+                )),
+                (this.underlines = this.underlines.filter(
+                  (i) => i.type !== e && i.cfiRange !== t,
+                )),
+                (this.marks = this.marks.filter(
+                  (i) => i.type !== e && i.cfiRange !== t,
+                )),
                 delete this._annotations[i];
             }
           }
@@ -4723,20 +4739,17 @@ export default `
           _annotationsAt(t) {
             return this._annotationsBySectionIndex[t];
           }
-          highlight(t, e, i, n, r) {
-            return this.add("highlight", t, e, i, n, r);
+          highlight(t, e, i, n, r, s) {
+            return this.add("highlight", t, e, i, n, r, s);
           }
-          underline(t, e, i, n, r) {
-            return this.add("underline", t, e, i, n, r);
+          underline(t, e, i, n, r, s) {
+            return this.add("underline", t, i, n, r, s, e);
           }
-          mark(t, e, i) {
-            return this.add("mark", t, e, i);
+          mark(t, e, i, n) {
+            return this.add("mark", t, e, i, n);
           }
           each() {
-            return this._annotations.forEach.apply(
-              this._annotations,
-              arguments,
-            );
+            return [...this.highlights, ...this.underlines, ...this.marks];
           }
           inject(t) {
             let e = t.index;
@@ -5846,9 +5859,9 @@ export default `
             this.elementBounds
           );
         }
-        highlight(t, e = {}, i, n = "epubjs-hl", r = {}) {
+        highlight(t, e = {}, i, n = "epubjs-hl", r = {}, s = "") {
           if (!this.contents) return;
-          const s = Object.assign(
+          const o = Object.assign(
             {
               fill: "yellow",
               "fill-opacity": "0.3",
@@ -5856,29 +5869,30 @@ export default `
             },
             r,
           );
-          let o = this.contents.range(t),
-            a = () => {
+          let a = this.contents.range(t),
+            c = () => {
               this.emit(h.c.VIEWS.MARK_CLICKED, t, e);
             };
           (e.epubcfi = t),
             this.pane || (this.pane = new l.Pane(this.iframe, this.element));
-          let c = new l.Highlight(o, n, e, s),
-            u = this.pane.addMark(c);
+          let u = new l.Highlight(a, n, e, o),
+            d = this.pane.addMark(u);
           return (
             (this.highlights[t] = {
-              mark: u,
-              element: u.element,
-              listeners: [a, i],
+              mark: d,
+              element: d.element,
+              listeners: [c, i],
+              cfiRangeText: s,
             }),
-            u.element.setAttribute("ref", n),
-            u.element.addEventListener("click", a),
-            i && u.element.addEventListener("click", i),
-            u
+            d.element.setAttribute("ref", n),
+            d.element.addEventListener("click", c),
+            i && d.element.addEventListener("click", i),
+            d
           );
         }
-        underline(t, e = {}, i, n = "epubjs-ul", r = {}) {
+        underline(t, e = {}, i, n = "epubjs-ul", r = {}, s = "") {
           if (!this.contents) return;
-          const s = Object.assign(
+          const o = Object.assign(
             {
               stroke: "black",
               "stroke-opacity": "0.3",
@@ -5886,57 +5900,63 @@ export default `
             },
             r,
           );
-          let o = this.contents.range(t),
-            a = () => {
+          let a = this.contents.range(t),
+            c = () => {
               this.emit(h.c.VIEWS.MARK_CLICKED, t, e);
             };
           (e.epubcfi = t),
             this.pane || (this.pane = new l.Pane(this.iframe, this.element));
-          let c = new l.Underline(o, n, e, s),
-            u = this.pane.addMark(c);
+          let u = new l.Underline(a, n, e, o),
+            d = this.pane.addMark(u);
           return (
             (this.underlines[t] = {
-              mark: u,
-              element: u.element,
-              listeners: [a, i],
+              mark: d,
+              element: d.element,
+              listeners: [c, i],
+              cfiRangeText: s,
             }),
-            u.element.setAttribute("ref", n),
-            u.element.addEventListener("click", a),
-            i && u.element.addEventListener("click", i),
-            u
+            d.element.setAttribute("ref", n),
+            d.element.addEventListener("click", c),
+            i && d.element.addEventListener("click", i),
+            d
           );
         }
-        mark(t, e = {}, i, n = "epubjs-mk", r = {}) {
+        mark(t, e = {}, i, n = "epubjs-mk", r = {}, s = "") {
           if (!this.contents) return;
           if (t in this.marks) {
             return this.marks[t];
           }
-          let s = this.contents.range(t);
-          if (!s) return;
-          let o = s.commonAncestorContainer,
-            a = 1 === o.nodeType ? o : o.parentNode,
-            l = (i) => {
+          let o = this.contents.range(t);
+          if (!o) return;
+          let a = o.commonAncestorContainer,
+            l = 1 === a.nodeType ? a : a.parentNode,
+            c = (i) => {
               this.emit(h.c.VIEWS.MARK_CLICKED, t, e);
             };
-          s.collapsed && 1 === o.nodeType
-            ? ((s = new Range()), s.selectNodeContents(o))
-            : s.collapsed && ((s = new Range()), s.selectNodeContents(a));
-          let c = this.document.createElement("a");
+          o.collapsed && 1 === a.nodeType
+            ? ((o = new Range()), o.selectNodeContents(a))
+            : o.collapsed && ((o = new Range()), o.selectNodeContents(l));
+          let u = this.document.createElement("a");
           return (
-            c.setAttribute("ref", n),
-            (c.style = r),
-            (c.style.position = "absolute"),
-            (c.dataset.epubcfi = t),
+            u.setAttribute("ref", n),
+            (u.style = r),
+            (u.style.position = "absolute"),
+            (u.dataset.epubcfi = t),
             e &&
               Object.keys(e).forEach((t) => {
-                c.dataset[t] = e[t];
+                u.dataset[t] = e[t];
               }),
-            i && c.addEventListener("click", i),
-            c.addEventListener("click", l),
-            this.placeMark(c, s),
-            this.element.appendChild(c),
-            (this.marks[t] = { element: c, range: s, listeners: [l, i] }),
-            a
+            i && u.addEventListener("click", i),
+            u.addEventListener("click", c),
+            this.placeMark(u, o),
+            this.element.appendChild(u),
+            (this.marks[t] = {
+              element: u,
+              range: o,
+              listeners: [c, i],
+              cfiRangeText: s,
+            }),
+            l
           );
         }
         placeMark(t, e) {

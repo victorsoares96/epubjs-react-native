@@ -55,7 +55,7 @@ export type Annotation<Data = any> = {
   data: Data;
   cfiRange: ePubCfi;
   sectionIndex: number;
-  text: string;
+  cfiRangeText: string;
   iconClass?: string;
   styles?: AnnotationStyles;
 };

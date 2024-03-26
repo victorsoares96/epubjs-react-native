@@ -49,17 +49,17 @@ export function mapObjectToAnnotation(objectName = 'annotation') {
     data: ${objectName}.data,
     cfiRange: ${objectName}.cfiRange,
     sectionIndex: ${objectName}.sectionIndex,
-    text: ${objectName}?.text || ${objectName}.mark?.range?.toString(),
+    cfiRangeText: ${objectName}?.cfiRangeText ? ${objectName}.cfiRangeText : ${objectName}.mark?.range?.toString(),
     iconClass: ${objectName}.data?.iconClass,
     styles: ${objectName}.type !== 'mark' ? {
-      color: ${objectName}.mark?.attributes?.fill || ${objectName}.mark?.attributes?.stroke || ${objectName}.styles?.color,
-      opacity: Number(${objectName}.mark?.attributes?.['fill-opacity'] || ${objectName}.mark?.attributes?.['stroke-opacity']) || ${objectName}.styles?.opacity,
-      thickness: Number(${objectName}.mark?.attributes?.['stroke-width']) || ${objectName}.styles?.thickness,
+      color: ${objectName}.styles?.fill || ${objectName}.mark?.attributes?.fill || ${objectName}.mark?.attributes?.stroke || ${objectName}.styles?.color,
+      opacity: Number(${objectName}.styles?.['fill-opacity'] || ${objectName}.mark?.attributes?.['fill-opacity'] || ${objectName}.mark?.attributes?.['stroke-opacity'] || ${objectName}.styles?.opacity),
+      thickness: Number(${objectName}.styles?.['stroke-width'] || ${objectName}.mark?.attributes?.['stroke-width'] || ${objectName}.styles?.thickness),
     } : undefined
   }`;
 }
 
-export function mapArrayObjectsToAnnotations(array: string) {
+export function mapArrayObjectsToAnnotations(array: string | Array<object>) {
   return `
     ${array}.map(annotation => {
       const transform = annotation;
@@ -69,11 +69,13 @@ export function mapArrayObjectsToAnnotations(array: string) {
   `;
 }
 
-export function onChangeAnnotations(annotations?: string) {
+export function onChangeAnnotations(
+  annotations = 'Object.values(rendition.annotations._annotations)'
+) {
   return `
     window.ReactNativeWebView.postMessage(JSON.stringify({
       type: 'onChangeAnnotations',
-      annotations: JSON.stringify(${mapArrayObjectsToAnnotations(annotations || 'Object.values(rendition.annotations._annotations)')})
+      annotations: ${mapArrayObjectsToAnnotations(annotations)}
     }));
   `;
 }
@@ -84,6 +86,7 @@ export function addAnnotation(
   data?: object,
   iconClass?: string,
   styles?: AnnotationStyles,
+  cfiRangeText?: string,
   noEmit = false
 ) {
   const epubStyles = mapAnnotationStylesToEpubStyles(type, styles);
@@ -94,16 +97,16 @@ export function addAnnotation(
   }
 
   return `
-    let annotation = rendition.annotations.add('${type}', ${JSON.stringify(cfiRange)}, ${JSON.stringify(
+    const annotation = rendition.annotations.add('${type}', ${JSON.stringify(cfiRange)}, ${JSON.stringify(
       data ?? {}
-    )}, () => {}, ${JSON.stringify(iconClass)}, ${JSON.stringify(epubStyles)});
+    )}, () => {}, ${JSON.stringify(iconClass)}, ${JSON.stringify(epubStyles)}, ${JSON.stringify(cfiRangeText)});
 
     const noEmit = ${noEmit};
 
     if (!noEmit) {
       window.ReactNativeWebView.postMessage(JSON.stringify({
         type: 'onAddAnnotation',
-        annotation: JSON.stringify(${mapObjectToAnnotation('annotation')})
+        annotation: ${mapObjectToAnnotation('annotation')}
       }));
     }
   `;
@@ -117,12 +120,12 @@ export function updateAnnotation(
   const epubStyles = mapAnnotationStylesToEpubStyles(annotation.type, styles);
 
   return `
-    const annotations = Object.values(rendition.annotations._annotations);
+    let annotations = Object.values(rendition.annotations._annotations);
 
-    let annotation = annotations.filter(item => item.cfiRange === ${JSON.stringify(annotation.cfiRange)});
+    annotations = annotations.filter(item => item.cfiRange === ${JSON.stringify(annotation.cfiRange)});
 
-    annotation.forEach(item => {
-      annotation?.update(${JSON.stringify(data)}, ${JSON.stringify(epubStyles)});
+    annotations.forEach(annotation => {
+      annotation.update(${JSON.stringify(data)}, ${JSON.stringify(epubStyles)});
     });
 
     rendition.views().forEach(view => view.pane ? view.pane.render() : null);

@@ -12,7 +12,7 @@ import {
 } from 'react-native-gesture-handler';
 import { WebView, WebViewMessageEvent } from 'react-native-webview';
 import { defaultTheme as initialTheme, ReaderContext } from './context';
-import type { Annotation, ReaderProps } from './types';
+import type { ReaderProps } from './types';
 import { OpeningBook } from './utils/OpeningBook';
 
 export type ViewProps = Omit<ReaderProps, 'src' | 'fileSystem'> & {
@@ -81,8 +81,8 @@ export function View({
   const book = useRef<WebView>(null);
   const [selectedText, setSelectedText] = useState<{
     cfiRange: string;
-    text: string;
-  }>({ cfiRange: '', text: '' });
+    cfiRangeText: string;
+  }>({ cfiRange: '', cfiRangeText: '' });
 
   const onMessage = (event: WebViewMessageEvent) => {
     const parsedEvent = JSON.parse(event.nativeEvent.data);
@@ -168,7 +168,7 @@ export function View({
     if (type === 'onSelected') {
       const { cfiRange, text } = parsedEvent;
 
-      setSelectedText({ cfiRange, text });
+      setSelectedText({ cfiRange, cfiRangeText: text });
       return onSelected(text, cfiRange);
     }
 
@@ -209,30 +209,19 @@ export function View({
     }
 
     if (type === 'onAddAnnotation') {
-      let { annotation } = parsedEvent;
-
-      annotation = {
-        type: annotation.type,
-        data: annotation.data,
-        cfiRange: annotation.cfiRange,
-        sectionIndex: annotation.sectionIndex,
-        text: annotation.text,
-        iconClass: annotation?.iconClass,
-        styles: annotation?.styles,
-      } as Annotation;
+      const { annotation } = parsedEvent;
 
       return onAddAnnotation(annotation);
     }
 
     if (type === 'onChangeAnnotations') {
-      const annotations = JSON.parse(parsedEvent.annotations);
+      const { annotations } = parsedEvent;
       setAnnotations(annotations);
       return onChangeAnnotations(annotations);
     }
 
     if (type === 'onSetInitialAnnotations') {
-      console.log('eita', parsedEvent);
-      const annotations = JSON.parse(parsedEvent.annotations);
+      const { annotations } = parsedEvent;
       setAnnotations(annotations);
       return () => {};
     }
@@ -328,7 +317,7 @@ export function View({
                     if (event.nativeEvent.label === item.label) {
                       const removeSelectionMenu = item.action(
                         selectedText.cfiRange,
-                        selectedText.text
+                        selectedText.cfiRangeText
                       );
 
                       if (removeSelectionMenu) {

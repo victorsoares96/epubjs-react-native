@@ -13,7 +13,10 @@ function AnnotationsList({ annotations, onClose }: Props) {
   return (
     <View style={{ width: '100%', marginVertical: 20 }}>
       {annotations
-        .filter((annotation) => !annotation?.data?.isTemp)
+        .filter(
+          (annotation) =>
+            !annotation?.data?.isTemp && annotation.type !== 'mark'
+        )
         .map((annotation) => (
           <View
             key={annotation.cfiRange}
@@ -29,7 +32,7 @@ function AnnotationsList({ annotations, onClose }: Props) {
                 style={{
                   width: 28,
                   height: 28,
-                  backgroundColor: annotation.styles.color,
+                  backgroundColor: annotation.styles?.color,
                   borderRadius: 14,
                   marginRight: 10,
                   borderColor: '#000',
@@ -62,7 +65,7 @@ function AnnotationsList({ annotations, onClose }: Props) {
                     }}
                     numberOfLines={2}
                   >
-                    &quot;{annotation.text}&quot;
+                    &quot;{annotation.cfiRangeText}&quot;
                   </Text>
                 </TouchableOpacity>
               )}
@@ -91,7 +94,7 @@ function AnnotationsList({ annotations, onClose }: Props) {
                     }}
                     numberOfLines={2}
                   >
-                    &quot;{annotation.text}&quot;
+                    &quot;{annotation.cfiRangeText}&quot;
                   </Text>
                 </TouchableOpacity>
               )}

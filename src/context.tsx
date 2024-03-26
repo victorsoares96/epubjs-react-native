@@ -728,7 +728,6 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const setInitialAnnotations = useCallback((annotations: Annotation[]) => {
-    console.log('setInitialAnnotations', annotations);
     annotations.forEach((annotation) => {
       webViewInjectFunctions.injectJavaScript(
         book,
@@ -738,23 +737,22 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
           annotation.data,
           annotation.iconClass,
           annotation.styles,
+          annotation.cfiRangeText,
           true
         )
       );
     });
 
+    const transform = JSON.stringify(annotations);
     webViewInjectFunctions.injectJavaScript(
       book,
       `
-        const xinitialAnnotations = ${Object.values(annotations)};
-        alert(xinitialAnnotations);
-        alert(JSON.stringify(xinitialAnnotations));
-        alert(JSON.parse(xinitialAnnotations));
+        const initialAnnotations = JSON.stringify(${transform});
 
-        /*window.ReactNativeWebView.postMessage(JSON.stringify({
+        window.ReactNativeWebView.postMessage(JSON.stringify({
           type: 'onSetInitialAnnotations',
-          annotations: JSON.stringify(${webViewInjectFunctions.mapArrayObjectsToAnnotations('initialAnnotations')})
-        }));*/
+          annotations: ${webViewInjectFunctions.mapArrayObjectsToAnnotations('JSON.parse(initialAnnotations)')}
+        }));
       `
     );
   }, []);

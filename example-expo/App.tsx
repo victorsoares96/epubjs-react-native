@@ -10,7 +10,7 @@ import {
   InitialLocation,
   Search,
   OpenExternalLink,
-  Annotations,
+  AmazonKindle,
 } from './examples';
 
 const { Navigator, Screen } = createNativeStackNavigator();
@@ -69,10 +69,10 @@ export const examples = [
     component: OpenExternalLink,
   },
   {
-    title: 'Annotations',
-    description: 'Some use cases for text markup',
-    route: 'Annotations',
-    component: Annotations,
+    title: 'Like a Amazon Kindle',
+    description: 'Imitates the Amazon Kindle annotation interface',
+    route: 'AmazonKindle',
+    component: AmazonKindle,
   },
 ];
 
