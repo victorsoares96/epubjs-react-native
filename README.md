@@ -164,8 +164,8 @@ The metadata object contains:
 
 You can see the examples in these repositories:
 
-- [Examples running on Expo Project](example-expo/src/App.tsx)
-- [Examples running on Bare React Native Project](example-bare/src/App.tsx)
+- [Examples running on Expo Project](example-expo/App.tsx)
+- [Examples running on Bare React Native Project](example-bare/App.tsx)
 
 Did you like this project? Consider [sponsoring](https://www.paypal.com/donate/?business=YNAUBS5LFN5KN&no_recurring=1&currency_code=USD) the development of this project to keep it alive! ❤️
 
