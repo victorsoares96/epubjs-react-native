@@ -1,3 +1,5 @@
+import * as webViewJavaScriptFunctions from './utils/webViewInjectFunctions';
+
 export default `
 <!DOCTYPE html>
   <html>
@@ -21,6 +23,22 @@ export default `
         justify-content: center;
         align-items: center;
       }
+
+      [ref="epubjs-mk-balloon"] {
+        background: url("data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPScxLjEnIHhtbG5zPSdodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZycgeG1sbnM6eGxpbms9J2h0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsnIHg9JzBweCcgeT0nMHB4JyB2aWV3Qm94PScwIDAgNzUgNzUnPjxnIGZpbGw9JyNCREJEQkQnIGlkPSdidWJibGUnPjxwYXRoIGNsYXNzPSdzdDAnIGQ9J00zNy41LDkuNEMxOS42LDkuNCw1LDIwLjUsNSwzNC4zYzAsNS45LDIuNywxMS4zLDcuMSwxNS42TDkuNiw2NS42bDE5LTcuM2MyLjgsMC42LDUuOCwwLjksOC45LDAuOSBDNTUuNSw1OS4yLDcwLDQ4LjEsNzAsMzQuM0M3MCwyMC41LDU1LjQsOS40LDM3LjUsOS40eicvPjwvZz48L3N2Zz4=") no-repeat;
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+        margin-left: 0;
+      }
+
+      [ref="epubjs-mk-heart"] {
+        background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAACXBIWXMAAAsTAAALEwEAmpwYAAACOUlEQVR4nLWUTWgTURDH14Oe9JiPNqFNujvvzdsm3bdvPxKMFUEPag/iwdaD3j1JDymlCMXiqUeRHvWgFRQUxKPirUU8eFARvCnUj7QXP7DiJtk8easJjRjzIQ784bEz82Pe7MzTtP9tpmnu8UbNpOM4uzvFKF+3GM1BHHIAbwjA7xyY5AaGPuCarZtHmzGcsGM+YevKp2JUrAN4XeW2wSxKMy6wrSkKtbsiJZ96SfnAGZbl8bG6DawhdLwqAK9xYI25XLaufCrmjkjJKQpVF3DLzrDRFtAHXJ9hUNsoxOTH8hn5afGcrBRjkR66w3I/0GoJaPWRO9T63tRGISanmVHzgK1FMBvGmSr/iZeUn5fL8svlRbl5aKQt6bGXjPQ7bKefA5MOIahZOpsuAQmUY3t1pWNSN5WABtwwT2kW4Mki0OqgoMov+YA1rrMTmk3IhCr3hd/5St303EtEV54Yw5xq4y4PcHOFt/etH12xRqQHWFGsn/MFuHAQaPCmGO8b9roQl5OEBpaB862xoZTuc4F+uJDLhv0CF/LZ0DPoe9M097YNNwd2hAMLb9rpnmGrdlr1LrQJO/zH9bMMnBWA4X0n1RV2T6TU6oUc2Pm/vQ0aN/CSAKzfFp0rvWWnI5gNbEnrxWwD59UOL+UzjXc7ftTbYlxezGca0X4Dm+sJ1jQO7LgA/Hoa9eCln5Cv/IQ8i3ogAL+pZdAGMYcQdAGfHSAkmCQkUOc8pXQgWNPUgysAl5XU+Z9gg9gPaBjV+CGbZVoAAAAASUVORK5CYII=") no-repeat;
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+        margin-left: 0;
+      }
     </style>
   </head>
 
@@ -36,7 +54,6 @@ export default `
       const theme = window.theme;
       const initialLocations = window.locations;
       const enableSelection = window.enable_selection;
-      const highlightOnSelect = highlightOnSelect;
 
       if (!file) {
         alert('Failed load book');
@@ -205,12 +222,6 @@ export default `
       });
 
       rendition.on("selected", function (cfiRange, contents) {
-        if (highlightOnSelect) {
-          rendition.annotations.add("highlight", cfiRange, {}, (e) => {
-            console.log("highlight clicked", e.target);
-          });
-        }
-
         book.getRange(cfiRange).then(function (range) {
           if (range) {
             window.ReactNativeWebView.postMessage(JSON.stringify({
@@ -223,15 +234,15 @@ export default `
       });
 
       rendition.on("markClicked", function (cfiRange, contents) {
-        book.getRange(cfiRange).then(function (range) {
-          if (range) {
-            window.ReactNativeWebView.postMessage(JSON.stringify({
-              type: 'onMarkPressed',
-              cfiRange: cfiRange,
-              text: range.toString(),
-            }));
-          }
-        });
+        const annotations = Object.values(rendition.annotations._annotations);
+        const annotation = annotations.find(item => item.cfiRange === cfiRange);
+
+        if (annotation) {
+          window.ReactNativeWebView.postMessage(JSON.stringify({
+            type: 'onPressAnnotation',
+            annotation: ${webViewJavaScriptFunctions.mapObjectToAnnotation('annotation')}
+          }));
+        }
       });
 
       rendition.on("resized", function (layout) {

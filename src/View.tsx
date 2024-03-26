@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import {
   TouchableWithoutFeedback,
   I18nManager,
@@ -32,7 +32,7 @@ export function View({
   onSearch = () => {},
   onLocationsReady = () => {},
   onSelected = () => {},
-  onMarkPressed = () => {},
+  onPressAnnotation = () => {},
   onOrientationChange = () => {},
   onLayout = () => {},
   onNavigationLoaded = () => {},
@@ -51,6 +51,10 @@ export function View({
     <OpeningBook width={width} height={height} />
   ),
   onPressExternalLink,
+  menuItems,
+  onAddAnnotation = () => {},
+  onChangeAnnotations = () => {},
+  initialAnnotations,
 }: ViewProps) {
   const {
     registerBook,
@@ -70,8 +74,15 @@ export function View({
     setKey,
     setSearchResults,
     theme,
+    removeSelection,
+    setAnnotations,
+    setInitialAnnotations,
   } = useContext(ReaderContext);
   const book = useRef<WebView>(null);
+  const [selectedText, setSelectedText] = useState<{
+    cfiRange: string;
+    cfiRangeText: string;
+  }>({ cfiRange: '', cfiRangeText: '' });
 
   const onMessage = (event: WebViewMessageEvent) => {
     const parsedEvent = JSON.parse(event.nativeEvent.data);
@@ -99,6 +110,10 @@ export function View({
       setTotalLocations(totalLocations);
       setCurrentLocation(currentLocation);
       setProgress(progress);
+
+      if (initialAnnotations) {
+        setInitialAnnotations(initialAnnotations);
+      }
 
       if (initialLocation) {
         goToLocation(initialLocation);
@@ -153,13 +168,8 @@ export function View({
     if (type === 'onSelected') {
       const { cfiRange, text } = parsedEvent;
 
+      setSelectedText({ cfiRange, cfiRangeText: text });
       return onSelected(text, cfiRange);
-    }
-
-    if (type === 'onMarkPressed') {
-      const { cfiRange, text } = parsedEvent;
-
-      return onMarkPressed(cfiRange, text);
     }
 
     if (type === 'onOrientationChange') {
@@ -196,6 +206,30 @@ export function View({
       const { toc } = parsedEvent;
 
       return onNavigationLoaded(toc);
+    }
+
+    if (type === 'onAddAnnotation') {
+      const { annotation } = parsedEvent;
+
+      return onAddAnnotation(annotation);
+    }
+
+    if (type === 'onChangeAnnotations') {
+      const { annotations } = parsedEvent;
+      setAnnotations(annotations);
+      return onChangeAnnotations(annotations);
+    }
+
+    if (type === 'onSetInitialAnnotations') {
+      const { annotations } = parsedEvent;
+      setAnnotations(annotations);
+      return () => {};
+    }
+
+    if (type === 'onPressAnnotation') {
+      const { annotation } = parsedEvent;
+
+      return onPressAnnotation(annotation);
     }
 
     return () => {};
@@ -274,6 +308,24 @@ export function View({
                 scrollEnabled={false}
                 mixedContentMode="compatibility"
                 onMessage={onMessage}
+                menuItems={menuItems?.map((item, key) => ({
+                  label: item.label,
+                  key: key.toString(),
+                }))}
+                onCustomMenuSelection={(event) => {
+                  menuItems?.forEach((item) => {
+                    if (event.nativeEvent.label === item.label) {
+                      const removeSelectionMenu = item.action(
+                        selectedText.cfiRange,
+                        selectedText.cfiRangeText
+                      );
+
+                      if (removeSelectionMenu) {
+                        removeSelection();
+                      }
+                    }
+                  });
+                }}
                 allowingReadAccessToURL={allowedUris}
                 allowUniversalAccessFromFileURLs
                 allowFileAccessFromFileURLs

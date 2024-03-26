@@ -10,10 +10,13 @@ import type {
   ePubCfi,
   FontSize,
   Location,
-  Mark,
+  AnnotationType,
   SearchResult,
   Theme,
+  Annotation,
+  AnnotationStyles,
 } from './types';
+import * as webViewInjectFunctions from './utils/webViewInjectFunctions';
 
 type ActionMap<M extends { [index: string]: any }> = {
   [Key in keyof M]: M[Key] extends undefined
@@ -41,6 +44,7 @@ enum Types {
   SET_IS_LOADING = 'SET_IS_LOADING',
   SET_IS_RENDERING = 'SET_IS_RENDERING',
   SET_SEARCH_RESULTS = 'SET_SEARCH_RESULTS',
+  SET_ANNOTATIONS = 'SET_ANNOTATIONS',
 }
 
 type BookPayload = {
@@ -66,6 +70,7 @@ type BookPayload = {
   [Types.SET_IS_LOADING]: boolean;
   [Types.SET_IS_RENDERING]: boolean;
   [Types.SET_SEARCH_RESULTS]: SearchResult[];
+  [Types.SET_ANNOTATIONS]: any[];
 };
 
 type BookActions = ActionMap<BookPayload>[keyof ActionMap<BookPayload>];
@@ -93,6 +98,7 @@ type InitialState = {
   isLoading: boolean;
   isRendering: boolean;
   searchResults: SearchResult[];
+  annotations: any[];
 };
 
 export const defaultTheme: Theme = {
@@ -144,6 +150,7 @@ const initialState: InitialState = {
   isLoading: true,
   isRendering: true,
   searchResults: [],
+  annotations: [],
 };
 
 function bookReducer(state: InitialState, action: BookActions): InitialState {
@@ -217,6 +224,11 @@ function bookReducer(state: InitialState, action: BookActions): InitialState {
       return {
         ...state,
         searchResults: action.payload,
+      };
+    case Types.SET_ANNOTATIONS:
+      return {
+        ...state,
+        annotations: action.payload,
       };
     default:
       return state;
@@ -313,22 +325,55 @@ export interface ReaderContextProps {
    */
   changeFontSize: (size: FontSize) => void;
 
-  /**
-   * Add Mark a specific cfi in the book
-   */
-  addMark: (
-    type: Mark,
+  addAnnotation: (
+    type: AnnotationType,
     cfiRange: ePubCfi,
-    data?: any,
-    callback?: () => void,
-    className?: string,
-    styles?: any
+    data?: object,
+    styles?: AnnotationStyles,
+    /**
+     * The name of the css class defined in the applied theme that will be used as the icon for the markup.
+     * Example of how the class should be defined in the theme file:
+     * ```html
+     * <style type="text/css">
+     *  [ref="epubjs-mk-heart"] {
+     *    background: url("data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPScxLj4...") no-repeat;
+     *    width: 20px;
+     *    height: 20px;
+     *    cursor: pointer;
+     *    margin-left: 0;
+     *  }
+     * </style>
+     * ```
+     *
+     *
+     * And how it should be defined:
+     *
+     *
+     * ```js
+     * addAnnotation('mark', 'epubCfi(20/14...)', {}, undefined, 'epubjs-mk-heart');
+     * ```
+     */
+    iconClass?: string
   ) => void;
 
+  updateAnnotation: (
+    annotation: Annotation,
+    data?: object,
+    styles?: AnnotationStyles
+  ) => void;
+
+  removeAnnotation: (annotation: Annotation) => void;
+
   /**
-   * Remove Mark a specific cfi in the book
+   * Remove all annotations matching with provided cfi
    */
-  removeMark: (cfiRange: ePubCfi, type: Mark) => void;
+  removeAnnotationByCfi: (cfiRange: ePubCfi) => void;
+
+  removeAnnotations: (type?: AnnotationType) => void;
+
+  setAnnotations: (annotations: Annotation[]) => void;
+
+  setInitialAnnotations: (annotations: Annotation[]) => void;
 
   setKey: (key: string) => void;
 
@@ -405,6 +450,10 @@ export interface ReaderContextProps {
   searchResults: SearchResult[];
 
   setSearchResults: (results: SearchResult[]) => void;
+
+  removeSelection: () => void;
+
+  annotations: Annotation[];
 }
 
 const ReaderContext = createContext<ReaderContextProps>({
@@ -439,9 +488,6 @@ const ReaderContext = createContext<ReaderContextProps>({
   changeFontFamily: () => {},
   changeFontSize: () => {},
 
-  addMark: () => {},
-  removeMark: () => {},
-
   setKey: () => {},
   key: '',
 
@@ -466,6 +512,17 @@ const ReaderContext = createContext<ReaderContextProps>({
 
   searchResults: [],
   setSearchResults: () => {},
+
+  removeSelection: () => {},
+
+  addAnnotation: () => {},
+  updateAnnotation: () => {},
+  removeAnnotation: () => {},
+  removeAnnotationByCfi: () => {},
+  removeAnnotations: () => {},
+  setAnnotations: () => {},
+  setInitialAnnotations: () => {},
+  annotations: [],
 });
 
 function ReaderProvider({ children }: { children: React.ReactNode }) {
@@ -589,34 +646,130 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
     dispatch({ type: Types.SET_SEARCH_RESULTS, payload: results });
   }, []);
 
-  const addMark = useCallback(
+  const addAnnotation = useCallback(
     (
-      type: Mark,
+      type: AnnotationType,
       cfiRange: string,
-      data?: any,
-      _callback?: () => void,
-      className?: string,
-      styles?: any
+      data?: object,
+      styles?: {
+        color?: string;
+        opacity?: number;
+        thickness?: number;
+      },
+      iconClass = ''
     ) => {
-      const defaultStyles = { fill: 'yellow' };
+      webViewInjectFunctions.injectJavaScript(
+        book,
+        `
+          ${webViewInjectFunctions.addAnnotation(type, cfiRange, data, iconClass, styles)}
 
-      book.current?.injectJavaScript(`
-      rendition.annotations.add('${type}', ${JSON.stringify(cfiRange)}, ${JSON.stringify(
-        data ?? {}
-      )}, () => {}, '${className}', ${JSON.stringify(styles ?? defaultStyles)}); true
-    `);
+          ${webViewInjectFunctions.onChangeAnnotations()}
+        `
+      );
     },
     []
   );
 
-  const removeMark = useCallback((cfiRange: string, type: Mark) => {
-    book.current?.injectJavaScript(`
-      rendition.annotations.remove('${cfiRange}', '${type}'); true
-    `);
+  const updateAnnotation = useCallback(
+    (annotation: Annotation, data = {}, styles?: AnnotationStyles) => {
+      webViewInjectFunctions.injectJavaScript(
+        book,
+        webViewInjectFunctions.updateAnnotation(annotation, data, styles)
+      );
+    },
+    []
+  );
+
+  const removeAnnotation = useCallback((annotation: Annotation) => {
+    webViewInjectFunctions.injectJavaScript(
+      book,
+      `
+        rendition.annotations.remove(${JSON.stringify(annotation.cfiRange)}, ${JSON.stringify(annotation.type)});
+
+        ${webViewInjectFunctions.onChangeAnnotations()}
+    `
+    );
+  }, []);
+
+  const removeAnnotationByCfi = useCallback((cfiRange: string) => {
+    webViewInjectFunctions.injectJavaScript(
+      book,
+      `
+        ['highlight', 'underline', 'mark'].forEach(type => {
+          rendition.annotations.remove('${cfiRange}', type);
+        });
+
+        ${webViewInjectFunctions.onChangeAnnotations()}
+    `
+    );
+  }, []);
+
+  const removeAnnotations = useCallback((type?: AnnotationType) => {
+    webViewInjectFunctions.injectJavaScript(
+      book,
+      `
+        let annotations = Object.values(rendition.annotations._annotations);
+
+        if (typeof ${type} === 'string') {
+          annotations = annotations.filter(annotation => annotation.type === ${type});
+        }
+
+        annotations.forEach(annotation => {
+          rendition.annotations.remove(annotation.cfiRange, annotation.type);
+        });
+
+        ${webViewInjectFunctions.onChangeAnnotations()}
+      `
+    );
+  }, []);
+
+  const setAnnotations = useCallback((annotations: Annotation[]) => {
+    dispatch({ type: Types.SET_ANNOTATIONS, payload: annotations });
+  }, []);
+
+  const setInitialAnnotations = useCallback((annotations: Annotation[]) => {
+    annotations.forEach((annotation) => {
+      webViewInjectFunctions.injectJavaScript(
+        book,
+        webViewInjectFunctions.addAnnotation(
+          annotation.type,
+          annotation.cfiRange,
+          annotation.data,
+          annotation.iconClass,
+          annotation.styles,
+          annotation.cfiRangeText,
+          true
+        )
+      );
+    });
+
+    const transform = JSON.stringify(annotations);
+    webViewInjectFunctions.injectJavaScript(
+      book,
+      `
+        const initialAnnotations = JSON.stringify(${transform});
+
+        window.ReactNativeWebView.postMessage(JSON.stringify({
+          type: 'onSetInitialAnnotations',
+          annotations: ${webViewInjectFunctions.mapArrayObjectsToAnnotations('JSON.parse(initialAnnotations)')}
+        }));
+      `
+    );
   }, []);
 
   const setKey = useCallback((key: string) => {
     dispatch({ type: Types.SET_KEY, payload: key });
+  }, []);
+
+  const removeSelection = useCallback(() => {
+    webViewInjectFunctions.injectJavaScript(
+      book,
+      `
+        const getSelections = () => rendition.getContents().map(contents => contents.window.getSelection());
+        const clearSelection = () => getSelections().forEach(s => s.removeAllRanges());
+        clearSelection();
+    `
+    );
   }, []);
 
   const contextValue = useMemo(
@@ -640,9 +793,6 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       getMeta,
       search,
 
-      addMark,
-      removeMark,
-
       setKey,
       key: state.key,
 
@@ -663,9 +813,19 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
 
       searchResults: state.searchResults,
       setSearchResults,
+
+      removeSelection,
+
+      addAnnotation,
+      updateAnnotation,
+      removeAnnotation,
+      removeAnnotationByCfi,
+      removeAnnotations,
+      setAnnotations,
+      setInitialAnnotations,
+      annotations: state.annotations,
     }),
     [
-      addMark,
       changeFontFamily,
       changeFontSize,
       changeTheme,
@@ -676,7 +836,6 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       goPrevious,
       goToLocation,
       registerBook,
-      removeMark,
       search,
       setAtEnd,
       setAtStart,
@@ -689,6 +848,14 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       setProgress,
       setSearchResults,
       setTotalLocations,
+      removeSelection,
+      addAnnotation,
+      updateAnnotation,
+      removeAnnotation,
+      removeAnnotationByCfi,
+      removeAnnotations,
+      setAnnotations,
+      setInitialAnnotations,
       state.atEnd,
       state.atStart,
       state.currentLocation,
@@ -701,6 +868,7 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       state.searchResults,
       state.theme,
       state.totalLocations,
+      state.annotations,
     ]
   );
   return (

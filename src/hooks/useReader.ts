@@ -13,8 +13,6 @@ export function useReader() {
     getCurrentLocation,
     getMeta,
     search,
-    addMark,
-    removeMark,
     theme,
     atStart,
     atEnd,
@@ -25,6 +23,11 @@ export function useReader() {
     isLoading,
     key,
     searchResults,
+    addAnnotation,
+    updateAnnotation,
+    removeAnnotation,
+    removeSelection,
+    annotations,
   } = useContext(ReaderContext);
 
   return {
@@ -38,8 +41,10 @@ export function useReader() {
     getCurrentLocation,
     getMeta,
     search,
-    addMark,
-    removeMark,
+    addAnnotation,
+    updateAnnotation,
+    removeAnnotation,
+    removeSelection,
     theme,
     atStart,
     atEnd,
@@ -50,6 +55,7 @@ export function useReader() {
     isLoading,
     key,
     searchResults,
+    annotations,
   } as Pick<
     ReaderContextProps,
     | 'changeFontSize'
@@ -62,8 +68,6 @@ export function useReader() {
     | 'getCurrentLocation'
     | 'getMeta'
     | 'search'
-    | 'addMark'
-    | 'removeMark'
     | 'theme'
     | 'atStart'
     | 'atEnd'
@@ -74,5 +78,10 @@ export function useReader() {
     | 'isLoading'
     | 'key'
     | 'searchResults'
+    | 'addAnnotation'
+    | 'updateAnnotation'
+    | 'removeAnnotation'
+    | 'removeSelection'
+    | 'annotations'
   >;
 }

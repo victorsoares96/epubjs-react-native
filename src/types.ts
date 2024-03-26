@@ -25,7 +25,40 @@ export type Location = {
   };
 };
 
-export type Mark = 'highlight' | 'underline';
+export type AnnotationType = 'mark' | 'highlight' | 'underline';
+
+export type AnnotationStyles = {
+  /**
+   * Change the annotation color.
+   * Only for `highlight` and `underline` type.
+   *
+   * Example: `green` or `#4c12a1`. Default is `yellow`
+   */
+  color?: string;
+  /**
+   * Change the annotation opacity.
+   * Only for `highlight` and `underline` type.
+   *
+   * Example: `0.5`. Default is `0.3`
+   */
+  opacity?: number;
+  /**
+   * Only for `underline` annotation type. Define underline thickness.
+   *
+   * Default is: `1px`
+   */
+  thickness?: number;
+};
+
+export type Annotation<Data = any> = {
+  type: AnnotationType;
+  data: Data;
+  cfiRange: ePubCfi;
+  sectionIndex: number;
+  cfiRangeText: string;
+  iconClass?: string;
+  styles?: AnnotationStyles;
+};
 
 export type FontSize = string;
 
@@ -173,12 +206,6 @@ export interface ReaderProps {
    */
   onSelected?: (selectedText: string, cfiRange: ePubCfi) => void;
   /**
-   * Called when marked text is pressed
-   * @param {SelectedText} selectedText
-   * @returns {void} void
-   */
-  onMarkPressed?: (selectedText: string, cfiRange: ePubCfi) => void;
-  /**
    * Called when screen orientation change is detected
    * @param {string} orientation
    * @returns {void} void
@@ -263,7 +290,7 @@ export interface ReaderProps {
   renderOpeningBookComponent?: () => JSX.Element;
   /**
    * Enable text selection feature on the book.
-   * Default is `true`
+   * Default is `false`
    */
   enableSelection?: boolean;
 
@@ -290,11 +317,6 @@ export interface ReaderProps {
   allowScriptedContent?: boolean;
 
   /**
-   * Default is `true`
-   */
-  highlightOnSelect?: boolean;
-
-  /**
    * Epubjs is rendering the epub-content inside and iframe which defaults to sandbox="allow-same-origin", to enable opening links or running javascript in an epub, you will need to pass this param.
    */
   allowPopups?: boolean;
@@ -305,4 +327,29 @@ export interface ReaderProps {
    * When used, the `allowPopups` property is automatically enabled
    */
   onPressExternalLink?: (url: string) => void;
+
+  /**
+   * An array of objects which will be shown when selecting text. An empty array will suppress the menu.
+   * These will appear after a long press to select text.
+   * @platform ios, android
+   */
+  menuItems?: Array<{
+    key?: string;
+    label: string;
+    /**
+     * To keep text selection set the function return to `false`
+     */
+    action: (cfiRange: string, text: string) => boolean;
+  }>;
+
+  onAddAnnotation?: (annotation: Annotation) => void;
+
+  onChangeAnnotations?: (annotations: Annotation[]) => void;
+
+  /**
+   * Called when annotation is pressed
+   */
+  onPressAnnotation?: (annotation: Annotation) => void;
+
+  initialAnnotations?: Annotation[];
 }

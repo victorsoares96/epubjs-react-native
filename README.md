@@ -89,7 +89,6 @@ export default function App() {
 | `onSearch`                   | `function`    | Called once when the book has been searched. Optional.       |
 | `onLocationsReady`           | `function`    | Called once the locations has been generated. Optional.      |
 | `onSelected`                 | `function`    | Called once a text selection has occurred. Optional.         |
-| `onMarkPressed`              | `function`    | Called when marked text is pressed. Optional.                |
 | `onOrientationChange`        | `function`    | Called when screen orientation change is detected. Optional. |
 | `onPress`                    | `function`    | Called when the book was pressed. Optional.                  |
 | `onDoublePress`              | `function`    | Called when the book was double pressed. Optional.           |
@@ -98,9 +97,13 @@ export default function App() {
 | `onLayout`                   | `function`    | Called when book layout is change. Optional.                 |
 | `defaultTheme`               | `object`      | Theme object. Optional.                                      |
 | `allowScriptedContent`       | `boolean`     | Allow run scripted content on sandbox. *Default is false on Android and true in iOS* |
-| `highlightOnSelect`          | `boolean`     | Highlight text on select. Default is true.                   |
 | `allowPopups`                | `boolean`     | Epubjs is rendering the epub-content inside and iframe which defaults to sandbox="allow-same-origin", to enable opening links or running javascript in an epub, you will need to pass this param. |
 | `onPressExternalLink`        | `function`    | Function that is invoked when external link is pressed. When used, the `allowPopups` property is automatically enabled |
+| `menuItems`                  | `array`       | An array of objects which will be shown when selecting text. An empty array will suppress the menu.                    |
+| `onAddAnnotation`            | `function`    | Function that is invoked when annotation is added in book.                                                             |
+| `onChangeAnnotations`        | `function`    | Function that is invoked when annotations array is modified.                                                           |
+| `onPressAnnotation`          | `function`    | Function that is invoked when annotation is pressed.                                                                   |
+| `initialAnnotations`         | `array`       | Used for load book with annotations attached                                                                           |
 
 ## Hooks
 
@@ -125,9 +128,13 @@ const { changeFontSize, goToLocation, ... } = useReader();
 | `search`             | `query`  | Search for a specific text in the book                                    |
 | `changeTheme`        | `theme`  | Change active theme                                                       |
 | `getCurrentLocation` |          | Returns the current location of the book                                  |
-| `addMark`            |          | Add mark a specific cfi in the book                                       |
-| `removeMark`         |          | Remove mark a specific cfi in the book                                    |
-`getMeta`              |          | Returns an object containing the book's metadata.
+| `getMeta`            |          | Returns an object containing the book's metadata.                         |
+| `addAnnotation`      |    `annotation`      | Attach annotation in the book.                                            |
+| `updateAnnotation`   |     `annotation, data, styles`     | Update annotation data and style                                          |
+| `removeAnnotation`   |  `annotation`        | Detach annotation in the book.                                            |
+| `removeAnnotationByCfi`  `cfi`          |          | Detach annotations in the book by provided cfi.                         |
+| `removeAnnotations`  |    `type?: optional`      | Detach all annotations in the book. Can be detach by type                 |
+| `removeSelection`    |          | Remove selection                 |
 
 The metadata object contains:
 - **cover** *(string, ArrayBuffer, null or undefined)*: The book's cover image `e.g.data:image/jpeg;base64,/9j/4AAQSkZJ...`
@@ -151,6 +158,7 @@ The metadata object contains:
 - `isLoading`: Indicates if the book is loading.
 - `searchResults`: Search results.
 - `meta`: A object containing the book's metadata.
+- `annotations`: A array containing the book's annotations.
 
 #### Examples
 

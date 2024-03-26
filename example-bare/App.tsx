@@ -9,6 +9,7 @@ import {
   InitialLocation,
   Search,
   OpenExternalLink,
+  Annotations,
 } from './examples';
 
 const { Navigator, Screen } = createNativeStackNavigator();
@@ -65,6 +66,12 @@ export const examples = [
     description: 'Handle opening external links in epub',
     route: 'OpenExternalLink',
     component: OpenExternalLink,
+  },
+  {
+    title: 'Annotations',
+    description: 'Some use cases for text markup',
+    route: 'Annotations',
+    component: Annotations,
   },
 ];
 
