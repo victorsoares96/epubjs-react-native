@@ -20,7 +20,7 @@ export function Reader({
   defaultTheme = initialTheme,
   initialLocations,
   allowScriptedContent = Platform.OS === 'ios',
-  enableSelection = true,
+  enableSelection = false,
   onPressExternalLink,
   renderLoadingFileComponent = (props) => (
     <LoadingFile {...props} width={width} height={height} />

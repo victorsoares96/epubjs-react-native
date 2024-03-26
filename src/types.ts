@@ -290,7 +290,7 @@ export interface ReaderProps {
   renderOpeningBookComponent?: () => JSX.Element;
   /**
    * Enable text selection feature on the book.
-   * Default is `true`
+   * Default is `false`
    */
   enableSelection?: boolean;
 

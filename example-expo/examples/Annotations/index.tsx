@@ -20,8 +20,9 @@ function Book() {
     cfiRange: string;
     text: string;
   } | null>(null);
-  const [selectedAnnotation, setSelectedAnnotation] =
-    React.useState<Annotation | null>(null);
+  const [selectedAnnotation, setSelectedAnnotation] = React.useState<
+    Annotation | undefined
+  >(undefined);
   const [tempMark, setTempMark] = React.useState<Annotation | null>(null);
 
   const bottomSheetRef = React.useRef<BottomSheet>(null);
@@ -34,6 +35,7 @@ function Book() {
         width={width}
         height={height}
         fileSystem={useFileSystem}
+        enableSelection
         initialLocation="introduction_001.xhtml"
         initialAnnotations={[
           // Chapter 1
@@ -63,7 +65,7 @@ function Book() {
         }}
         onPressAnnotation={(annotation) => {
           setSelectedAnnotation(annotation);
-          bottomSheetRef.current.snapToIndex(0);
+          bottomSheetRef.current?.snapToIndex(0);
         }}
         onChangeAnnotations={(annotation) => {
           console.log('onChangeAnnotations', annotation);
@@ -101,7 +103,7 @@ function Book() {
             action: (cfiRange, text) => {
               setSelection({ cfiRange, text });
               addAnnotation('highlight', cfiRange, { isTemp: true });
-              bottomSheetRef.current.snapToIndex(0);
+              bottomSheetRef.current?.snapToIndex(0);
               return true;
             },
           },
@@ -118,7 +120,7 @@ function Book() {
           setSelection(null);
           if (tempMark) removeAnnotation(tempMark);
           setTempMark(null);
-          setSelectedAnnotation(null);
+          setSelectedAnnotation(undefined);
         }}
       >
         <BottomSheetView style={styles.contentContainer}>
@@ -126,7 +128,7 @@ function Book() {
             annotation={selectedAnnotation}
             selection={selection}
             onClose={() => {
-              bottomSheetRef.current.close();
+              bottomSheetRef.current?.close();
               if (tempMark) removeAnnotation(tempMark);
               setTempMark(null);
             }}
@@ -134,7 +136,7 @@ function Book() {
 
           <AnnotationsList
             annotations={annotations}
-            onClose={() => bottomSheetRef.current.close()}
+            onClose={() => bottomSheetRef.current?.close()}
           />
         </BottomSheetView>
       </BottomSheet>
@@ -142,7 +144,7 @@ function Book() {
   );
 }
 
-export function AmazonKindle() {
+export function Annotations() {
   return (
     <SafeAreaView>
       <ReaderProvider>

@@ -4,4 +4,4 @@ export * from './CustomThemes';
 export * from './InitialLocation';
 export * from './Search';
 export * from './OpenExternalLink';
-export * from './AmazonKindle';
+export * from './Annotations';

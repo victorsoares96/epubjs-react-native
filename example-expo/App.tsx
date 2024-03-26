@@ -2,7 +2,6 @@ import * as React from 'react';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaView, StyleSheet, Text, TouchableOpacity } from 'react-native';
-import { PaperProvider } from 'react-native-paper';
 import {
   Basic,
   Formats,
@@ -10,7 +9,7 @@ import {
   InitialLocation,
   Search,
   OpenExternalLink,
-  AmazonKindle,
+  Annotations,
 } from './examples';
 
 const { Navigator, Screen } = createNativeStackNavigator();
@@ -69,10 +68,10 @@ export const examples = [
     component: OpenExternalLink,
   },
   {
-    title: 'Like a Amazon Kindle',
-    description: 'Imitates the Amazon Kindle annotation interface',
-    route: 'AmazonKindle',
-    component: AmazonKindle,
+    title: 'Annotations',
+    description: 'Some use cases for text markup',
+    route: 'Annotations',
+    component: Annotations,
   },
 ];
 
@@ -96,25 +95,23 @@ function Examples() {
 
 export default function App() {
   return (
-    <PaperProvider>
-      <NavigationContainer>
-        <Navigator initialRouteName="Examples">
-          <Screen
-            name="Examples"
-            options={{ title: 'Examples' }}
-            component={Examples}
-          />
+    <NavigationContainer>
+      <Navigator initialRouteName="Examples">
+        <Screen
+          name="Examples"
+          options={{ title: 'Examples' }}
+          component={Examples}
+        />
 
-          {examples.map(({ title, route, component: Example }) => (
-            <Screen
-              key={route}
-              name={route}
-              options={{ title }}
-              component={Example}
-            />
-          ))}
-        </Navigator>
-      </NavigationContainer>
-    </PaperProvider>
+        {examples.map(({ title, route, component: Example }) => (
+          <Screen
+            key={route}
+            name={route}
+            options={{ title }}
+            component={Example}
+          />
+        ))}
+      </Navigator>
+    </NavigationContainer>
   );
 }

@@ -23,7 +23,7 @@ function AnnotationForm({ annotation, selection, onClose }: Props) {
   useEffect(() => {
     if (annotation) {
       setObservation(annotation.data?.observation);
-      setColor(annotation.styles?.color);
+      setColor(annotation.styles?.color || '');
     }
 
     return () => {
@@ -93,13 +93,13 @@ function AnnotationForm({ annotation, selection, onClose }: Props) {
               const key = Date.now();
               addAnnotation(
                 'underline',
-                selection.cfiRange,
-                { key, text: selection.text, observation },
+                selection!.cfiRange,
+                { key, text: selection!.text, observation },
                 { color, opacity: 0.8 }
               );
-              addAnnotation('mark', selection.cfiRange, {
+              addAnnotation('mark', selection!.cfiRange, {
                 key,
-                text: selection.text,
+                text: selection!.text,
                 observation,
               });
 
