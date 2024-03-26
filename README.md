@@ -89,7 +89,6 @@ export default function App() {
 | `onSearch`                   | `function`    | Called once when the book has been searched. Optional.       |
 | `onLocationsReady`           | `function`    | Called once the locations has been generated. Optional.      |
 | `onSelected`                 | `function`    | Called once a text selection has occurred. Optional.         |
-| `onMarkPressed`              | `function`    | Called when marked text is pressed. Optional.                |
 | `onOrientationChange`        | `function`    | Called when screen orientation change is detected. Optional. |
 | `onPress`                    | `function`    | Called when the book was pressed. Optional.                  |
 | `onDoublePress`              | `function`    | Called when the book was double pressed. Optional.           |
@@ -130,11 +129,11 @@ const { changeFontSize, goToLocation, ... } = useReader();
 | `changeTheme`        | `theme`  | Change active theme                                                       |
 | `getCurrentLocation` |          | Returns the current location of the book                                  |
 | `getMeta`            |          | Returns an object containing the book's metadata.                         |
-| `addAnnotation`      |          | Attach annotation in the book.                                            |
-| `updateAnnotation`   |          | Update annotation data and style                                          |
-| `removeAnnotation`   |          | Detach annotation in the book.                                            |
-| `removeAnnotationByCfi`            |          | Detach annotations in the book by provided cfi.                         |
-| `removeAnnotations`  |          | Detach all annotations in the book. Can be detach by type                 |
+| `addAnnotation`      |    `annotation`      | Attach annotation in the book.                                            |
+| `updateAnnotation`   |     `annotation, data, styles`     | Update annotation data and style                                          |
+| `removeAnnotation`   |  `annotation`        | Detach annotation in the book.                                            |
+| `removeAnnotationByCfi`  `cfi`          |          | Detach annotations in the book by provided cfi.                         |
+| `removeAnnotations`  |    `type?: optional`      | Detach all annotations in the book. Can be detach by type                 |
 | `removeSelection`    |          | Remove selection                 |
 
 The metadata object contains:
