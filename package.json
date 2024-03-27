@@ -1,14 +1,13 @@
 {
   "name": "@epubjs-react-native/core",
-  "version": "1.4.0-beta.40",
+  "version": "1.4.0-alpha.4",
   "description": "A digital book reader in .opf .epub format for react native using epub.js library inside a webview.",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
   "types": "lib/typescript/index.d.ts",
-  "react-native": "src/index",
-  "source": "src/index",
+  "react-native": "lib/commonjs/index",
+  "source": "lib/commonjs/index",
   "files": [
-    "src",
     "lib",
     "android",
     "ios",
@@ -32,6 +31,7 @@
     "build": "bob build",
     "release": "yarn build && npm publish",
     "release:beta": "yarn build && npm publish --tag beta",
+    "release:alpha": "yarn build && npm publish --tag alpha",
     "release-local": "yarn build && npm link && echo [FINISH]: Run \"npm link @epubjs-react-native/core\" to link the package to your project",
     "example-bare": "yarn --cwd example-bare",
     "example-expo": "yarn --cwd example-expo",
@@ -102,8 +102,8 @@
   "peerDependencies": {
     "react": "*",
     "react-native": "*",
-    "react-native-gesture-handler": "^2.12.0",
-    "react-native-webview": "^13.3.0"
+    "react-native-gesture-handler": "*",
+    "react-native-webview": "*"
   },
   "config": {
     "commitizen": {
@@ -117,11 +117,13 @@
     "source": "src",
     "output": "lib",
     "targets": [
-      "commonjs",
-      "module",
+      ["commonjs", { "sourceMaps": false }],
+      ["module", { "sourceMaps": false }],
       [
         "typescript",
         {
+          "sourceMaps": false,
+          "declarationMaps": false,
           "project": "tsconfig.build.json"
         }
       ]

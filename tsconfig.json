@@ -1,9 +1,8 @@
 {
   "compilerOptions": {
     "baseUrl": "./",
-    "paths": {
-      "@epubjs-react-native/core": ["./src/index"]
-    },
+    "sourceMap": false,
+    "declarationMap": false,
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
     "esModuleInterop": true,
@@ -22,5 +21,5 @@
     "skipLibCheck": true,
     "strict": true,
     "target": "esnext"
-  }
+  },
 }
