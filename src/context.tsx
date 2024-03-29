@@ -16,6 +16,7 @@ import type {
   Annotation,
   AnnotationStyles,
   Chapter,
+  Bookmark,
 } from './types';
 import * as webViewInjectFunctions from './utils/webViewInjectFunctions';
 
@@ -48,6 +49,8 @@ enum Types {
   SET_ANNOTATIONS = 'SET_ANNOTATIONS',
   SET_CHAPTER = 'SET_CHAPTER',
   SET_CHAPTERS = 'SET_CHAPTERS',
+  SET_BOOKMARKS = 'SET_BOOKMARKS',
+  SET_IS_BOOKMARKED = 'SET_IS_BOOKMARKED',
 }
 
 type BookPayload = {
@@ -76,6 +79,8 @@ type BookPayload = {
   [Types.SET_ANNOTATIONS]: Annotation[];
   [Types.SET_CHAPTER]: Chapter | null;
   [Types.SET_CHAPTERS]: Chapter[];
+  [Types.SET_BOOKMARKS]: Bookmark[];
+  [Types.SET_IS_BOOKMARKED]: boolean;
 };
 
 type BookActions = ActionMap<BookPayload>[keyof ActionMap<BookPayload>];
@@ -105,7 +110,9 @@ type InitialState = {
   searchResults: SearchResult[];
   annotations: Annotation[];
   chapter: Chapter | null;
-  chapters: Array<Chapter>;
+  chapters: Chapter[];
+  bookmarks: Bookmark[];
+  isBookmarked: boolean;
 };
 
 export const defaultTheme: Theme = {
@@ -160,6 +167,8 @@ const initialState: InitialState = {
   annotations: [],
   chapter: null,
   chapters: [],
+  bookmarks: [],
+  isBookmarked: false,
 };
 
 function bookReducer(state: InitialState, action: BookActions): InitialState {
@@ -248,6 +257,16 @@ function bookReducer(state: InitialState, action: BookActions): InitialState {
       return {
         ...state,
         chapters: action.payload,
+      };
+    case Types.SET_BOOKMARKS:
+      return {
+        ...state,
+        bookmarks: action.payload,
+      };
+    case Types.SET_IS_BOOKMARKED:
+      return {
+        ...state,
+        isBookmarked: action.payload,
       };
     default:
       return state;
@@ -400,6 +419,12 @@ export interface ReaderContextProps {
 
   setChapters: (chapters: Chapter[]) => void;
 
+  addBookmark: (data?: object) => void;
+
+  removeBookmark: (bookmark: Bookmark) => void;
+
+  updateBookmark: (id: number, data: object) => void;
+
   /**
    * Works like a unique id for book
    */
@@ -484,6 +509,13 @@ export interface ReaderContextProps {
    * also called table of contents(toc)
    */
   chapters: Chapter[];
+
+  bookmarks: Bookmark[];
+
+  /**
+   * Indicates if current page is bookmarked
+   */
+  isBookmarked: boolean;
 }
 
 const ReaderContext = createContext<ReaderContextProps>({
@@ -523,6 +555,10 @@ const ReaderContext = createContext<ReaderContextProps>({
   setChapter: () => {},
   setChapters: () => {},
 
+  addBookmark: () => {},
+  removeBookmark: () => {},
+  updateBookmark: () => {},
+
   key: '',
 
   theme: defaultTheme,
@@ -559,6 +595,8 @@ const ReaderContext = createContext<ReaderContextProps>({
   annotations: [],
   chapter: null,
   chapters: [],
+  bookmarks: [],
+  isBookmarked: false,
 });
 
 function ReaderProvider({ children }: { children: React.ReactNode }) {
@@ -816,6 +854,22 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
     dispatch({ type: Types.SET_CHAPTERS, payload: chapters });
   }, []);
 
+  const addBookmark = useCallback(() => {
+    //
+  }, []);
+
+  const removeBookmark = useCallback(() => {
+    //
+  }, []);
+
+  const updateBookmark = useCallback(() => {
+    //
+  }, []);
+
+  const setIsBookmarked = useCallback((value: boolean) => {
+    dispatch({ type: Types.SET_IS_BOOKMARKED, payload: value });
+  }, []);
+
   const contextValue = useMemo(
     () => ({
       registerBook,
@@ -873,6 +927,13 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       setChapters,
       chapter: state.chapter,
       chapters: state.chapters,
+
+      addBookmark,
+      removeBookmark,
+      updateBookmark,
+      bookmarks: state.bookmarks,
+      setIsBookmarked,
+      isBookmarked: state.isBookmarked,
     }),
     [
       changeFontFamily,
@@ -922,6 +983,12 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       setChapters,
       state.chapter,
       state.chapters,
+      addBookmark,
+      removeBookmark,
+      updateBookmark,
+      state.bookmarks,
+      state.isBookmarked,
+      setIsBookmarked,
     ]
   );
   return (
