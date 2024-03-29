@@ -13,6 +13,8 @@ export function Basic() {
           width={width}
           height={height}
           fileSystem={useFileSystem}
+          onSwipeLeft={() => console.log('swipe left')}
+          onSwipeRight={() => console.log('swipe right')}
         />
       </ReaderProvider>
     </SafeAreaView>

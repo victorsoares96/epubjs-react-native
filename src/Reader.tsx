@@ -20,12 +20,12 @@ export function Reader({
   defaultTheme = initialTheme,
   initialLocations,
   allowScriptedContent = Platform.OS === 'ios',
-  enableSelection = false,
   onPressExternalLink,
   renderLoadingFileComponent = (props) => (
     <LoadingFile {...props} width={width} height={height} />
   ),
   fileSystem: useFileSystem,
+  menuItems,
   ...rest
 }: ReaderProps) {
   const {
@@ -38,6 +38,7 @@ export function Reader({
     writeAsStringAsync,
   } = useFileSystem();
   const allowPopups = onPressExternalLink ? true : rest.allowPopups;
+  const enableSelection = menuItems ? true : rest.enableSelection || false;
 
   const { setIsLoading, isLoading } = useContext(ReaderContext);
   const { injectWebVieWVariables } = useInjectWebVieWVariables();
@@ -222,6 +223,7 @@ export function Reader({
       width={width}
       height={height}
       onPressExternalLink={onPressExternalLink}
+      enableSelection={enableSelection}
       {...rest}
     />
   );
