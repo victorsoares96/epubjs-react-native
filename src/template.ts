@@ -94,7 +94,6 @@ export default `
 
           let match = flatten(book.navigation.toc)
               .filter((chapter) => {
-                  console.log(ePub.CFI.prototype.compare)
                   return book.canonical(chapter.href).includes(locationHref)
               }, null)
               .reduce((result, chapter) => {
