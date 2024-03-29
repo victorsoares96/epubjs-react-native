@@ -90,8 +90,6 @@ export default `
       function getChapter(location) {
           const locationHref = location.start.href
 
-          console.log('current toc', flatten(book.navigation.toc))
-
           let match = flatten(book.navigation.toc)
               .filter((chapter) => {
                   return book.canonical(chapter.href).includes(locationHref)
