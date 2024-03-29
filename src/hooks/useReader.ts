@@ -28,6 +28,8 @@ export function useReader() {
     removeAnnotation,
     removeSelection,
     annotations,
+    chapter,
+    chapters,
   } = useContext(ReaderContext);
 
   return {
@@ -56,6 +58,8 @@ export function useReader() {
     key,
     searchResults,
     annotations,
+    chapter,
+    chapters,
   } as Pick<
     ReaderContextProps,
     | 'changeFontSize'
@@ -83,5 +87,7 @@ export function useReader() {
     | 'removeAnnotation'
     | 'removeSelection'
     | 'annotations'
+    | 'chapter'
+    | 'chapters'
   >;
 }

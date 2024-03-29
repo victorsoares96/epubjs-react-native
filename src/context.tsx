@@ -15,10 +15,11 @@ import type {
   Theme,
   Annotation,
   AnnotationStyles,
+  Chapter,
 } from './types';
 import * as webViewInjectFunctions from './utils/webViewInjectFunctions';
 
-type ActionMap<M extends { [index: string]: any }> = {
+type ActionMap<M extends { [index: string]: unknown }> = {
   [Key in keyof M]: M[Key] extends undefined
     ? {
         type: Key;
@@ -45,6 +46,8 @@ enum Types {
   SET_IS_RENDERING = 'SET_IS_RENDERING',
   SET_SEARCH_RESULTS = 'SET_SEARCH_RESULTS',
   SET_ANNOTATIONS = 'SET_ANNOTATIONS',
+  SET_CHAPTER = 'SET_CHAPTER',
+  SET_CHAPTERS = 'SET_CHAPTERS',
 }
 
 type BookPayload = {
@@ -70,7 +73,9 @@ type BookPayload = {
   [Types.SET_IS_LOADING]: boolean;
   [Types.SET_IS_RENDERING]: boolean;
   [Types.SET_SEARCH_RESULTS]: SearchResult[];
-  [Types.SET_ANNOTATIONS]: any[];
+  [Types.SET_ANNOTATIONS]: Annotation[];
+  [Types.SET_CHAPTER]: Chapter | null;
+  [Types.SET_CHAPTERS]: Chapter[];
 };
 
 type BookActions = ActionMap<BookPayload>[keyof ActionMap<BookPayload>];
@@ -98,7 +103,9 @@ type InitialState = {
   isLoading: boolean;
   isRendering: boolean;
   searchResults: SearchResult[];
-  annotations: any[];
+  annotations: Annotation[];
+  chapter: Chapter | null;
+  chapters: Array<Chapter>;
 };
 
 export const defaultTheme: Theme = {
@@ -151,6 +158,8 @@ const initialState: InitialState = {
   isRendering: true,
   searchResults: [],
   annotations: [],
+  chapter: null,
+  chapters: [],
 };
 
 function bookReducer(state: InitialState, action: BookActions): InitialState {
@@ -229,6 +238,16 @@ function bookReducer(state: InitialState, action: BookActions): InitialState {
       return {
         ...state,
         annotations: action.payload,
+      };
+    case Types.SET_CHAPTER:
+      return {
+        ...state,
+        chapter: action.payload,
+      };
+    case Types.SET_CHAPTERS:
+      return {
+        ...state,
+        chapters: action.payload,
       };
     default:
       return state;
@@ -377,6 +396,10 @@ export interface ReaderContextProps {
 
   setKey: (key: string) => void;
 
+  setChapter: (chapter: Chapter | null) => void;
+
+  setChapters: (chapters: Chapter[]) => void;
+
   /**
    * Works like a unique id for book
    */
@@ -454,6 +477,13 @@ export interface ReaderContextProps {
   removeSelection: () => void;
 
   annotations: Annotation[];
+
+  chapter: Chapter | null;
+
+  /**
+   * also called table of contents(toc)
+   */
+  chapters: Chapter[];
 }
 
 const ReaderContext = createContext<ReaderContextProps>({
@@ -489,6 +519,10 @@ const ReaderContext = createContext<ReaderContextProps>({
   changeFontSize: () => {},
 
   setKey: () => {},
+
+  setChapter: () => {},
+  setChapters: () => {},
+
   key: '',
 
   theme: defaultTheme,
@@ -523,6 +557,8 @@ const ReaderContext = createContext<ReaderContextProps>({
   setAnnotations: () => {},
   setInitialAnnotations: () => {},
   annotations: [],
+  chapter: null,
+  chapters: [],
 });
 
 function ReaderProvider({ children }: { children: React.ReactNode }) {
@@ -772,6 +808,14 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
     );
   }, []);
 
+  const setChapter = useCallback((chapter: Chapter | null) => {
+    dispatch({ type: Types.SET_CHAPTER, payload: chapter });
+  }, []);
+
+  const setChapters = useCallback((chapters: Chapter[]) => {
+    dispatch({ type: Types.SET_CHAPTERS, payload: chapters });
+  }, []);
+
   const contextValue = useMemo(
     () => ({
       registerBook,
@@ -824,6 +868,11 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       setAnnotations,
       setInitialAnnotations,
       annotations: state.annotations,
+
+      setChapter,
+      setChapters,
+      chapter: state.chapter,
+      chapters: state.chapters,
     }),
     [
       changeFontFamily,
@@ -869,6 +918,10 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       state.theme,
       state.totalLocations,
       state.annotations,
+      setChapter,
+      setChapters,
+      state.chapter,
+      state.chapters,
     ]
   );
   return (

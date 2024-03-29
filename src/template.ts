@@ -76,6 +76,32 @@ export default `
 
       window.ReactNativeWebView.postMessage(JSON.stringify({ type: "onStarted" }));
 
+      function flatten(chapters) {
+        return [].concat.apply([], chapters.map((chapter) => [].concat.apply([chapter], flatten(chapter.subitems))));
+      }
+
+      function getCfiFromHref(book, href) {
+          const [_, id] = href.split('#')
+          const section = book.spine.get(href.split('/')[1])
+          const el = (id ? section.document.getElementById(id) : section.document.body)
+          return section.cfiFromElement(el)
+      }
+
+      function getChapter(location) {
+          const locationHref = location.start.href
+
+          let match = flatten(book.navigation.toc)
+              .filter((chapter) => {
+                  return book.canonical(chapter.href).includes(locationHref)
+              }, null)
+              .reduce((result, chapter) => {
+                  const locationAfterChapter = ePub.CFI.prototype.compare(location.start.cfi, getCfiFromHref(book, chapter.href)) > 0
+                  return locationAfterChapter ? chapter : result
+              }, null);
+
+          return match;
+      };
+
       if (!enableSelection) {
         rendition.themes.default({
           'body': {
@@ -178,12 +204,14 @@ export default `
       rendition.on("relocated", function (location) {
         var percent = book.locations.percentageFromCfi(location.start.cfi);
         var percentage = Math.floor(percent * 100);
+        var chapter = getChapter(location);
 
         window.ReactNativeWebView.postMessage(JSON.stringify({
           type: "onLocationChange",
           totalLocations: book.locations.total,
           currentLocation: location,
           progress: percentage,
+          currentChapter: chapter,
         }));
 
         if (location.atStart) {

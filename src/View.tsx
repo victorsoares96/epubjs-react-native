@@ -77,6 +77,8 @@ export function View({
     removeSelection,
     setAnnotations,
     setInitialAnnotations,
+    setChapter,
+    setChapters,
   } = useContext(ReaderContext);
   const book = useRef<WebView>(null);
   const [selectedText, setSelectedText] = useState<{
@@ -136,10 +138,12 @@ export function View({
     }
 
     if (type === 'onLocationChange') {
-      const { totalLocations, currentLocation, progress } = parsedEvent;
+      const { totalLocations, currentLocation, progress, currentChapter } =
+        parsedEvent;
       setTotalLocations(totalLocations);
       setCurrentLocation(currentLocation);
       setProgress(progress);
+      setChapter(currentChapter);
 
       if (currentLocation.atStart) setAtStart(true);
       else if (currentLocation.atEnd) setAtEnd(true);
@@ -147,7 +151,12 @@ export function View({
         setAtStart(false);
         setAtEnd(false);
       }
-      return onLocationChange(totalLocations, currentLocation, progress);
+      return onLocationChange(
+        totalLocations,
+        currentLocation,
+        progress,
+        currentChapter
+      );
     }
 
     if (type === 'onSearch') {
@@ -204,6 +213,8 @@ export function View({
 
     if (type === 'onNavigationLoaded') {
       const { toc } = parsedEvent;
+
+      setChapters(toc);
 
       return onNavigationLoaded(toc);
     }
