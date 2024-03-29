@@ -117,7 +117,10 @@ export default function App() {
             <Screen
               key={route}
               name={route}
-              options={{ title }}
+              options={{
+                title,
+                headerShown: title !== 'Full Example',
+              }}
               component={Example}
             />
           ))}

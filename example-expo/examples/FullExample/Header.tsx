@@ -1,45 +1,43 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import { useNavigation } from '@react-navigation/native';
-import React from 'react';
-import { View, TouchableOpacity, StyleSheet, Text } from 'react-native';
+import React, { useState } from 'react';
+import { View, TouchableOpacity, StyleSheet } from 'react-native';
 
 import { useReader } from '@epubjs-react-native/core';
 import { IconButton, MD3Colors } from 'react-native-paper';
 import { MAX_FONT_SIZE, MIN_FONT_SIZE } from './utils';
 
 interface Props {
-  showSettings: boolean;
-  toggleShowSetting: () => void;
   currentFontSize: number;
   increaseFontSize: () => void;
   decreaseFontSize: () => void;
   switchTheme: () => void;
   switchFontFamily: () => void;
+  onPressSearch: () => void;
 }
 
 export function Header({
-  showSettings,
-  toggleShowSetting,
   currentFontSize,
   increaseFontSize,
   decreaseFontSize,
   switchTheme,
   switchFontFamily,
+  onPressSearch,
 }: Props) {
   const navigation = useNavigation();
-  const { progress, theme } = useReader();
+  const { theme } = useReader();
+
+  const [showSettings, setShowSettings] = useState(false);
 
   return (
     <View style={styles.container}>
       <IconButton
-        icon="mdi-arrow-left"
-        size={20}
+        icon="arrow-left"
+        size={22}
         onPress={() => navigation.goBack()}
       />
 
       <View style={styles.actions}>
-        {!showSettings && <Text>{progress}</Text>}
-
         {showSettings && (
           <TouchableOpacity
             onPress={switchTheme}
@@ -79,19 +77,14 @@ export function Header({
           />
         )}
 
-        {!showSettings && (
-          <IconButton
-            icon="content-save"
-            iconColor={MD3Colors.error50}
-            size={20}
-          />
-        )}
+        <IconButton icon="magnify" size={20} onPress={onPressSearch} />
+
+        <IconButton icon="bookmark" size={20} />
 
         <IconButton
           icon={showSettings ? 'cog' : 'cog-outline'}
-          iconColor={MD3Colors.error50}
           size={20}
-          onPress={toggleShowSetting}
+          onPress={() => setShowSettings((oldState) => !oldState)}
         />
       </View>
     </View>
@@ -100,11 +93,10 @@ export function Header({
 
 const styles = StyleSheet.create({
   container: {
-    flex: 0,
-    paddingHorizontal: 30,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    marginHorizontal: 10,
   },
   themeIcon: {
     width: 24,
@@ -115,10 +107,8 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   actions: {
-    width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-end',
-    paddingRight: 20,
   },
 });
