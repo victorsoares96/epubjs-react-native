@@ -60,6 +60,14 @@ export type Annotation<Data = any> = {
   styles?: AnnotationStyles;
 };
 
+export type Chapter = {
+  id: string;
+  href: string;
+  label: string;
+  parent?: any;
+  subitems: Array<any>;
+};
+
 export type FontSize = string;
 
 /**
@@ -180,12 +188,14 @@ export interface ReaderProps {
    * @param {string} cfi
    * @param {number} progress
    * @param {number} totalPages
+   * @param {string} currentChapter
    * @returns {void} void
    */
   onLocationChange?: (
     totalLocations: number,
     currentLocation: Location,
-    progress: number
+    progress: number,
+    currentChapter: Chapter | null
   ) => void;
   /**
    * Called once when the book has been searched
