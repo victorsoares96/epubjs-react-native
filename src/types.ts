@@ -68,10 +68,12 @@ export type Chapter = {
   subitems: Array<any>;
 };
 
-export type Bookmark = {
+export type Bookmark<Data = any> = {
   id: number;
   chapter: Chapter;
   location: Location;
+  text: string;
+  data?: Data;
 };
 
 export type FontSize = string;
@@ -368,4 +370,16 @@ export interface ReaderProps {
   onPressAnnotation?: (annotation: Annotation) => void;
 
   initialAnnotations?: Annotation[];
+
+  onAddBookmark?: (bookmark: Bookmark) => void;
+
+  onRemoveBookmark?: (bookmark: Bookmark) => void;
+
+  onUpdateBookmark?: (bookmark: Bookmark) => void;
+
+  onChangeBookmarks?: (bookmarks: Bookmark[]) => void;
+
+  onIsBookmarked?: (isBookmarked: boolean) => void;
+
+  initialBookmarks?: Bookmark[];
 }

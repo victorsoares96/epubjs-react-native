@@ -32,6 +32,7 @@ export function useReader() {
     chapters,
     addBookmark,
     removeBookmark,
+    removeBookmarks,
     updateBookmark,
     bookmarks,
     isBookmarked,
@@ -67,6 +68,7 @@ export function useReader() {
     chapters,
     addBookmark,
     removeBookmark,
+    removeBookmarks,
     updateBookmark,
     bookmarks,
     isBookmarked,
@@ -101,6 +103,7 @@ export function useReader() {
     | 'chapters'
     | 'addBookmark'
     | 'removeBookmark'
+    | 'removeBookmarks'
     | 'updateBookmark'
     | 'bookmarks'
     | 'isBookmarked'

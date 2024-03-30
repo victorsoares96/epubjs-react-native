@@ -35,6 +35,9 @@ function Inner() {
         width={width}
         height={height * 0.7}
         fileSystem={useFileSystem}
+        onAddBookmark={(bookmark) => console.log(bookmark)}
+        onChangeBookmarks={(bookmarks) => console.log(bookmarks)}
+        onIsBookmarked={(isBookmarked) => console.log({ isBookmarked })}
       />
     </SafeAreaView>
   );

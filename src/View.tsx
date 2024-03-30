@@ -55,6 +55,12 @@ export function View({
   onAddAnnotation = () => {},
   onChangeAnnotations = () => {},
   initialAnnotations,
+  onAddBookmark = () => {},
+  onRemoveBookmark = () => {},
+  onUpdateBookmark = () => {},
+  onChangeBookmarks = () => {},
+  onIsBookmarked = () => {},
+  initialBookmarks,
 }: ViewProps) {
   const {
     registerBook,
@@ -79,6 +85,9 @@ export function View({
     setInitialAnnotations,
     setChapter,
     setChapters,
+    setBookmarks,
+    bookmarks,
+    setIsBookmarked,
   } = useContext(ReaderContext);
   const book = useRef<WebView>(null);
   const [selectedText, setSelectedText] = useState<{
@@ -144,6 +153,14 @@ export function View({
       setCurrentLocation(currentLocation);
       setProgress(progress);
       setChapter(currentChapter);
+
+      const isBookmarked = bookmarks.some(
+        (bookmark) =>
+          bookmark.location.start.cfi === currentLocation.start.cfi &&
+          bookmark.location.end.cfi === currentLocation.end.cfi
+      );
+      setIsBookmarked(isBookmarked);
+      onIsBookmarked(isBookmarked);
 
       if (currentLocation.atStart) setAtStart(true);
       else if (currentLocation.atEnd) setAtEnd(true);
@@ -244,11 +261,54 @@ export function View({
     }
 
     if (type === 'onAddBookmark') {
-      console.log(parsedEvent);
+      const { bookmark } = parsedEvent;
+
+      setBookmarks([...bookmarks, bookmark]);
+      onAddBookmark(bookmark);
+      return onChangeBookmarks([...bookmarks, bookmark]);
+    }
+
+    if (type === 'onRemoveBookmark') {
+      const { bookmark } = parsedEvent;
+
+      onRemoveBookmark(bookmark);
+      onChangeBookmarks(bookmarks.filter(({ id }) => id !== bookmark.id));
+    }
+
+    if (type === 'onRemoveBookmarks') {
+      onChangeBookmarks(bookmarks);
+    }
+
+    if (type === 'onUpdateBookmark') {
+      const { bookmark } = parsedEvent;
+
+      onUpdateBookmark(bookmark);
+      return onChangeBookmarks(bookmarks);
+    }
+
+    if (type === 'onRemoveBookmarks') {
+      onChangeBookmarks([]);
+    }
+
+    if (
+      ['onAddBookmarks', 'onRemoveBookmark', 'onUpdateBookmark'].includes(type)
+    ) {
+      const { bookmark } = parsedEvent;
+
+      const index = bookmarks.findIndex((item) => item.id === bookmark.id);
+      bookmarks[index] = bookmark;
+
+      return onChangeBookmarks(bookmarks);
     }
 
     return () => {};
   };
+
+  useEffect(() => {
+    if (initialBookmarks) {
+      setBookmarks(initialBookmarks);
+    }
+  }, [initialBookmarks, setBookmarks]);
 
   useEffect(() => {
     if (book.current) registerBook(book.current);

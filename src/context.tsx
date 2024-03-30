@@ -423,7 +423,13 @@ export interface ReaderContextProps {
 
   removeBookmark: (bookmark: Bookmark) => void;
 
+  removeBookmarks: () => void;
+
   updateBookmark: (id: number, data: object) => void;
+
+  setBookmarks: (bookmarks: Bookmark[]) => void;
+
+  setIsBookmarked: (isBookmarked: boolean) => void;
 
   /**
    * Works like a unique id for book
@@ -557,7 +563,10 @@ const ReaderContext = createContext<ReaderContextProps>({
 
   addBookmark: () => {},
   removeBookmark: () => {},
+  removeBookmarks: () => {},
   updateBookmark: () => {},
+  setBookmarks: () => {},
+  setIsBookmarked: () => {},
 
   key: '',
 
@@ -854,13 +863,14 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
     dispatch({ type: Types.SET_CHAPTERS, payload: chapters });
   }, []);
 
-  const addBookmark = useCallback((location: Location) => {
+  const addBookmark = useCallback((location: Location, data?: object) => {
     webViewInjectFunctions.injectJavaScript(
       book,
       `
       const location = ${JSON.stringify(location)};
       const chapter = getChapter(${JSON.stringify(location)});
       const cfi = makeRangeCfi(location.start.cfi, location.end.cfi);
+      const data = ${JSON.stringify(data)};
 
       book.getRange(cfi).then(range => {
         window.ReactNativeWebView.postMessage(JSON.stringify({
@@ -870,6 +880,7 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
             chapter,
             location,
             text: range.toString(),
+            data,
           },
         }));
       }).catch(error => alert(error?.message));
@@ -877,13 +888,74 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
     );
   }, []);
 
-  const removeBookmark = useCallback(() => {
-    //
+  const removeBookmark = useCallback(
+    (bookmark: Bookmark) => {
+      webViewInjectFunctions.injectJavaScript(
+        book,
+        `
+        const bookmark = ${JSON.stringify(bookmark)};
+        window.ReactNativeWebView.postMessage(JSON.stringify({
+          type: "onRemoveBookmark",
+          bookmark,
+        }));
+      `
+      );
+
+      dispatch({
+        type: Types.SET_BOOKMARKS,
+        payload: state.bookmarks.filter(({ id }) => id !== bookmark.id),
+      });
+    },
+    [state.bookmarks]
+  );
+
+  const removeBookmarks = useCallback(() => {
+    dispatch({
+      type: Types.SET_BOOKMARKS,
+      payload: [],
+    });
+
+    webViewInjectFunctions.injectJavaScript(
+      book,
+      `
+      window.ReactNativeWebView.postMessage(JSON.stringify({
+        type: "onRemoveBookmarks",
+      }));
+    `
+    );
   }, []);
 
-  const updateBookmark = useCallback(() => {
-    //
+  const setBookmarks = useCallback((bookmarks: Bookmark[]) => {
+    dispatch({ type: Types.SET_BOOKMARKS, payload: bookmarks });
   }, []);
+
+  const updateBookmark = useCallback(
+    (id: number, data: object) => {
+      const { bookmarks } = state;
+      const bookmark = state.bookmarks.find((item) => item.id === id);
+
+      if (!bookmark) return;
+
+      bookmark.data = data;
+
+      const index = state.bookmarks.findIndex((item) => item.id === id);
+      bookmarks[index] = bookmark;
+
+      dispatch({ type: Types.SET_BOOKMARKS, payload: bookmarks });
+
+      webViewInjectFunctions.injectJavaScript(
+        book,
+        `
+        const bookmark = ${JSON.stringify(bookmark)};
+        window.ReactNativeWebView.postMessage(JSON.stringify({
+          type: "onUpdateBookmark",
+          bookmark,
+        }));
+      `
+      );
+    },
+    [state]
+  );
 
   const setIsBookmarked = useCallback((value: boolean) => {
     dispatch({ type: Types.SET_IS_BOOKMARKED, payload: value });
@@ -949,7 +1021,9 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
 
       addBookmark,
       removeBookmark,
+      removeBookmarks,
       updateBookmark,
+      setBookmarks,
       bookmarks: state.bookmarks,
       setIsBookmarked,
       isBookmarked: state.isBookmarked,
@@ -1004,7 +1078,9 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       state.chapters,
       addBookmark,
       removeBookmark,
+      removeBookmarks,
       updateBookmark,
+      setBookmarks,
       state.bookmarks,
       state.isBookmarked,
       setIsBookmarked,
