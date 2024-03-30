@@ -419,7 +419,7 @@ export interface ReaderContextProps {
 
   setChapters: (chapters: Chapter[]) => void;
 
-  addBookmark: (data?: object) => void;
+  addBookmark: (location: Location, data?: object) => void;
 
   removeBookmark: (bookmark: Bookmark) => void;
 
@@ -854,8 +854,27 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
     dispatch({ type: Types.SET_CHAPTERS, payload: chapters });
   }, []);
 
-  const addBookmark = useCallback(() => {
-    //
+  const addBookmark = useCallback((location: Location) => {
+    webViewInjectFunctions.injectJavaScript(
+      book,
+      `
+      const location = ${JSON.stringify(location)};
+      const chapter = getChapter(${JSON.stringify(location)});
+      const cfi = makeRangeCfi(location.start.cfi, location.end.cfi);
+
+      book.getRange(cfi).then(range => {
+        window.ReactNativeWebView.postMessage(JSON.stringify({
+          type: "onAddBookmark",
+          bookmark: {
+            id: Date.now(),
+            chapter,
+            location,
+            text: range.toString(),
+          },
+        }));
+      }).catch(error => alert(error?.message));
+    `
+    );
   }, []);
 
   const removeBookmark = useCallback(() => {

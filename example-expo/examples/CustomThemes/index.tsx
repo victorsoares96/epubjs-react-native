@@ -13,11 +13,11 @@ import { light, dark, sepia } from './themes';
 
 function Inner() {
   const { width, height } = useWindowDimensions();
-  const { changeTheme } = useReader();
+  const { changeTheme, addBookmark, getCurrentLocation } = useReader();
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.options}>
-        <TouchableOpacity onPress={() => changeTheme(light)}>
+        <TouchableOpacity onPress={() => addBookmark(getCurrentLocation())}>
           <Text>Light Theme</Text>
         </TouchableOpacity>
 

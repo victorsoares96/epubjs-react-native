@@ -243,6 +243,10 @@ export function View({
       return onPressAnnotation(annotation);
     }
 
+    if (type === 'onAddBookmark') {
+      console.log(parsedEvent);
+    }
+
     return () => {};
   };
 

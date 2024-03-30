@@ -33,6 +33,7 @@
     "release:beta": "yarn build && npm publish --tag beta",
     "release:alpha": "yarn build && npm publish --tag alpha",
     "release-local": "yarn build && npm link && echo [FINISH]: Run \"npm link @epubjs-react-native/core\" to link the package to your project",
+    "release-to-examples": "yarn build && node ./scripts/release-to-examples.js",
     "example-bare": "yarn --cwd example-bare",
     "example-expo": "yarn --cwd example-expo",
     "bootstrap": "yarn example-bare && yarn example-expo && yarn"

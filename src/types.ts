@@ -68,7 +68,11 @@ export type Chapter = {
   subitems: Array<any>;
 };
 
-export type Bookmark = any;
+export type Bookmark = {
+  id: number;
+  chapter: Chapter;
+  location: Location;
+};
 
 export type FontSize = string;
 
