@@ -4,7 +4,11 @@ import { LoadingFile } from './utils/LoadingFile';
 import type { ReaderProps } from './types';
 import { View } from './View';
 import { useInjectWebVieWVariables } from './hooks/useInjectWebviewVariables';
-import { ReaderContext, defaultTheme as initialTheme } from './context';
+import {
+  ReaderContext,
+  ReaderProvider,
+  defaultTheme as initialTheme,
+} from './context';
 import { isURL } from './utils/isURL';
 import { getSourceType } from './utils/getSourceType';
 import { getSourceName } from './utils/getPathname';
@@ -13,7 +17,7 @@ import { isFsUri } from './utils/isFsUri';
 import jszip from './jszip';
 import epubjs from './epubjs';
 
-export function Reader({
+function Reader({
   src,
   width,
   height,
@@ -224,5 +228,13 @@ export function Reader({
       onPressExternalLink={onPressExternalLink}
       {...rest}
     />
+  );
+}
+
+export default function Wrapper(props: ReaderProps) {
+  return (
+    <ReaderProvider>
+      <Reader {...props} />
+    </ReaderProvider>
   );
 }

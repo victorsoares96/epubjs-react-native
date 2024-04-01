@@ -6,12 +6,12 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
-import { Reader, ReaderProvider, useReader } from '@epubjs-react-native/core';
+import { Reader, useReader } from '@epubjs-react-native/core';
 import { useFileSystem } from '@epubjs-react-native/expo-file-system';
 import { styles } from './styles';
 import { light, dark, sepia } from './themes';
 
-function Inner() {
+export function CustomThemes() {
   const { width, height } = useWindowDimensions();
   const { changeTheme } = useReader();
   return (
@@ -37,13 +37,5 @@ function Inner() {
         fileSystem={useFileSystem}
       />
     </SafeAreaView>
-  );
-}
-
-export function CustomThemes() {
-  return (
-    <ReaderProvider>
-      <Inner />
-    </ReaderProvider>
   );
 }

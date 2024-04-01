@@ -8,11 +8,11 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
-import { Reader, ReaderProvider, useReader } from '@epubjs-react-native/core';
+import { Reader, useReader } from '@epubjs-react-native/core';
 import { useFileSystem } from '@epubjs-react-native/file-system';
 import { styles } from './styles';
 
-function Inner() {
+export function Search() {
   const { width, height } = useWindowDimensions();
   const { search, searchResults, goToLocation } = useReader();
   const [term, setTerm] = React.useState('');
@@ -53,13 +53,5 @@ function Inner() {
         )}
       />
     </SafeAreaView>
-  );
-}
-
-export function Search() {
-  return (
-    <ReaderProvider>
-      <Inner />
-    </ReaderProvider>
   );
 }

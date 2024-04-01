@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Linking, SafeAreaView, useWindowDimensions } from 'react-native';
-import { Reader, ReaderProvider } from '@epubjs-react-native/core';
+import { Reader } from '@epubjs-react-native/core';
 import { useFileSystem } from '@epubjs-react-native/file-system';
 
 export function OpenExternalLink() {
@@ -8,18 +8,16 @@ export function OpenExternalLink() {
 
   return (
     <SafeAreaView>
-      <ReaderProvider>
-        <Reader
-          src="https://github.com/IDPF/epub3-samples/releases/download/20230704/accessible_epub_3.epub"
-          width={width}
-          height={height}
-          fileSystem={useFileSystem}
-          initialLocation="pr01s04.xhtml"
-          onPressExternalLink={(url) => {
-            Linking.openURL(url);
-          }}
-        />
-      </ReaderProvider>
+      <Reader
+        src="https://github.com/IDPF/epub3-samples/releases/download/20230704/accessible_epub_3.epub"
+        width={width}
+        height={height}
+        fileSystem={useFileSystem}
+        initialLocation="pr01s04.xhtml"
+        onPressExternalLink={(url) => {
+          Linking.openURL(url);
+        }}
+      />
     </SafeAreaView>
   );
 }

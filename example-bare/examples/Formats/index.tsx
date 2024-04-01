@@ -8,7 +8,7 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
-import { Reader, ReaderProvider } from '@epubjs-react-native/core';
+import { Reader } from '@epubjs-react-native/core';
 import { useFileSystem } from '@epubjs-react-native/file-system';
 import base64 from './base64';
 import { styles } from './styles';
@@ -57,14 +57,12 @@ export function Formats() {
         </TouchableOpacity>
       </View>
 
-      <ReaderProvider>
-        <Reader
-          src={src}
-          width={width}
-          height={height * 0.7}
-          fileSystem={useFileSystem}
-        />
-      </ReaderProvider>
+      <Reader
+        src={src}
+        width={width}
+        height={height * 0.7}
+        fileSystem={useFileSystem}
+      />
 
       {src === opf && (
         <Text style={styles.currentFormat}>Current format: .opf</Text>
