@@ -19,24 +19,6 @@ function Inner() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.options}>
-        <View style={styles.form}>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter a term"
-            onChangeText={(text) => setTerm(text)}
-          />
-
-          <TouchableOpacity
-            onPress={() => {
-              search(term);
-            }}
-          >
-            <Text>Search</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-
       <Reader
         src="https://s3.amazonaws.com/moby-dick/OPS/package.opf"
         width={width}
