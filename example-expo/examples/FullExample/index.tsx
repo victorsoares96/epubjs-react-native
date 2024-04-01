@@ -1,11 +1,6 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import React, { useState } from 'react';
-import {
-  SafeAreaView,
-  useWindowDimensions,
-  StatusBar,
-  StyleSheet,
-} from 'react-native';
+import { SafeAreaView, useWindowDimensions, StyleSheet } from 'react-native';
 import {
   ReaderProvider,
   Reader,
@@ -13,13 +8,17 @@ import {
   Theme,
 } from '@epubjs-react-native/core';
 import { useFileSystem } from '@epubjs-react-native/expo-file-system';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Header } from './Header';
 import { Footer } from './Footer';
 import { MAX_FONT_SIZE, MIN_FONT_SIZE, availableFonts, themes } from './utils';
+import { SearchList } from './SeachList';
 
 function Component() {
   const { width, height } = useWindowDimensions();
 
+  const bottomSheetRef = React.useRef<BottomSheetModal>(null);
   const { theme, changeFontSize, changeFontFamily, changeTheme } = useReader();
 
   const [isFullScreen, setIsFullScreen] = useState(false);
@@ -62,29 +61,35 @@ function Component() {
     <SafeAreaView
       style={{ ...styles.container, backgroundColor: theme.body.background }}
     >
-      <StatusBar translucent showHideTransition="none" hidden />
+      <GestureHandlerRootView>
+        {!isFullScreen && (
+          <Header
+            currentFontSize={currentFontSize}
+            increaseFontSize={increaseFontSize}
+            decreaseFontSize={decreaseFontSize}
+            switchTheme={switchTheme}
+            switchFontFamily={switchFontFamily}
+            onPressSearch={() => bottomSheetRef.current?.present()}
+          />
+        )}
 
-      {!isFullScreen && (
-        <Header
-          currentFontSize={currentFontSize}
-          increaseFontSize={increaseFontSize}
-          decreaseFontSize={decreaseFontSize}
-          switchTheme={switchTheme}
-          switchFontFamily={switchFontFamily}
+        <Reader
+          src="https://s3.amazonaws.com/moby-dick/OPS/package.opf"
+          width={width}
+          height={!isFullScreen ? height * 0.7 : height}
+          fileSystem={useFileSystem}
+          defaultTheme={themes[1]}
+          initialLocation="introduction_001.xhtml"
+          onDoublePress={() => setIsFullScreen((oldState) => !oldState)}
         />
-      )}
 
-      <Reader
-        src="https://s3.amazonaws.com/moby-dick/OPS/package.opf"
-        width={width}
-        height={!isFullScreen ? height * 0.7 : height}
-        fileSystem={useFileSystem}
-        defaultTheme={themes[1]}
-        initialLocation="introduction_001.xhtml"
-        onDoublePress={() => setIsFullScreen((oldState) => !oldState)}
-      />
+        <SearchList
+          ref={bottomSheetRef}
+          onClose={() => bottomSheetRef.current?.dismiss()}
+        />
 
-      {!isFullScreen && <Footer />}
+        {!isFullScreen && <Footer />}
+      </GestureHandlerRootView>
     </SafeAreaView>
   );
 }
