@@ -11,6 +11,7 @@ import {
   Search,
   OpenExternalLink,
   Annotations,
+  Bookmarks,
   FullExample,
 } from './examples';
 
@@ -76,6 +77,12 @@ export const examples = [
     component: Annotations,
   },
   {
+    title: 'Bookmarks',
+    description: 'Using bookmarks in the book',
+    route: 'Bookmarks',
+    component: Bookmarks,
+  },
+  {
     title: 'Full Example',
     description:
       'A complete reader using all (or almost all) library resources',
@@ -119,7 +126,7 @@ export default function App() {
               name={route}
               options={{
                 title,
-                headerShown: title !== 'Full Example',
+                headerShown: !['Bookmarks', 'FullExample'].includes(route),
               }}
               component={Example}
             />

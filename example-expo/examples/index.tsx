@@ -6,3 +6,4 @@ export * from './Search';
 export * from './OpenExternalLink';
 export * from './Annotations';
 export * from './FullExample';
+export * from './Bookmarks';

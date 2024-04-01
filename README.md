@@ -104,6 +104,12 @@ export default function App() {
 | `onChangeAnnotations`        | `function`    | Function that is invoked when annotations array is modified.                                                           |
 | `onPressAnnotation`          | `function`    | Function that is invoked when annotation is pressed.                                                                   |
 | `initialAnnotations`         | `array`       | Used for load book with annotations attached                                                                           |
+| `onAddBookmark`              | `function`    |                                                              |
+| `onRemoveBookmark`              | `function`    |                                                              |
+| `onRemoveBookmarks`              | `function`    |                                                              |
+| `onUpdateBookmark`              | `function`    |                                                              |
+| `onChangeBookmarks`          | `function`    | Function that is invoked when bookmarks array is modified.                                                           |
+| `initialBookmarks`           | `array`       | load bookmarks after render book                                                                           |
 
 ## Hooks
 
@@ -135,6 +141,10 @@ const { changeFontSize, goToLocation, ... } = useReader();
 | `removeAnnotationByCfi`  `cfi`          |          | Detach annotations in the book by provided cfi.                         |
 | `removeAnnotations`  |    `type?: optional`      | Detach all annotations in the book. Can be detach by type                 |
 | `removeSelection`    |          | Remove selection                 |
+| `addBookmark`      |    `bookmark`      | Attach bookmark                                            |
+| `updateBookmark`   |     `id, data`     | Update bookmark data                                          |
+| `removeBookmark`   |  `bookmark`        | Remove bookmark                                            |
+| `removeBookmarks`  |          | Remove all bookmarks                 |
 
 ##### States
 
@@ -151,6 +161,8 @@ const { changeFontSize, goToLocation, ... } = useReader();
 - `annotations`: A array containing the book's annotations.
 - `chapter`: A current chapter.
 - `chapters`: A array containing the book's chapters. Also called table of contents(toc).
+- `bookmarks`: A array containing the bookmarks.
+- `isBookmarked`: Indicates if current location is bookmarked.
 
 The `meta` object contains:
 

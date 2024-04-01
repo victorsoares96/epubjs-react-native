@@ -12,7 +12,7 @@ import {
 } from 'react-native-gesture-handler';
 import { WebView, WebViewMessageEvent } from 'react-native-webview';
 import { defaultTheme as initialTheme, ReaderContext } from './context';
-import type { ReaderProps } from './types';
+import type { Bookmark, ReaderProps } from './types';
 import { OpeningBook } from './utils/OpeningBook';
 
 export type ViewProps = Omit<ReaderProps, 'src' | 'fileSystem'> & {
@@ -55,6 +55,12 @@ export function View({
   onAddAnnotation = () => {},
   onChangeAnnotations = () => {},
   initialAnnotations,
+  onAddBookmark = () => {},
+  onRemoveBookmark = () => {},
+  onUpdateBookmark = () => {},
+  onChangeBookmarks = () => {},
+  onIsBookmarked = () => {},
+  initialBookmarks,
 }: ViewProps) {
   const {
     registerBook,
@@ -79,12 +85,30 @@ export function View({
     setInitialAnnotations,
     setChapter,
     setChapters,
+    setBookmarks,
+    bookmarks,
+    setIsBookmarked,
+    currentLocation: currLoc,
   } = useContext(ReaderContext);
   const book = useRef<WebView>(null);
   const [selectedText, setSelectedText] = useState<{
     cfiRange: string;
     cfiRangeText: string;
   }>({ cfiRange: '', cfiRangeText: '' });
+
+  const handleChangeIsBookmarked = (
+    items: Bookmark[],
+    currentLoc = currLoc
+  ) => {
+    const isBookmarked = items.some(
+      (bookmark) =>
+        bookmark.location.start.cfi === currentLoc?.start.cfi &&
+        bookmark.location.end.cfi === currentLoc?.end.cfi
+    );
+
+    setIsBookmarked(isBookmarked);
+    onIsBookmarked(isBookmarked);
+  };
 
   const onMessage = (event: WebViewMessageEvent) => {
     const parsedEvent = JSON.parse(event.nativeEvent.data);
@@ -144,6 +168,8 @@ export function View({
       setCurrentLocation(currentLocation);
       setProgress(progress);
       setChapter(currentChapter);
+
+      handleChangeIsBookmarked(bookmarks, currentLocation);
 
       if (currentLocation.atStart) setAtStart(true);
       else if (currentLocation.atEnd) setAtEnd(true);
@@ -243,8 +269,52 @@ export function View({
       return onPressAnnotation(annotation);
     }
 
+    if (type === 'onAddBookmark') {
+      const { bookmark } = parsedEvent;
+
+      setBookmarks([...bookmarks, bookmark]);
+      onAddBookmark(bookmark);
+      handleChangeIsBookmarked([...bookmarks, bookmark]);
+      return onChangeBookmarks([...bookmarks, bookmark]);
+    }
+
+    if (type === 'onRemoveBookmark') {
+      const { bookmark } = parsedEvent;
+
+      onRemoveBookmark(bookmark);
+      handleChangeIsBookmarked(
+        bookmarks.filter(({ id }) => id !== bookmark.id)
+      );
+      return onChangeBookmarks(
+        bookmarks.filter(({ id }) => id !== bookmark.id)
+      );
+    }
+
+    if (type === 'onRemoveBookmarks') {
+      handleChangeIsBookmarked([]);
+      return onChangeBookmarks([]);
+    }
+
+    if (type === 'onUpdateBookmark') {
+      const { bookmark } = parsedEvent;
+      const Bookmarks = bookmarks;
+
+      const index = Bookmarks.findIndex((item) => item.id === bookmark.id);
+      Bookmarks[index] = bookmark;
+
+      onUpdateBookmark(bookmark);
+      handleChangeIsBookmarked(Bookmarks);
+      return onChangeBookmarks(Bookmarks);
+    }
+
     return () => {};
   };
+
+  useEffect(() => {
+    if (initialBookmarks) {
+      setBookmarks(initialBookmarks);
+    }
+  }, [initialBookmarks, setBookmarks]);
 
   useEffect(() => {
     if (book.current) registerBook(book.current);
