@@ -2,7 +2,7 @@
 import React from 'react';
 import { SafeAreaView, useWindowDimensions, StyleSheet } from 'react-native';
 import { ReaderProvider, Reader } from '@epubjs-react-native/core';
-import { useFileSystem } from '@epubjs-react-native/expo-file-system';
+import { useFileSystem } from '@epubjs-react-native/file-system';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Header } from './Header';

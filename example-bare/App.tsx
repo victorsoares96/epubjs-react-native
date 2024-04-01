@@ -11,6 +11,7 @@ import {
   Search,
   OpenExternalLink,
   Annotations,
+  Bookmarks,
 } from './examples';
 
 const { Navigator, Screen } = createNativeStackNavigator();
@@ -74,6 +75,12 @@ export const examples = [
     route: 'Annotations',
     component: Annotations,
   },
+  {
+    title: 'Bookmarks',
+    description: 'Using bookmarks in the book',
+    route: 'Bookmarks',
+    component: Bookmarks,
+  },
 ];
 
 function Examples() {
@@ -109,7 +116,7 @@ export default function App() {
             <Screen
               key={route}
               name={route}
-              options={{ title }}
+              options={{ title, headerShown: !['Bookmarks'].includes(route) }}
               component={Example}
             />
           ))}
