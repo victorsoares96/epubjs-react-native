@@ -2,6 +2,7 @@ import * as React from 'react';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaView, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { PaperProvider } from 'react-native-paper';
 import {
   Basic,
   Formats,
@@ -10,6 +11,7 @@ import {
   Search,
   OpenExternalLink,
   Annotations,
+  Bookmarks,
 } from './examples';
 
 const { Navigator, Screen } = createNativeStackNavigator();
@@ -73,6 +75,12 @@ export const examples = [
     route: 'Annotations',
     component: Annotations,
   },
+  {
+    title: 'Bookmarks',
+    description: 'Using bookmarks in the book',
+    route: 'Bookmarks',
+    component: Bookmarks,
+  },
 ];
 
 function Examples() {
@@ -95,23 +103,25 @@ function Examples() {
 
 export default function App() {
   return (
-    <NavigationContainer>
-      <Navigator initialRouteName="Examples">
-        <Screen
-          name="Examples"
-          options={{ title: 'Examples' }}
-          component={Examples}
-        />
-
-        {examples.map(({ title, route, component: Example }) => (
+    <PaperProvider>
+      <NavigationContainer>
+        <Navigator initialRouteName="Examples">
           <Screen
-            key={route}
-            name={route}
-            options={{ title }}
-            component={Example}
+            name="Examples"
+            options={{ title: 'Examples' }}
+            component={Examples}
           />
-        ))}
-      </Navigator>
-    </NavigationContainer>
+
+          {examples.map(({ title, route, component: Example }) => (
+            <Screen
+              key={route}
+              name={route}
+              options={{ title, headerShown: !['Bookmarks'].includes(route) }}
+              component={Example}
+            />
+          ))}
+        </Navigator>
+      </NavigationContainer>
+    </PaperProvider>
   );
 }

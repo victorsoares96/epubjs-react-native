@@ -1,6 +1,6 @@
 {
   "name": "@epubjs-react-native/core",
-  "version": "1.4.0-beta.42",
+  "version": "1.4.0-beta.43",
   "description": "A digital book reader in .opf .epub format for react native using epub.js library inside a webview.",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
@@ -33,6 +33,7 @@
     "release:beta": "yarn build && npm publish --tag beta",
     "release:alpha": "yarn build && npm publish --tag alpha",
     "release-local": "yarn build && npm link && echo [FINISH]: Run \"npm link @epubjs-react-native/core\" to link the package to your project",
+    "release-to-examples": "yarn build && node ./scripts/release-to-examples.js",
     "example-bare": "yarn --cwd example-bare",
     "example-expo": "yarn --cwd example-expo",
     "bootstrap": "yarn example-bare && yarn example-expo && yarn"

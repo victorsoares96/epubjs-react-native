@@ -30,6 +30,12 @@ export function useReader() {
     annotations,
     chapter,
     chapters,
+    addBookmark,
+    removeBookmark,
+    removeBookmarks,
+    updateBookmark,
+    bookmarks,
+    isBookmarked,
   } = useContext(ReaderContext);
 
   return {
@@ -60,6 +66,12 @@ export function useReader() {
     annotations,
     chapter,
     chapters,
+    addBookmark,
+    removeBookmark,
+    removeBookmarks,
+    updateBookmark,
+    bookmarks,
+    isBookmarked,
   } as Pick<
     ReaderContextProps,
     | 'changeFontSize'
@@ -89,5 +101,11 @@ export function useReader() {
     | 'annotations'
     | 'chapter'
     | 'chapters'
+    | 'addBookmark'
+    | 'removeBookmark'
+    | 'removeBookmarks'
+    | 'updateBookmark'
+    | 'bookmarks'
+    | 'isBookmarked'
   >;
 }
