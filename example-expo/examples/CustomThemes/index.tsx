@@ -13,11 +13,11 @@ import { light, dark, sepia } from './themes';
 
 function Inner() {
   const { width, height } = useWindowDimensions();
-  const { changeTheme, addBookmark, getCurrentLocation } = useReader();
+  const { changeTheme } = useReader();
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.options}>
-        <TouchableOpacity onPress={() => addBookmark(getCurrentLocation())}>
+        <TouchableOpacity onPress={() => changeTheme(light)}>
           <Text>Light Theme</Text>
         </TouchableOpacity>
 
@@ -35,9 +35,6 @@ function Inner() {
         width={width}
         height={height * 0.7}
         fileSystem={useFileSystem}
-        onAddBookmark={(bookmark) => console.log(bookmark)}
-        onChangeBookmarks={(bookmarks) => console.log(bookmarks)}
-        onIsBookmarked={(isBookmarked) => console.log({ isBookmarked })}
       />
     </SafeAreaView>
   );
