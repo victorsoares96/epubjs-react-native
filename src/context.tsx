@@ -713,6 +713,31 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
         book.spine.spineItems.map((item) => {
           return item.load(book.load.bind(book)).then(() => {
             let results = item.find('${query}'.trim());
+            const locationHref = item.href;
+
+            let [match] = flatten(book.navigation.toc)
+            .filter((chapter) => {
+                return book.canonical(chapter.href).includes(locationHref)
+            }, null);
+
+            if (results.length > 0) {
+              results = results.map(result => ({ ...result, chapter: { ...match, index: book.navigation.toc.findIndex(elem => elem.id === match.id) } }))
+            }
+
+            item.unload();
+            return Promise.resolve(results);
+          });
+        })
+      ).then((results) => {
+        window.ReactNativeWebView.postMessage(
+          JSON.stringify({ type: 'onSearch', results: [].concat.apply([], results) })
+        );
+      });
+
+      Promise.all(
+        book.spine.spineItems.map((item) => {
+          return item.load(book.load.bind(book)).then(() => {
+            let results = item.find('${query}'.trim());
             item.unload();
             return Promise.resolve(results);
           });

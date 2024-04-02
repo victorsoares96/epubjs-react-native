@@ -116,7 +116,10 @@ export default function App() {
             <Screen
               key={route}
               name={route}
-              options={{ title, headerShown: !['Bookmarks'].includes(route) }}
+              options={{
+                title,
+                headerShown: !['Search', 'Bookmarks'].includes(route),
+              }}
               component={Example}
             />
           ))}
