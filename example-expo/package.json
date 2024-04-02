@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@epubjs-react-native/core": "1.4.0-beta.43",
+    "@epubjs-react-native/core": "1.4.0-staging.34",
     "@epubjs-react-native/expo-file-system": "^1.1.2",
     "@gorhom/bottom-sheet": "^4",
     "@react-navigation/native": "^6.1.15",
