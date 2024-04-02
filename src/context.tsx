@@ -712,8 +712,8 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       Promise.all(
         book.spine.spineItems.map((item) => {
           return item.load(book.load.bind(book)).then(() => {
-            let results = item.find('${query}'.trim());
-            const locationHref = item.href;
+            let results = item.find('while'.trim());
+            const locationHref = item.href
 
             let [match] = flatten(book.navigation.toc)
             .filter((chapter) => {
@@ -729,9 +729,12 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
           });
         })
       ).then((results) => {
-        window.ReactNativeWebView.postMessage(
-          JSON.stringify({ type: 'onSearch', results: [].concat.apply([], results) })
-        );
+        const items = [].concat.apply([], results);
+        eitas.forEach(eita => {
+          rendition.annotations.highlight(eita.cfi, {}, () => {})
+        });
+
+        console.log(paginate(eitas, 20, 1));
       });
 
       Promise.all(
