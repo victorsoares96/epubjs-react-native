@@ -17,6 +17,7 @@ import type {
   AnnotationStyles,
   Chapter,
   Bookmark,
+  SearchOptions,
 } from './types';
 import * as webViewInjectFunctions from './utils/webViewInjectFunctions';
 
@@ -336,9 +337,15 @@ export interface ReaderContextProps {
 
   /**
    * Search for a specific text in the book
-   * @param {string} query {@link string} text to search
    */
-  search: (query: string) => void;
+  search: (
+    query: string,
+    offset: number,
+    limit: number,
+    options?: SearchOptions
+  ) => void;
+
+  clearSearchResults: () => void;
 
   /**
    * @param theme {@link Theme}
@@ -550,7 +557,9 @@ const ReaderContext = createContext<ReaderContextProps>({
     publisher: '',
     rights: '',
   }),
+
   search: () => {},
+  clearSearchResults: () => {},
 
   changeTheme: () => {},
   changeFontFamily: () => {},
@@ -707,13 +716,21 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
 
   const getMeta = useCallback(() => state.meta, [state.meta]);
 
-  const search = useCallback((query: string) => {
-    book.current?.injectJavaScript(`
+  const search = useCallback(
+    (query: string, offset: number, limit: number, options?: SearchOptions) => {
+      if (!query) return;
+
+      book.current?.injectJavaScript(`
+      const offset = ${offset};
+      const limit = ${limit};
+      const highlightTerm = ${options?.highlightTerm || true};
+      const highlightTermDuration = ${options?.highlightTermDuration || 3000};
+
       Promise.all(
         book.spine.spineItems.map((item) => {
           return item.load(book.load.bind(book)).then(() => {
-            let results = item.find('while'.trim());
-            const locationHref = item.href
+            let results = item.find('${query}'.trim());
+            const locationHref = item.href;
 
             let [match] = flatten(book.navigation.toc)
             .filter((chapter) => {
@@ -730,27 +747,27 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
         })
       ).then((results) => {
         const items = [].concat.apply([], results);
-        eitas.forEach(eita => {
-          rendition.annotations.highlight(eita.cfi, {}, () => {})
+        items.forEach(item => {
+          if (highlightTerm) {
+            rendition.annotations.highlight(item.cfi, {}, () => {});
+
+            setTimeout(() => {
+              rendition.annotations.remove(item.cfi, 'highlight');
+            }, highlightTermDuration);
+          }
         });
 
-        console.log(paginate(eitas, 20, 1));
-      });
-
-      Promise.all(
-        book.spine.spineItems.map((item) => {
-          return item.load(book.load.bind(book)).then(() => {
-            let results = item.find('${query}'.trim());
-            item.unload();
-            return Promise.resolve(results);
-          });
-        })
-      ).then((results) =>
         window.ReactNativeWebView.postMessage(
-          JSON.stringify({ type: 'onSearch', results: [].concat.apply([], results) })
-        )
-      ); true
+          JSON.stringify({ type: 'onSearch', results: items.slice((offset - 1) * limit, offset * limit) })
+        );
+      }); true
     `);
+    },
+    []
+  );
+
+  const clearSearchResults = useCallback(() => {
+    dispatch({ type: Types.SET_SEARCH_RESULTS, payload: [] });
   }, []);
 
   const setSearchResults = useCallback((results: SearchResult[]) => {

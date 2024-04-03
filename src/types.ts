@@ -61,6 +61,7 @@ export type Annotation<Data = any> = {
 };
 
 export type Chapter = {
+  index: number;
   id: string;
   href: string;
   label: string;
@@ -98,7 +99,19 @@ export type Theme = {
 
 export type SearchResult = {
   cfi: ePubCfi;
+  chapter: Chapter;
   excerpt: string;
+};
+
+export type SearchOptions = {
+  /**
+   * Default is true
+   */
+  highlightTerm?: boolean;
+  /**
+   * Default is 3000 ms
+   */
+  highlightTermDuration?: number;
 };
 
 export type LoadingFileProps = {
