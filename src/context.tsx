@@ -47,6 +47,7 @@ enum Types {
   SET_IS_LOADING = 'SET_IS_LOADING',
   SET_IS_RENDERING = 'SET_IS_RENDERING',
   SET_SEARCH_RESULTS = 'SET_SEARCH_RESULTS',
+  SET_IS_SEARCHING = 'SET_IS_SEARCHING',
   SET_ANNOTATIONS = 'SET_ANNOTATIONS',
   SET_CHAPTER = 'SET_CHAPTER',
   SET_CHAPTERS = 'SET_CHAPTERS',
@@ -76,6 +77,7 @@ type BookPayload = {
   [Types.SET_LOCATIONS]: ePubCfi[];
   [Types.SET_IS_LOADING]: boolean;
   [Types.SET_IS_RENDERING]: boolean;
+  [Types.SET_IS_SEARCHING]: boolean;
   [Types.SET_SEARCH_RESULTS]: SearchResult[];
   [Types.SET_ANNOTATIONS]: Annotation[];
   [Types.SET_CHAPTER]: Chapter | null;
@@ -108,6 +110,7 @@ type InitialState = {
   locations: ePubCfi[];
   isLoading: boolean;
   isRendering: boolean;
+  isSearching: boolean;
   searchResults: SearchResult[];
   annotations: Annotation[];
   chapter: Chapter | null;
@@ -164,6 +167,7 @@ const initialState: InitialState = {
   locations: [],
   isLoading: true,
   isRendering: true,
+  isSearching: false,
   searchResults: [],
   annotations: [],
   chapter: null,
@@ -238,6 +242,11 @@ function bookReducer(state: InitialState, action: BookActions): InitialState {
       return {
         ...state,
         isRendering: action.payload,
+      };
+    case Types.SET_IS_SEARCHING:
+      return {
+        ...state,
+        isSearching: action.payload,
       };
     case Types.SET_SEARCH_RESULTS:
       return {
@@ -339,11 +348,13 @@ export interface ReaderContextProps {
    * Search for a specific text in the book
    */
   search: (
-    query: string,
-    offset: number,
-    limit: number,
+    term: string,
+    page?: number,
+    limit?: number,
     options?: SearchOptions
   ) => void;
+
+  setIsSearching: (value: boolean) => void;
 
   clearSearchResults: () => void;
 
@@ -504,6 +515,8 @@ export interface ReaderContextProps {
    */
   isRendering: boolean;
 
+  isSearching: boolean;
+
   /**
    * Search results
    * @returns {SearchResult[]} {@link SearchResult[]}
@@ -560,6 +573,7 @@ const ReaderContext = createContext<ReaderContextProps>({
 
   search: () => {},
   clearSearchResults: () => {},
+  setIsSearching: () => {},
 
   changeTheme: () => {},
   changeFontFamily: () => {},
@@ -598,6 +612,7 @@ const ReaderContext = createContext<ReaderContextProps>({
   isLoading: true,
   isRendering: true,
 
+  isSearching: false,
   searchResults: [],
   setSearchResults: () => {},
 
@@ -717,28 +732,36 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
   const getMeta = useCallback(() => state.meta, [state.meta]);
 
   const search = useCallback(
-    (query: string, offset: number, limit: number, options?: SearchOptions) => {
-      if (!query) return;
+    (term: string, page?: number, limit?: number, options?: SearchOptions) => {
+      if (!term) return;
+
+      dispatch({ type: Types.SET_IS_SEARCHING, payload: true });
 
       book.current?.injectJavaScript(`
-      const offset = ${offset};
-      const limit = ${limit};
+      const page = ${page || 1};
+      const limit = ${limit || 20};
+      const term = ${JSON.stringify(term)};
+      const chapterId = ${options?.chapterId};
       const highlightTerm = ${options?.highlightTerm || true};
       const highlightTermDuration = ${options?.highlightTermDuration || 3000};
 
       Promise.all(
         book.spine.spineItems.map((item) => {
           return item.load(book.load.bind(book)).then(() => {
-            let results = item.find('${query}'.trim());
+            let results = item.find(term.trim());
             const locationHref = item.href;
 
             let [match] = flatten(book.navigation.toc)
-            .filter((chapter) => {
+            .filter((chapter, index) => {
                 return book.canonical(chapter.href).includes(locationHref)
             }, null);
 
             if (results.length > 0) {
-              results = results.map(result => ({ ...result, chapter: { ...match, index: book.navigation.toc.findIndex(elem => elem.id === match.id) } }))
+              results = results.map(result => ({ ...result, chapter: { ...match, index: book.navigation.toc.findIndex(elem => elem.id === match.id) } }));
+
+              if (chapterId) {
+                results = results.filter(result => result.chapter.id === chapterId);
+              }
             }
 
             item.unload();
@@ -758,9 +781,9 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
         });
 
         window.ReactNativeWebView.postMessage(
-          JSON.stringify({ type: 'onSearch', results: items.slice((offset - 1) * limit, offset * limit) })
+          JSON.stringify({ type: 'onSearch', results: items.slice((page - 1) * limit, page * limit) })
         );
-      }); true
+      }).catch(err => alert(err?.message))
     `);
     },
     []
@@ -768,6 +791,10 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
 
   const clearSearchResults = useCallback(() => {
     dispatch({ type: Types.SET_SEARCH_RESULTS, payload: [] });
+  }, []);
+
+  const setIsSearching = useCallback((value: boolean) => {
+    dispatch({ type: Types.SET_IS_SEARCHING, payload: value });
   }, []);
 
   const setSearchResults = useCallback((results: SearchResult[]) => {
@@ -1025,7 +1052,10 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       getLocations,
       getCurrentLocation,
       getMeta,
+
       search,
+      clearSearchResults,
+      setIsSearching,
 
       setKey,
       key: state.key,
@@ -1045,6 +1075,7 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       isLoading: state.isLoading,
       isRendering: state.isRendering,
 
+      isSearching: state.isSearching,
       searchResults: state.searchResults,
       setSearchResults,
 
@@ -1085,6 +1116,8 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       goToLocation,
       registerBook,
       search,
+      clearSearchResults,
+      setIsSearching,
       setAtEnd,
       setAtStart,
       setCurrentLocation,
@@ -1113,6 +1146,7 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       state.key,
       state.locations,
       state.progress,
+      state.isSearching,
       state.searchResults,
       state.theme,
       state.totalLocations,

@@ -105,6 +105,10 @@ export type SearchResult = {
 
 export type SearchOptions = {
   /**
+   * Example: toc-introduction_001
+   */
+  chapterId?: string;
+  /**
    * Default is true
    */
   highlightTerm?: boolean;

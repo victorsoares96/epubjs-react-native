@@ -13,6 +13,8 @@ export function useReader() {
     getCurrentLocation,
     getMeta,
     search,
+    clearSearchResults,
+    isSearching,
     theme,
     atStart,
     atEnd,
@@ -49,6 +51,7 @@ export function useReader() {
     getCurrentLocation,
     getMeta,
     search,
+    clearSearchResults,
     addAnnotation,
     updateAnnotation,
     removeAnnotation,
@@ -62,6 +65,7 @@ export function useReader() {
     locations,
     isLoading,
     key,
+    isSearching,
     searchResults,
     annotations,
     chapter,
@@ -107,5 +111,7 @@ export function useReader() {
     | 'updateBookmark'
     | 'bookmarks'
     | 'isBookmarked'
+    | 'clearSearchResults'
+    | 'isSearching'
   >;
 }
