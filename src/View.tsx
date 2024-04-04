@@ -187,12 +187,11 @@ export function View({
     }
 
     if (type === 'onSearch') {
-      const { results } = parsedEvent;
-      console.log('onSearch', results);
-      setSearchResults(results);
+      const { results, totalResults } = parsedEvent;
+      setSearchResults({ results, totalResults });
       setIsSearching(false);
 
-      return onSearch(results);
+      return onSearch(results, totalResults);
     }
 
     if (type === 'onLocationsReady') {

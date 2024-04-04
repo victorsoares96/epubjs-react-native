@@ -78,7 +78,7 @@ type BookPayload = {
   [Types.SET_IS_LOADING]: boolean;
   [Types.SET_IS_RENDERING]: boolean;
   [Types.SET_IS_SEARCHING]: boolean;
-  [Types.SET_SEARCH_RESULTS]: SearchResult[];
+  [Types.SET_SEARCH_RESULTS]: { results: SearchResult[]; totalResults: number };
   [Types.SET_ANNOTATIONS]: Annotation[];
   [Types.SET_CHAPTER]: Chapter | null;
   [Types.SET_CHAPTERS]: Chapter[];
@@ -111,7 +111,7 @@ type InitialState = {
   isLoading: boolean;
   isRendering: boolean;
   isSearching: boolean;
-  searchResults: SearchResult[];
+  searchResults: { results: SearchResult[]; totalResults: number };
   annotations: Annotation[];
   chapter: Chapter | null;
   chapters: Chapter[];
@@ -168,7 +168,7 @@ const initialState: InitialState = {
   isLoading: true,
   isRendering: true,
   isSearching: false,
-  searchResults: [],
+  searchResults: { results: [], totalResults: 0 },
   annotations: [],
   chapter: null,
   chapters: [],
@@ -517,13 +517,15 @@ export interface ReaderContextProps {
 
   isSearching: boolean;
 
-  /**
-   * Search results
-   * @returns {SearchResult[]} {@link SearchResult[]}
-   */
-  searchResults: SearchResult[];
+  searchResults: { results: SearchResult[]; totalResults: number };
 
-  setSearchResults: (results: SearchResult[]) => void;
+  setSearchResults: ({
+    results,
+    totalResults,
+  }: {
+    results: SearchResult[];
+    totalResults: number;
+  }) => void;
 
   removeSelection: () => void;
 
@@ -613,7 +615,7 @@ const ReaderContext = createContext<ReaderContextProps>({
   isRendering: true,
 
   isSearching: false,
-  searchResults: [],
+  searchResults: { results: [], totalResults: 0 },
   setSearchResults: () => {},
 
   removeSelection: () => {},
@@ -733,7 +735,10 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
 
   const search = useCallback(
     (term: string, page?: number, limit?: number, options?: SearchOptions) => {
-      dispatch({ type: Types.SET_SEARCH_RESULTS, payload: [] });
+      dispatch({
+        type: Types.SET_SEARCH_RESULTS,
+        payload: { results: [], totalResults: 0 },
+      });
       dispatch({ type: Types.SET_IS_SEARCHING, payload: true });
 
       webViewInjectFunctions.injectJavaScript(
@@ -743,9 +748,6 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       const limit = ${limit || 20};
       const term = ${JSON.stringify(term)};
       const chapterId = ${options?.chapterId};
-      const highlightTerm = ${options?.highlightTerm || true};
-      const highlightTermColor = ${JSON.stringify(options?.highlightTermColor || 'yellow')}
-      const highlightTermDuration = ${options?.highlightTermDuration || 3000};
 
       if (!term) {
         window.ReactNativeWebView.postMessage(
@@ -777,24 +779,15 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
           })
         ).then((results) => {
           const items = [].concat.apply([], results);
-          items.forEach(item => {
-            if (highlightTerm) {
-              rendition.annotations.highlight(item.cfi, {}, () => {});
-
-              setTimeout(() => {
-                rendition.annotations.remove(item.cfi, 'highlight');
-              }, highlightTermDuration);
-            }
-          });
 
           window.ReactNativeWebView.postMessage(
-            JSON.stringify({ type: 'onSearch', results: items.slice((page - 1) * limit, page * limit) })
+            JSON.stringify({ type: 'onSearch', results: items.slice((page - 1) * limit, page * limit), totalResults: items.length })
           );
         }).catch(err => {
           alert(err?.message);
 
           window.ReactNativeWebView.postMessage(
-            JSON.stringify({ type: 'onSearch', results: [] })
+            JSON.stringify({ type: 'onSearch', results: [], totalResults: 0 })
           );
         })
       }
@@ -805,16 +798,31 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
   );
 
   const clearSearchResults = useCallback(() => {
-    dispatch({ type: Types.SET_SEARCH_RESULTS, payload: [] });
+    dispatch({
+      type: Types.SET_SEARCH_RESULTS,
+      payload: { results: [], totalResults: 0 },
+    });
   }, []);
 
   const setIsSearching = useCallback((value: boolean) => {
     dispatch({ type: Types.SET_IS_SEARCHING, payload: value });
   }, []);
 
-  const setSearchResults = useCallback((results: SearchResult[]) => {
-    dispatch({ type: Types.SET_SEARCH_RESULTS, payload: results });
-  }, []);
+  const setSearchResults = useCallback(
+    ({
+      results,
+      totalResults,
+    }: {
+      results: SearchResult[];
+      totalResults: number;
+    }) => {
+      dispatch({
+        type: Types.SET_SEARCH_RESULTS,
+        payload: { results, totalResults },
+      });
+    },
+    []
+  );
 
   const addAnnotation = useCallback(
     (

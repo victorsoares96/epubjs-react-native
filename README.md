@@ -132,6 +132,7 @@ const { changeFontSize, goToLocation, ... } = useReader();
 | `goPrevious`         |          | Go to previous page in the book                                           |
 | `goNext`             |          | Go to next page in the book                                               |
 | `search`             | `query`  | Search for a specific text in the book                                    |
+| `clearSearchResults` | `void`   | Clear search results                                                      |
 | `changeTheme`        | `theme`  | Change active theme                                                       |
 | `getCurrentLocation` |          | Returns the current location of the book                                  |
 | `getMeta`            |          | Returns an object containing the book's metadata.                         |

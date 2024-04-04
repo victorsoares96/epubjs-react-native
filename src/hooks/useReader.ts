@@ -28,6 +28,7 @@ export function useReader() {
     addAnnotation,
     updateAnnotation,
     removeAnnotation,
+    removeAnnotationByCfi,
     removeSelection,
     annotations,
     chapter,
@@ -55,6 +56,7 @@ export function useReader() {
     addAnnotation,
     updateAnnotation,
     removeAnnotation,
+    removeAnnotationByCfi,
     removeSelection,
     theme,
     atStart,
@@ -101,6 +103,7 @@ export function useReader() {
     | 'addAnnotation'
     | 'updateAnnotation'
     | 'removeAnnotation'
+    | 'removeAnnotationByCfi'
     | 'removeSelection'
     | 'annotations'
     | 'chapter'

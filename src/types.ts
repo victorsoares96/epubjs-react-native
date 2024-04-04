@@ -108,18 +108,6 @@ export type SearchOptions = {
    * Example: toc-introduction_001
    */
   chapterId?: string;
-  /**
-   * Default is true
-   */
-  highlightTerm?: boolean;
-  /**
-   * Default is 3000 ms
-   */
-  highlightTermDuration?: number;
-  /**
-   * Default is yellow
-   */
-  highlightTermColor?: string;
 };
 
 export type LoadingFileProps = {
@@ -229,9 +217,10 @@ export interface ReaderProps {
   /**
    * Called once when the book has been searched
    * @param {SearchResult[]} results
+   * @param {number} totalResults
    * @returns {void} void
    */
-  onSearch?: (results: SearchResult[]) => void;
+  onSearch?: (results: SearchResult[], totalResults: number) => void;
   /**
    * Called once the locations has been generated
    * @param {string} locations
