@@ -3,21 +3,21 @@
 import React, { forwardRef, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { useReader } from '@epubjs-react-native/core';
-import {
+import BottomSheet, {
   BottomSheetFlatList,
   BottomSheetModal,
   BottomSheetModalProvider,
   BottomSheetTextInput,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
-import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
+import { BottomSheetMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
 import { IconButton, MD3Colors, Text } from 'react-native-paper';
 import SearchResult from './SearchResult';
 
 interface Props {
   onClose: () => void;
 }
-export type Ref = BottomSheetModalMethods;
+export type Ref = BottomSheetMethods;
 
 export const SearchList = forwardRef<Ref, Props>(({ onClose }, ref) => {
   const {
@@ -29,13 +29,94 @@ export const SearchList = forwardRef<Ref, Props>(({ onClose }, ref) => {
   } = useReader();
 
   const [searchTerm, setSearchTerm] = useState('');
-  const snapPoints = React.useMemo(() => ['50%', '75%'], []);
+
+  const data = React.useMemo(() => searchResults, [searchResults]);
+  const snapPoints = React.useMemo(() => ['50%', '90%'], []);
 
   const handleSearchTerm = () => {
-    if (searchTerm) {
-      search(searchTerm, 1, 20);
-    }
+    search(searchTerm, 1, 20);
   };
+
+  const renderItem = React.useCallback(
+    ({ item }) => (
+      <SearchResult
+        searchTerm={searchTerm}
+        searchResult={item}
+        onPress={(searchResult) => {
+          goToLocation(searchResult.cfi);
+          onClose();
+        }}
+      />
+    ),
+    [goToLocation, onClose, searchTerm]
+  );
+  return (
+    <BottomSheet
+      ref={ref}
+      index={-1}
+      snapPoints={snapPoints}
+      enablePanDownToClose
+    >
+      <BottomSheetView style={styles.contentContainer}>
+        <View style={styles.title}>
+          <Text variant="titleMedium">Search Results</Text>
+
+          {searchResults.length > 0 && (
+            <Text style={{ color: MD3Colors.primary50 }}>
+              found: {searchResults.length}
+            </Text>
+          )}
+        </View>
+
+        <View
+          style={{
+            width: '100%',
+            flexDirection: 'row',
+            alignItems: 'center',
+          }}
+        >
+          <BottomSheetTextInput
+            defaultValue={searchTerm}
+            style={styles.input}
+            placeholder="Type an term here..."
+            onChangeText={(text) => setSearchTerm(text)}
+          />
+
+          <IconButton
+            icon="magnify"
+            size={20}
+            onPress={handleSearchTerm}
+            loading={isSearching}
+          />
+        </View>
+
+        {isSearching && (
+          <View style={styles.title}>
+            <Text variant="bodyMedium" style={{ fontStyle: 'italic' }}>
+              Searching results...
+            </Text>
+          </View>
+        )}
+
+        {!isSearching && searchResults.length === 0 && (
+          <View style={styles.title}>
+            <Text variant="bodyMedium" style={{ fontStyle: 'italic' }}>
+              No results...
+            </Text>
+          </View>
+        )}
+
+        <BottomSheetFlatList
+          data={data}
+          keyExtractor={(i) => i.cfi}
+          renderItem={renderItem}
+          contentContainerStyle={{
+            backgroundColor: 'white',
+          }}
+        />
+      </BottomSheetView>
+    </BottomSheet>
+  );
   return (
     <BottomSheetModalProvider>
       <View style={styles.container}>
@@ -70,10 +151,23 @@ export const SearchList = forwardRef<Ref, Props>(({ onClose }, ref) => {
                 onChangeText={(text) => setSearchTerm(text)}
               />
 
-              <IconButton icon="magnify" size={20} onPress={handleSearchTerm} />
+              <IconButton
+                icon="magnify"
+                size={20}
+                onPress={handleSearchTerm}
+                loading={isSearching}
+              />
             </View>
 
-            {searchResults.length === 0 && (
+            {isSearching && (
+              <View style={styles.title}>
+                <Text variant="bodyMedium" style={{ fontStyle: 'italic' }}>
+                  Searching results...
+                </Text>
+              </View>
+            )}
+
+            {!isSearching && searchResults.length === 0 && (
               <View style={styles.title}>
                 <Text variant="bodyMedium" style={{ fontStyle: 'italic' }}>
                   No results...

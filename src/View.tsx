@@ -188,6 +188,7 @@ export function View({
 
     if (type === 'onSearch') {
       const { results } = parsedEvent;
+      console.log('onSearch', results);
       setSearchResults(results);
       setIsSearching(false);
 

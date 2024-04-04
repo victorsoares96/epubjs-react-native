@@ -116,6 +116,10 @@ export type SearchOptions = {
    * Default is 3000 ms
    */
   highlightTermDuration?: number;
+  /**
+   * Default is yellow
+   */
+  highlightTermColor?: string;
 };
 
 export type LoadingFileProps = {

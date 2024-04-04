@@ -733,58 +733,73 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
 
   const search = useCallback(
     (term: string, page?: number, limit?: number, options?: SearchOptions) => {
-      if (!term) return;
-
+      dispatch({ type: Types.SET_SEARCH_RESULTS, payload: [] });
       dispatch({ type: Types.SET_IS_SEARCHING, payload: true });
 
-      book.current?.injectJavaScript(`
+      webViewInjectFunctions.injectJavaScript(
+        book,
+        `
       const page = ${page || 1};
       const limit = ${limit || 20};
       const term = ${JSON.stringify(term)};
       const chapterId = ${options?.chapterId};
       const highlightTerm = ${options?.highlightTerm || true};
+      const highlightTermColor = ${JSON.stringify(options?.highlightTermColor || 'yellow')}
       const highlightTermDuration = ${options?.highlightTermDuration || 3000};
 
-      Promise.all(
-        book.spine.spineItems.map((item) => {
-          return item.load(book.load.bind(book)).then(() => {
-            let results = item.find(term.trim());
-            const locationHref = item.href;
-
-            let [match] = flatten(book.navigation.toc)
-            .filter((chapter, index) => {
-                return book.canonical(chapter.href).includes(locationHref)
-            }, null);
-
-            if (results.length > 0) {
-              results = results.map(result => ({ ...result, chapter: { ...match, index: book.navigation.toc.findIndex(elem => elem.id === match.id) } }));
-
-              if (chapterId) {
-                results = results.filter(result => result.chapter.id === chapterId);
-              }
-            }
-
-            item.unload();
-            return Promise.resolve(results);
-          });
-        })
-      ).then((results) => {
-        const items = [].concat.apply([], results);
-        items.forEach(item => {
-          if (highlightTerm) {
-            rendition.annotations.highlight(item.cfi, {}, () => {});
-
-            setTimeout(() => {
-              rendition.annotations.remove(item.cfi, 'highlight');
-            }, highlightTermDuration);
-          }
-        });
-
+      if (!term) {
         window.ReactNativeWebView.postMessage(
-          JSON.stringify({ type: 'onSearch', results: items.slice((page - 1) * limit, page * limit) })
+          JSON.stringify({ type: 'onSearch', results: [] })
         );
-      }).catch(err => alert(err?.message))
-    `);
+      } else {
+        Promise.all(
+          book.spine.spineItems.map((item) => {
+            return item.load(book.load.bind(book)).then(() => {
+              let results = item.find(term.trim());
+              const locationHref = item.href;
+
+              let [match] = flatten(book.navigation.toc)
+              .filter((chapter, index) => {
+                  return book.canonical(chapter.href).includes(locationHref)
+              }, null);
+
+              if (results.length > 0) {
+                results = results.map(result => ({ ...result, chapter: { ...match, index: book.navigation.toc.findIndex(elem => elem.id === match?.id) } }));
+
+                if (chapterId) {
+                  results = results.filter(result => result.chapter.id === chapterId);
+                }
+              }
+
+              item.unload();
+              return Promise.resolve(results);
+            });
+          })
+        ).then((results) => {
+          const items = [].concat.apply([], results);
+          items.forEach(item => {
+            if (highlightTerm) {
+              rendition.annotations.highlight(item.cfi, {}, () => {});
+
+              setTimeout(() => {
+                rendition.annotations.remove(item.cfi, 'highlight');
+              }, highlightTermDuration);
+            }
+          });
+
+          window.ReactNativeWebView.postMessage(
+            JSON.stringify({ type: 'onSearch', results: items.slice((page - 1) * limit, page * limit) })
+          );
+        }).catch(err => {
+          alert(err?.message);
+
+          window.ReactNativeWebView.postMessage(
+            JSON.stringify({ type: 'onSearch', results: [] })
+          );
+        })
+      }
+    `
+      );
     },
     []
   );

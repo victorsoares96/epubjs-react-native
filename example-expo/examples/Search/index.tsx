@@ -15,7 +15,7 @@ function Inner() {
   return (
     <SafeAreaView style={styles.container}>
       <GestureHandlerRootView>
-        <Header onPressSearch={() => bottomSheetRef.current.present()} />
+        <Header onPressSearch={() => bottomSheetRef.current.snapToIndex(0)} />
 
         <Reader
           src="https://s3.amazonaws.com/moby-dick/OPS/package.opf"
@@ -26,7 +26,7 @@ function Inner() {
 
         <SearchList
           ref={bottomSheetRef}
-          onClose={() => bottomSheetRef.current?.dismiss()}
+          onClose={() => bottomSheetRef.current?.close()}
         />
       </GestureHandlerRootView>
     </SafeAreaView>
