@@ -159,8 +159,9 @@ const { changeFontSize, goToLocation, ... } = useReader();
 - `searchResults`: Search results.
 - `meta`: A object containing the book's metadata.
 - `annotations`: A array containing the book's annotations.
-- `chapter`: A current chapter.
-- `chapters`: A array containing the book's chapters. Also called table of contents(toc).
+- `section`: A current section(chapter) of the book.
+- `toc`: Also called table of contents, is an ordered list of links into the content.
+- `landmarks`: Containing a array of major sections of the content
 - `bookmarks`: A array containing the bookmarks.
 - `isBookmarked`: Indicates if current location is bookmarked.
 

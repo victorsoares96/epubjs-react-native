@@ -83,8 +83,9 @@ export function View({
     removeSelection,
     setAnnotations,
     setInitialAnnotations,
-    setChapter,
-    setChapters,
+    setSection,
+    setToc,
+    setLandmarks,
     setBookmarks,
     bookmarks,
     setIsBookmarked,
@@ -162,12 +163,12 @@ export function View({
     }
 
     if (type === 'onLocationChange') {
-      const { totalLocations, currentLocation, progress, currentChapter } =
+      const { totalLocations, currentLocation, progress, currentSection } =
         parsedEvent;
       setTotalLocations(totalLocations);
       setCurrentLocation(currentLocation);
       setProgress(progress);
-      setChapter(currentChapter);
+      setSection(currentSection);
 
       handleChangeIsBookmarked(bookmarks, currentLocation);
 
@@ -181,7 +182,7 @@ export function View({
         totalLocations,
         currentLocation,
         progress,
-        currentChapter
+        currentSection
       );
     }
 
@@ -238,11 +239,12 @@ export function View({
     }
 
     if (type === 'onNavigationLoaded') {
-      const { toc } = parsedEvent;
+      const { toc, landmarks } = parsedEvent;
 
-      setChapters(toc);
+      setToc(toc);
+      setLandmarks(landmarks);
 
-      return onNavigationLoaded(toc);
+      return onNavigationLoaded({ toc, landmarks });
     }
 
     if (type === 'onAddAnnotation') {

@@ -2,7 +2,7 @@ import * as React from 'react';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaView, StyleSheet, Text, TouchableOpacity } from 'react-native';
-import { PaperProvider } from 'react-native-paper';
+import { MD3LightTheme, PaperProvider } from 'react-native-paper';
 import {
   Basic,
   Formats,
@@ -12,6 +12,7 @@ import {
   OpenExternalLink,
   Annotations,
   Bookmarks,
+  Toc,
 } from './examples';
 
 const { Navigator, Screen } = createNativeStackNavigator();
@@ -81,6 +82,12 @@ export const examples = [
     route: 'Bookmarks',
     component: Bookmarks,
   },
+  {
+    title: 'Table of Contents',
+    description: 'Ordered list of links into the content',
+    route: 'TableOfContents',
+    component: Toc,
+  },
 ];
 
 function Examples() {
@@ -103,7 +110,7 @@ function Examples() {
 
 export default function App() {
   return (
-    <PaperProvider>
+    <PaperProvider theme={MD3LightTheme}>
       <NavigationContainer>
         <Navigator initialRouteName="Examples">
           <Screen
@@ -116,7 +123,10 @@ export default function App() {
             <Screen
               key={route}
               name={route}
-              options={{ title, headerShown: !['Bookmarks'].includes(route) }}
+              options={{
+                title,
+                headerShown: !['Bookmarks', 'TableOfContents'].includes(route),
+              }}
               component={Example}
             />
           ))}

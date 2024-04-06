@@ -60,7 +60,7 @@ export type Annotation<Data = any> = {
   styles?: AnnotationStyles;
 };
 
-export type Chapter = {
+export type Section = {
   id: string;
   href: string;
   label: string;
@@ -68,9 +68,17 @@ export type Chapter = {
   subitems: Array<any>;
 };
 
+export type Toc = Section[];
+
+export type Landmark = {
+  href: string;
+  label: string;
+  type: string;
+};
+
 export type Bookmark<Data = any> = {
   id: number;
-  chapter: Chapter;
+  section: Section;
   location: Location;
   text: string;
   data?: Data;
@@ -196,14 +204,14 @@ export interface ReaderProps {
    * @param {string} cfi
    * @param {number} progress
    * @param {number} totalPages
-   * @param {string} currentChapter
+   * @param {string} currentTocItem
    * @returns {void} void
    */
   onLocationChange?: (
     totalLocations: number,
     currentLocation: Location,
     progress: number,
-    currentChapter: Chapter | null
+    currentSection: Section | null
   ) => void;
   /**
    * Called once when the book has been searched
@@ -253,10 +261,17 @@ export interface ReaderProps {
    */
   onLayout?: (layout: any) => void;
   /**
-   * @param {any} toc
+   * @param {Toc} toc
+   * @param {Landmark[]} landmarks
    * @returns {void} void
    */
-  onNavigationLoaded?: (toc: any) => void;
+  onNavigationLoaded?: ({
+    toc,
+    landmarks,
+  }: {
+    toc: Toc;
+    landmarks: Landmark[];
+  }) => void;
   /**
    * Called when the book was pressed
    * @returns {void} void
@@ -278,7 +293,7 @@ export interface ReaderProps {
    */
   height: number;
   /**
-   * Can be an ePubCfi or chapter url
+   * Can be an ePubCfi or toc href
    */
   initialLocation?: string;
   /**
