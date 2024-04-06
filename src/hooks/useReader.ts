@@ -28,8 +28,9 @@ export function useReader() {
     removeAnnotation,
     removeSelection,
     annotations,
-    chapter,
-    chapters,
+    section,
+    toc,
+    landmarks,
     addBookmark,
     removeBookmark,
     removeBookmarks,
@@ -64,8 +65,9 @@ export function useReader() {
     key,
     searchResults,
     annotations,
-    chapter,
-    chapters,
+    section,
+    toc,
+    landmarks,
     addBookmark,
     removeBookmark,
     removeBookmarks,
@@ -99,8 +101,9 @@ export function useReader() {
     | 'removeAnnotation'
     | 'removeSelection'
     | 'annotations'
-    | 'chapter'
-    | 'chapters'
+    | 'section'
+    | 'toc'
+    | 'landmarks'
     | 'addBookmark'
     | 'removeBookmark'
     | 'removeBookmarks'
