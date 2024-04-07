@@ -14,6 +14,7 @@ import { WebView, WebViewMessageEvent } from 'react-native-webview';
 import { defaultTheme as initialTheme, ReaderContext } from './context';
 import type { Bookmark, ReaderProps } from './types';
 import { OpeningBook } from './utils/OpeningBook';
+import INTERNAL_EVENTS from './utils/internalEvents.util';
 
 export type ViewProps = Omit<ReaderProps, 'src' | 'fileSystem'> & {
   templateUri: string;
@@ -61,6 +62,9 @@ export function View({
   onChangeBookmarks = () => {},
   onIsBookmarked = () => {},
   initialBookmarks,
+  injectedJavascript,
+  getInjectionJavascriptFn,
+  onWebViewMessage,
 }: ViewProps) {
   const {
     registerBook,
@@ -97,6 +101,12 @@ export function View({
     cfiRangeText: string;
   }>({ cfiRange: '', cfiRangeText: '' });
 
+  useEffect(() => {
+    if (getInjectionJavascriptFn && book.current) {
+      getInjectionJavascriptFn(book.current.injectJavaScript);
+    }
+  }, [getInjectionJavascriptFn]);
+
   const handleChangeIsBookmarked = (
     items: Bookmark[],
     currentLoc = currLoc
@@ -115,6 +125,10 @@ export function View({
     const parsedEvent = JSON.parse(event.nativeEvent.data);
 
     const { type } = parsedEvent;
+
+    if (!INTERNAL_EVENTS.includes(type) && onWebViewMessage) {
+      return onWebViewMessage(parsedEvent);
+    }
 
     delete parsedEvent.type;
 
@@ -144,6 +158,10 @@ export function View({
 
       if (initialLocation) {
         goToLocation(initialLocation);
+      }
+
+      if (injectedJavascript) {
+        book.current?.injectJavaScript(injectedJavascript);
       }
 
       return onReady(totalLocations, currentLocation, progress);

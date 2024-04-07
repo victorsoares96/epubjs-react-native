@@ -13,6 +13,7 @@ import {
   Annotations,
   Bookmarks,
   Toc,
+  JavascriptInjection,
 } from './examples';
 
 const { Navigator, Screen } = createNativeStackNavigator();
@@ -87,6 +88,12 @@ export const examples = [
     description: 'Ordered list of links into the content',
     route: 'TableOfContents',
     component: Toc,
+  },
+  {
+    title: 'Javascript Injection',
+    description: 'Inject a script into the open ebook instance',
+    route: 'JavascriptInjection',
+    component: JavascriptInjection,
   },
 ];
 

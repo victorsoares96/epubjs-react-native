@@ -37,6 +37,7 @@ export function useReader() {
     updateBookmark,
     bookmarks,
     isBookmarked,
+    injectJavascript,
   } = useContext(ReaderContext);
 
   return {
@@ -74,6 +75,7 @@ export function useReader() {
     updateBookmark,
     bookmarks,
     isBookmarked,
+    injectJavascript,
   } as Pick<
     ReaderContextProps,
     | 'changeFontSize'
@@ -110,5 +112,6 @@ export function useReader() {
     | 'updateBookmark'
     | 'bookmarks'
     | 'isBookmarked'
+    | 'injectJavascript'
   >;
 }

@@ -534,6 +534,8 @@ export interface ReaderContextProps {
    * Indicates if current page is bookmarked
    */
   isBookmarked: boolean;
+
+  injectJavascript?: (script: string) => void;
 }
 
 const ReaderContext = createContext<ReaderContextProps>({
@@ -620,6 +622,8 @@ const ReaderContext = createContext<ReaderContextProps>({
   landmarks: [],
   bookmarks: [],
   isBookmarked: false,
+
+  injectJavascript: () => {},
 });
 
 function ReaderProvider({ children }: { children: React.ReactNode }) {
@@ -979,6 +983,10 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
     dispatch({ type: Types.SET_IS_BOOKMARKED, payload: value });
   }, []);
 
+  const injectJavascript = useCallback((script: string) => {
+    book.current?.injectJavaScript(script);
+  }, []);
+
   const contextValue = useMemo(
     () => ({
       registerBook,
@@ -1047,6 +1055,7 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       bookmarks: state.bookmarks,
       setIsBookmarked,
       isBookmarked: state.isBookmarked,
+      injectJavascript,
     }),
     [
       changeFontFamily,
@@ -1106,6 +1115,7 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       state.bookmarks,
       state.isBookmarked,
       setIsBookmarked,
+      injectJavascript,
     ]
   );
   return (
