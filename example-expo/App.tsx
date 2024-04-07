@@ -132,7 +132,11 @@ export default function App() {
               name={route}
               options={{
                 title,
-                headerShown: !['Bookmarks', 'TableOfContents'].includes(route),
+                headerShown: ![
+                  'Bookmarks',
+                  'TableOfContents',
+                  'JavascriptInjection',
+                ].includes(route),
               }}
               component={Example}
             />

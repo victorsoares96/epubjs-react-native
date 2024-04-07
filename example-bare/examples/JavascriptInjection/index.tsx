@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { SafeAreaView, useWindowDimensions } from 'react-native';
 import { Reader, ReaderProvider } from '@epubjs-react-native/core';
-import { useFileSystem } from '@epubjs-react-native/expo-file-system';
+import { useFileSystem } from '@epubjs-react-native/file-system';
 import { Header } from './Header';
 
 export function JavascriptInjection() {

@@ -13,6 +13,7 @@ import {
   Annotations,
   Bookmarks,
   Toc,
+  JavascriptInjection,
 } from './examples';
 
 const { Navigator, Screen } = createNativeStackNavigator();
@@ -88,6 +89,12 @@ export const examples = [
     route: 'TableOfContents',
     component: Toc,
   },
+  {
+    title: 'Javascript Injection',
+    description: 'Inject a script into the open ebook instance',
+    route: 'JavascriptInjection',
+    component: JavascriptInjection,
+  },
 ];
 
 function Examples() {
@@ -125,7 +132,11 @@ export default function App() {
               name={route}
               options={{
                 title,
-                headerShown: !['Bookmarks', 'TableOfContents'].includes(route),
+                headerShown: ![
+                  'Bookmarks',
+                  'TableOfContents',
+                  'JavascriptInjection',
+                ].includes(route),
               }}
               component={Example}
             />
