@@ -106,7 +106,15 @@ export type Theme = {
 
 export type SearchResult = {
   cfi: ePubCfi;
+  section: Section;
   excerpt: string;
+};
+
+export type SearchOptions = {
+  /**
+   * Example: toc-introduction_001
+   */
+  sectionId?: string;
 };
 
 export type LoadingFileProps = {
@@ -216,9 +224,10 @@ export interface ReaderProps {
   /**
    * Called once when the book has been searched
    * @param {SearchResult[]} results
+   * @param {number} totalResults
    * @returns {void} void
    */
-  onSearch?: (results: SearchResult[]) => void;
+  onSearch?: (results: SearchResult[], totalResults: number) => void;
   /**
    * Called once the locations has been generated
    * @param {string} locations

@@ -12,7 +12,7 @@ import {
   OpenExternalLink,
   Annotations,
   Bookmarks,
-  Toc,
+  TableOfContents,
   JavascriptInjection,
 } from './examples';
 
@@ -87,7 +87,7 @@ export const examples = [
     title: 'Table of Contents',
     description: 'Ordered list of links into the content',
     route: 'TableOfContents',
-    component: Toc,
+    component: TableOfContents,
   },
   {
     title: 'Javascript Injection',
@@ -136,6 +136,7 @@ export default function App() {
                   'Bookmarks',
                   'TableOfContents',
                   'JavascriptInjection',
+                  'Search',
                 ].includes(route),
               }}
               component={Example}

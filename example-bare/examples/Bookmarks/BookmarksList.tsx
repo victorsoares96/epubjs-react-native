@@ -121,7 +121,7 @@ export const BookmarksList = forwardRef<Ref, Props>(({ onClose }, ref) => {
 
                   <View style={styles.bookmarkInfoText}>
                     <Text numberOfLines={1} style={{ marginBottom: 2 }}>
-                      Chapter: {bookmark.chapter.label}
+                      Chapter: {bookmark.section.label}
                     </Text>
 
                     <Text numberOfLines={2} style={{ fontStyle: 'italic' }}>

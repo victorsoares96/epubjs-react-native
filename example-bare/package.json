@@ -9,7 +9,7 @@
     "web": "expo start --web"
   },
   "dependencies": {
-    "@epubjs-react-native/core": "1.4.0-beta.45",
+    "@epubjs-react-native/core": "1.4.0-beta.46",
     "@epubjs-react-native/file-system": "^1.1.2",
     "@gorhom/bottom-sheet": "^4",
     "@react-navigation/native": "^6.1.15",
@@ -22,7 +22,7 @@
     "react-native-fs": "^2.20.0",
     "react-native-gesture-handler": "^2.15.0",
     "react-native-paper": "^5.12.3",
-    "react-native-reanimated": "~3.8.0",
+    "react-native-reanimated": "~3.6.2",
     "react-native-safe-area-context": "^4.9.0",
     "react-native-screens": "^3.29.0",
     "react-native-vector-icons": "^10.0.3",

@@ -16,6 +16,7 @@ import type {
   Annotation,
   AnnotationStyles,
   Bookmark,
+  SearchOptions,
   Section,
   Toc,
   Landmark,
@@ -48,6 +49,7 @@ enum Types {
   SET_IS_LOADING = 'SET_IS_LOADING',
   SET_IS_RENDERING = 'SET_IS_RENDERING',
   SET_SEARCH_RESULTS = 'SET_SEARCH_RESULTS',
+  SET_IS_SEARCHING = 'SET_IS_SEARCHING',
   SET_ANNOTATIONS = 'SET_ANNOTATIONS',
   SET_SECTION = 'SET_SECTION',
   SET_TOC = 'SET_TOC',
@@ -78,7 +80,8 @@ type BookPayload = {
   [Types.SET_LOCATIONS]: ePubCfi[];
   [Types.SET_IS_LOADING]: boolean;
   [Types.SET_IS_RENDERING]: boolean;
-  [Types.SET_SEARCH_RESULTS]: SearchResult[];
+  [Types.SET_IS_SEARCHING]: boolean;
+  [Types.SET_SEARCH_RESULTS]: { results: SearchResult[]; totalResults: number };
   [Types.SET_ANNOTATIONS]: Annotation[];
   [Types.SET_SECTION]: Section | null;
   [Types.SET_TOC]: Toc;
@@ -111,7 +114,8 @@ type InitialState = {
   locations: ePubCfi[];
   isLoading: boolean;
   isRendering: boolean;
-  searchResults: SearchResult[];
+  isSearching: boolean;
+  searchResults: { results: SearchResult[]; totalResults: number };
   annotations: Annotation[];
   section: Section | null;
   toc: Toc;
@@ -168,7 +172,8 @@ const initialState: InitialState = {
   locations: [],
   isLoading: true,
   isRendering: true,
-  searchResults: [],
+  isSearching: false,
+  searchResults: { results: [], totalResults: 0 },
   annotations: [],
   section: null,
   toc: [],
@@ -243,6 +248,11 @@ function bookReducer(state: InitialState, action: BookActions): InitialState {
       return {
         ...state,
         isRendering: action.payload,
+      };
+    case Types.SET_IS_SEARCHING:
+      return {
+        ...state,
+        isSearching: action.payload,
       };
     case Types.SET_SEARCH_RESULTS:
       return {
@@ -347,9 +357,17 @@ export interface ReaderContextProps {
 
   /**
    * Search for a specific text in the book
-   * @param {string} query {@link string} text to search
    */
-  search: (query: string) => void;
+  search: (
+    term: string,
+    page?: number,
+    limit?: number,
+    options?: SearchOptions
+  ) => void;
+
+  setIsSearching: (value: boolean) => void;
+
+  clearSearchResults: () => void;
 
   /**
    * @param theme {@link Theme}
@@ -510,13 +528,17 @@ export interface ReaderContextProps {
    */
   isRendering: boolean;
 
-  /**
-   * Search results
-   * @returns {SearchResult[]} {@link SearchResult[]}
-   */
-  searchResults: SearchResult[];
+  isSearching: boolean;
 
-  setSearchResults: (results: SearchResult[]) => void;
+  searchResults: { results: SearchResult[]; totalResults: number };
+
+  setSearchResults: ({
+    results,
+    totalResults,
+  }: {
+    results: SearchResult[];
+    totalResults: number;
+  }) => void;
 
   removeSelection: () => void;
 
@@ -535,7 +557,7 @@ export interface ReaderContextProps {
    */
   isBookmarked: boolean;
 
-  injectJavascript?: (script: string) => void;
+  injectJavascript: (script: string) => void;
 }
 
 const ReaderContext = createContext<ReaderContextProps>({
@@ -564,7 +586,10 @@ const ReaderContext = createContext<ReaderContextProps>({
     publisher: '',
     rights: '',
   }),
+
   search: () => {},
+  clearSearchResults: () => {},
+  setIsSearching: () => {},
 
   changeTheme: () => {},
   changeFontFamily: () => {},
@@ -604,7 +629,8 @@ const ReaderContext = createContext<ReaderContextProps>({
   isLoading: true,
   isRendering: true,
 
-  searchResults: [],
+  isSearching: false,
+  searchResults: { results: [], totalResults: 0 },
   setSearchResults: () => {},
 
   removeSelection: () => {},
@@ -725,27 +751,96 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
 
   const getMeta = useCallback(() => state.meta, [state.meta]);
 
-  const search = useCallback((query: string) => {
-    book.current?.injectJavaScript(`
-      Promise.all(
-        book.spine.spineItems.map((item) => {
-          return item.load(book.load.bind(book)).then(() => {
-            let results = item.find('${query}'.trim());
-            item.unload();
-            return Promise.resolve(results);
-          });
-        })
-      ).then((results) =>
+  const search = useCallback(
+    (term: string, page?: number, limit?: number, options?: SearchOptions) => {
+      dispatch({
+        type: Types.SET_SEARCH_RESULTS,
+        payload: { results: [], totalResults: 0 },
+      });
+      dispatch({ type: Types.SET_IS_SEARCHING, payload: true });
+
+      webViewInjectFunctions.injectJavaScript(
+        book,
+        `
+      const page = ${page || 1};
+      const limit = ${limit || 20};
+      const term = ${JSON.stringify(term)};
+      const chapterId = ${JSON.stringify(options?.sectionId)};
+
+      if (!term) {
         window.ReactNativeWebView.postMessage(
-          JSON.stringify({ type: 'onSearch', results: [].concat.apply([], results) })
-        )
-      ); true
-    `);
+          JSON.stringify({ type: 'onSearch', results: [] })
+        );
+      } else {
+        Promise.all(
+          book.spine.spineItems.map((item) => {
+            return item.load(book.load.bind(book)).then(() => {
+              let results = item.find(term.trim());
+              const locationHref = item.href;
+
+              let [match] = flatten(book.navigation.toc)
+              .filter((chapter, index) => {
+                  return book.canonical(chapter.href).includes(locationHref)
+              }, null);
+
+              if (results.length > 0) {
+                results = results.map(result => ({ ...result, chapter: { ...match, index: book.navigation.toc.findIndex(elem => elem.id === match?.id) } }));
+
+                if (chapterId) {
+                  results = results.filter(result => result.chapter.id === chapterId);
+                }
+              }
+
+              item.unload();
+              return Promise.resolve(results);
+            });
+          })
+        ).then((results) => {
+          const items = [].concat.apply([], results);
+
+          window.ReactNativeWebView.postMessage(
+            JSON.stringify({ type: 'onSearch', results: items.slice((page - 1) * limit, page * limit), totalResults: items.length })
+          );
+        }).catch(err => {
+          alert(err?.message);
+
+          window.ReactNativeWebView.postMessage(
+            JSON.stringify({ type: 'onSearch', results: [], totalResults: 0 })
+          );
+        })
+      }
+    `
+      );
+    },
+    []
+  );
+
+  const clearSearchResults = useCallback(() => {
+    dispatch({
+      type: Types.SET_SEARCH_RESULTS,
+      payload: { results: [], totalResults: 0 },
+    });
   }, []);
 
-  const setSearchResults = useCallback((results: SearchResult[]) => {
-    dispatch({ type: Types.SET_SEARCH_RESULTS, payload: results });
+  const setIsSearching = useCallback((value: boolean) => {
+    dispatch({ type: Types.SET_IS_SEARCHING, payload: value });
   }, []);
+
+  const setSearchResults = useCallback(
+    ({
+      results,
+      totalResults,
+    }: {
+      results: SearchResult[];
+      totalResults: number;
+    }) => {
+      dispatch({
+        type: Types.SET_SEARCH_RESULTS,
+        payload: { results, totalResults },
+      });
+    },
+    []
+  );
 
   const addAnnotation = useCallback(
     (
@@ -1006,7 +1101,10 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       getLocations,
       getCurrentLocation,
       getMeta,
+
       search,
+      clearSearchResults,
+      setIsSearching,
 
       setKey,
       key: state.key,
@@ -1026,6 +1124,7 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       isLoading: state.isLoading,
       isRendering: state.isRendering,
 
+      isSearching: state.isSearching,
       searchResults: state.searchResults,
       setSearchResults,
 
@@ -1069,6 +1168,8 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       goToLocation,
       registerBook,
       search,
+      clearSearchResults,
+      setIsSearching,
       setAtEnd,
       setAtStart,
       setCurrentLocation,
@@ -1097,6 +1198,7 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       state.key,
       state.locations,
       state.progress,
+      state.isSearching,
       state.searchResults,
       state.theme,
       state.totalLocations,

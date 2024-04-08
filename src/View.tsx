@@ -94,6 +94,7 @@ export function View({
     bookmarks,
     setIsBookmarked,
     currentLocation: currLoc,
+    setIsSearching,
   } = useContext(ReaderContext);
   const book = useRef<WebView>(null);
   const [selectedText, setSelectedText] = useState<{
@@ -205,10 +206,11 @@ export function View({
     }
 
     if (type === 'onSearch') {
-      const { results } = parsedEvent;
-      setSearchResults(results);
+      const { results, totalResults } = parsedEvent;
+      setSearchResults({ results, totalResults });
+      setIsSearching(false);
 
-      return onSearch(results);
+      return onSearch(results, totalResults);
     }
 
     if (type === 'onLocationsReady') {
