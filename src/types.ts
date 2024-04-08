@@ -114,7 +114,7 @@ export type SearchOptions = {
   /**
    * Example: toc-introduction_001
    */
-  chapterId?: string;
+  sectionId?: string;
 };
 
 export type LoadingFileProps = {

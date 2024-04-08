@@ -765,7 +765,7 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       const page = ${page || 1};
       const limit = ${limit || 20};
       const term = ${JSON.stringify(term)};
-      const chapterId = ${options?.chapterId};
+      const chapterId = ${JSON.stringify(options?.sectionId)};
 
       if (!term) {
         window.ReactNativeWebView.postMessage(

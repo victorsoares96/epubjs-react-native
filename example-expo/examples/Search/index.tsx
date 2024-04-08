@@ -1,21 +1,21 @@
 import * as React from 'react';
 import { SafeAreaView, useWindowDimensions } from 'react-native';
-import { Chapter, Reader, ReaderProvider } from '@epubjs-react-native/core';
+import { Section, Reader, ReaderProvider } from '@epubjs-react-native/core';
 import { useFileSystem } from '@epubjs-react-native/expo-file-system';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import BottomSheet from '@gorhom/bottom-sheet';
+import BottomSheet, { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { styles } from './styles';
 import { Header } from './Header';
-import { SearchList } from './SeachList';
-import { ChapterList } from './ChapterList';
+import { SearchList } from './SearchList';
+import { TableOfContents } from '../TableOfContents/TableOfContents';
 
 function Inner() {
   const { width, height } = useWindowDimensions();
 
   const searchListRef = React.useRef<BottomSheet>(null);
-  const chapterListRef = React.useRef<BottomSheet>(null);
+  const tableOfContentsRef = React.useRef<BottomSheet>(null);
 
-  const [chapter, setChapter] = React.useState<Chapter | null>(null);
+  const [section, setSection] = React.useState<Section | null>(null);
   return (
     <SafeAreaView style={styles.container}>
       <GestureHandlerRootView>
@@ -30,13 +30,21 @@ function Inner() {
 
         <SearchList
           ref={searchListRef}
+          section={section}
+          onOpenTableOfContents={() =>
+            tableOfContentsRef.current?.snapToIndex(0)
+          }
+          onClearFilter={() => setSection(null)}
           onClose={() => searchListRef.current?.close()}
         />
 
-        <ChapterList
-          ref={chapterListRef}
-          onClose={() => chapterListRef.current.close()}
-          onSelectChapter={(selectedChapter) => setChapter(selectedChapter)}
+        <TableOfContents
+          ref={tableOfContentsRef}
+          onClose={() => tableOfContentsRef.current?.close()}
+          onPressSection={(selectedSection) => {
+            setSection(selectedSection);
+            tableOfContentsRef.current?.close();
+          }}
         />
       </GestureHandlerRootView>
     </SafeAreaView>
@@ -46,7 +54,9 @@ function Inner() {
 export function Search() {
   return (
     <ReaderProvider>
-      <Inner />
+      <BottomSheetModalProvider>
+        <Inner />
+      </BottomSheetModalProvider>
     </ReaderProvider>
   );
 }
