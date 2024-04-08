@@ -397,4 +397,15 @@ export interface ReaderProps {
   onIsBookmarked?: (isBookmarked: boolean) => void;
 
   initialBookmarks?: Bookmark[];
+
+  /**
+   * Set this to provide JavaScript that will be injected when the book loads.
+   */
+  injectedJavascript?: string;
+
+  getInjectionJavascriptFn?: (
+    injectJavascript: (script: string) => void
+  ) => void;
+
+  onWebViewMessage?: (event: any) => void;
 }

@@ -105,11 +105,14 @@ export default function App() {
 | `onPressAnnotation`          | `function`    | Function that is invoked when annotation is pressed.                                                                   |
 | `initialAnnotations`         | `array`       | Used for load book with annotations attached                                                                           |
 | `onAddBookmark`              | `function`    |                                                              |
-| `onRemoveBookmark`              | `function`    |                                                              |
-| `onRemoveBookmarks`              | `function`    |                                                              |
-| `onUpdateBookmark`              | `function`    |                                                              |
+| `onRemoveBookmark`           | `function`    |                                                              |
+| `onRemoveBookmarks`          | `function`    |                                                              |
+| `onUpdateBookmark`           | `function`    |                                                              |
 | `onChangeBookmarks`          | `function`    | Function that is invoked when bookmarks array is modified.                                                           |
 | `initialBookmarks`           | `array`       | load bookmarks after render book                                                                           |
+| `injectedJavascript`         | `string`      | Provide JavaScript that will be injected after the book loads.                                  |
+| `getInjectionJavascriptFn`   | `function`    | Provides injectJavascript function, is same the webView function                                           |
+| `onWebViewMessage`           | `function`    | A webview event listener, is same the webView onMessage                                                                           |
 
 ## Hooks
 
@@ -141,10 +144,11 @@ const { changeFontSize, goToLocation, ... } = useReader();
 | `removeAnnotationByCfi`  `cfi`          |          | Detach annotations in the book by provided cfi.                         |
 | `removeAnnotations`  |    `type?: optional`      | Detach all annotations in the book. Can be detach by type                 |
 | `removeSelection`    |          | Remove selection                 |
-| `addBookmark`      |    `bookmark`      | Attach bookmark                                            |
-| `updateBookmark`   |     `id, data`     | Update bookmark data                                          |
-| `removeBookmark`   |  `bookmark`        | Remove bookmark                                            |
-| `removeBookmarks`  |          | Remove all bookmarks                 |
+| `addBookmark`        |    `bookmark`      | Attach bookmark                                            |
+| `updateBookmark`     |     `id, data`     | Update bookmark data                                          |
+| `removeBookmark`     |  `bookmark`        | Remove bookmark                                            |
+| `removeBookmarks`    |          | Remove all bookmarks                 |
+| `injectJavascript`   |`function`| Provide JavaScript that will be injected after the book loads.                 |
 
 ##### States
 
