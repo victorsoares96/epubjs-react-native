@@ -42,7 +42,8 @@ export const SearchList = forwardRef<Ref, Props>(
     const snapPoints = React.useMemo(() => ['50%', '90%'], []);
 
     const renderItem = React.useCallback(
-      ({ item }) => (
+      // eslint-disable-next-line react/no-unused-prop-types
+      ({ item }: { item: SearchResultType }) => (
         <SearchResult
           searchTerm={searchTerm}
           searchResult={item}

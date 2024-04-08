@@ -557,7 +557,7 @@ export interface ReaderContextProps {
    */
   isBookmarked: boolean;
 
-  injectJavascript?: (script: string) => void;
+  injectJavascript: (script: string) => void;
 }
 
 const ReaderContext = createContext<ReaderContextProps>({
