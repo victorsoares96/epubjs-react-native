@@ -15,9 +15,11 @@ import type {
   Theme,
   Annotation,
   AnnotationStyles,
-  Chapter,
   Bookmark,
   SearchOptions,
+  Section,
+  Toc,
+  Landmark,
 } from './types';
 import * as webViewInjectFunctions from './utils/webViewInjectFunctions';
 
@@ -49,8 +51,9 @@ enum Types {
   SET_SEARCH_RESULTS = 'SET_SEARCH_RESULTS',
   SET_IS_SEARCHING = 'SET_IS_SEARCHING',
   SET_ANNOTATIONS = 'SET_ANNOTATIONS',
-  SET_CHAPTER = 'SET_CHAPTER',
-  SET_CHAPTERS = 'SET_CHAPTERS',
+  SET_SECTION = 'SET_SECTION',
+  SET_TOC = 'SET_TOC',
+  SET_LANDMARKS = 'SET_LANDMARKS',
   SET_BOOKMARKS = 'SET_BOOKMARKS',
   SET_IS_BOOKMARKED = 'SET_IS_BOOKMARKED',
 }
@@ -80,8 +83,9 @@ type BookPayload = {
   [Types.SET_IS_SEARCHING]: boolean;
   [Types.SET_SEARCH_RESULTS]: SearchResult[];
   [Types.SET_ANNOTATIONS]: Annotation[];
-  [Types.SET_CHAPTER]: Chapter | null;
-  [Types.SET_CHAPTERS]: Chapter[];
+  [Types.SET_SECTION]: Section | null;
+  [Types.SET_TOC]: Toc;
+  [Types.SET_LANDMARKS]: Landmark[];
   [Types.SET_BOOKMARKS]: Bookmark[];
   [Types.SET_IS_BOOKMARKED]: boolean;
 };
@@ -113,8 +117,9 @@ type InitialState = {
   isSearching: boolean;
   searchResults: SearchResult[];
   annotations: Annotation[];
-  chapter: Chapter | null;
-  chapters: Chapter[];
+  section: Section | null;
+  toc: Toc;
+  landmarks: Landmark[];
   bookmarks: Bookmark[];
   isBookmarked: boolean;
 };
@@ -170,8 +175,9 @@ const initialState: InitialState = {
   isSearching: false,
   searchResults: [],
   annotations: [],
-  chapter: null,
-  chapters: [],
+  section: null,
+  toc: [],
+  landmarks: [],
   bookmarks: [],
   isBookmarked: false,
 };
@@ -258,15 +264,20 @@ function bookReducer(state: InitialState, action: BookActions): InitialState {
         ...state,
         annotations: action.payload,
       };
-    case Types.SET_CHAPTER:
+    case Types.SET_SECTION:
       return {
         ...state,
-        chapter: action.payload,
+        section: action.payload,
       };
-    case Types.SET_CHAPTERS:
+    case Types.SET_TOC:
       return {
         ...state,
-        chapters: action.payload,
+        toc: action.payload,
+      };
+    case Types.SET_LANDMARKS:
+      return {
+        ...state,
+        landmarks: action.payload,
       };
     case Types.SET_BOOKMARKS:
       return {
@@ -433,9 +444,11 @@ export interface ReaderContextProps {
 
   setKey: (key: string) => void;
 
-  setChapter: (chapter: Chapter | null) => void;
+  setSection: (section: Section | null) => void;
 
-  setChapters: (chapters: Chapter[]) => void;
+  setToc: (toc: Toc) => void;
+
+  setLandmarks: (landmarks: Landmark[]) => void;
 
   addBookmark: (location: Location, data?: object) => void;
 
@@ -529,12 +542,11 @@ export interface ReaderContextProps {
 
   annotations: Annotation[];
 
-  chapter: Chapter | null;
+  section: Section | null;
 
-  /**
-   * also called table of contents(toc)
-   */
-  chapters: Chapter[];
+  toc: Toc;
+
+  landmarks: Landmark[];
 
   bookmarks: Bookmark[];
 
@@ -542,6 +554,8 @@ export interface ReaderContextProps {
    * Indicates if current page is bookmarked
    */
   isBookmarked: boolean;
+
+  injectJavascript?: (script: string) => void;
 }
 
 const ReaderContext = createContext<ReaderContextProps>({
@@ -581,8 +595,9 @@ const ReaderContext = createContext<ReaderContextProps>({
 
   setKey: () => {},
 
-  setChapter: () => {},
-  setChapters: () => {},
+  setSection: () => {},
+  setToc: () => {},
+  setLandmarks: () => {},
 
   addBookmark: () => {},
   removeBookmark: () => {},
@@ -626,10 +641,13 @@ const ReaderContext = createContext<ReaderContextProps>({
   setAnnotations: () => {},
   setInitialAnnotations: () => {},
   annotations: [],
-  chapter: null,
-  chapters: [],
+  section: null,
+  toc: [],
+  landmarks: [],
   bookmarks: [],
   isBookmarked: false,
+
+  injectJavascript: () => {},
 });
 
 function ReaderProvider({ children }: { children: React.ReactNode }) {
@@ -942,12 +960,16 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
     );
   }, []);
 
-  const setChapter = useCallback((chapter: Chapter | null) => {
-    dispatch({ type: Types.SET_CHAPTER, payload: chapter });
+  const setSection = useCallback((section: Section | null) => {
+    dispatch({ type: Types.SET_SECTION, payload: section });
   }, []);
 
-  const setChapters = useCallback((chapters: Chapter[]) => {
-    dispatch({ type: Types.SET_CHAPTERS, payload: chapters });
+  const setToc = useCallback((toc: Toc) => {
+    dispatch({ type: Types.SET_TOC, payload: toc });
+  }, []);
+
+  const setLandmarks = useCallback((landmarks: Landmark[]) => {
+    dispatch({ type: Types.SET_LANDMARKS, payload: landmarks });
   }, []);
 
   const addBookmark = useCallback((location: Location, data?: object) => {
@@ -1048,6 +1070,10 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
     dispatch({ type: Types.SET_IS_BOOKMARKED, payload: value });
   }, []);
 
+  const injectJavascript = useCallback((script: string) => {
+    book.current?.injectJavaScript(script);
+  }, []);
+
   const contextValue = useMemo(
     () => ({
       registerBook,
@@ -1105,10 +1131,12 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       setInitialAnnotations,
       annotations: state.annotations,
 
-      setChapter,
-      setChapters,
-      chapter: state.chapter,
-      chapters: state.chapters,
+      setSection,
+      setToc,
+      setLandmarks,
+      section: state.section,
+      toc: state.toc,
+      landmarks: state.landmarks,
 
       addBookmark,
       removeBookmark,
@@ -1118,6 +1146,7 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       bookmarks: state.bookmarks,
       setIsBookmarked,
       isBookmarked: state.isBookmarked,
+      injectJavascript,
     }),
     [
       changeFontFamily,
@@ -1166,10 +1195,12 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       state.theme,
       state.totalLocations,
       state.annotations,
-      setChapter,
-      setChapters,
-      state.chapter,
-      state.chapters,
+      setSection,
+      setToc,
+      setLandmarks,
+      state.section,
+      state.toc,
+      state.landmarks,
       addBookmark,
       removeBookmark,
       removeBookmarks,
@@ -1178,6 +1209,7 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       state.bookmarks,
       state.isBookmarked,
       setIsBookmarked,
+      injectJavascript,
     ]
   );
   return (

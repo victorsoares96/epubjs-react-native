@@ -14,6 +14,7 @@ import { WebView, WebViewMessageEvent } from 'react-native-webview';
 import { defaultTheme as initialTheme, ReaderContext } from './context';
 import type { Bookmark, ReaderProps } from './types';
 import { OpeningBook } from './utils/OpeningBook';
+import INTERNAL_EVENTS from './utils/internalEvents.util';
 
 export type ViewProps = Omit<ReaderProps, 'src' | 'fileSystem'> & {
   templateUri: string;
@@ -61,6 +62,9 @@ export function View({
   onChangeBookmarks = () => {},
   onIsBookmarked = () => {},
   initialBookmarks,
+  injectedJavascript,
+  getInjectionJavascriptFn,
+  onWebViewMessage,
 }: ViewProps) {
   const {
     registerBook,
@@ -83,8 +87,9 @@ export function View({
     removeSelection,
     setAnnotations,
     setInitialAnnotations,
-    setChapter,
-    setChapters,
+    setSection,
+    setToc,
+    setLandmarks,
     setBookmarks,
     bookmarks,
     setIsBookmarked,
@@ -96,6 +101,12 @@ export function View({
     cfiRange: string;
     cfiRangeText: string;
   }>({ cfiRange: '', cfiRangeText: '' });
+
+  useEffect(() => {
+    if (getInjectionJavascriptFn && book.current) {
+      getInjectionJavascriptFn(book.current.injectJavaScript);
+    }
+  }, [getInjectionJavascriptFn]);
 
   const handleChangeIsBookmarked = (
     items: Bookmark[],
@@ -115,6 +126,10 @@ export function View({
     const parsedEvent = JSON.parse(event.nativeEvent.data);
 
     const { type } = parsedEvent;
+
+    if (!INTERNAL_EVENTS.includes(type) && onWebViewMessage) {
+      return onWebViewMessage(parsedEvent);
+    }
 
     delete parsedEvent.type;
 
@@ -146,6 +161,10 @@ export function View({
         goToLocation(initialLocation);
       }
 
+      if (injectedJavascript) {
+        book.current?.injectJavaScript(injectedJavascript);
+      }
+
       return onReady(totalLocations, currentLocation, progress);
     }
 
@@ -163,12 +182,12 @@ export function View({
     }
 
     if (type === 'onLocationChange') {
-      const { totalLocations, currentLocation, progress, currentChapter } =
+      const { totalLocations, currentLocation, progress, currentSection } =
         parsedEvent;
       setTotalLocations(totalLocations);
       setCurrentLocation(currentLocation);
       setProgress(progress);
-      setChapter(currentChapter);
+      setSection(currentSection);
 
       handleChangeIsBookmarked(bookmarks, currentLocation);
 
@@ -182,7 +201,7 @@ export function View({
         totalLocations,
         currentLocation,
         progress,
-        currentChapter
+        currentSection
       );
     }
 
@@ -241,11 +260,12 @@ export function View({
     }
 
     if (type === 'onNavigationLoaded') {
-      const { toc } = parsedEvent;
+      const { toc, landmarks } = parsedEvent;
 
-      setChapters(toc);
+      setToc(toc);
+      setLandmarks(landmarks);
 
-      return onNavigationLoaded(toc);
+      return onNavigationLoaded({ toc, landmarks });
     }
 
     if (type === 'onAddAnnotation') {

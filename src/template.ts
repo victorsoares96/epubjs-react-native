@@ -219,10 +219,11 @@ export default `
             );
           });
 
-          book.loaded.navigation.then(function (toc) {
+          book.loaded.navigation.then(function (item) {
             window.ReactNativeWebView.postMessage(JSON.stringify({
               type: 'onNavigationLoaded',
-              toc: toc,
+              toc: item.toc,
+              landmarks: item.landmarks
             }));
           });
         })
@@ -248,7 +249,7 @@ export default `
           totalLocations: book.locations.total,
           currentLocation: location,
           progress: percentage,
-          currentChapter: chapter,
+          currentSection: chapter,
         }));
 
         if (location.atStart) {

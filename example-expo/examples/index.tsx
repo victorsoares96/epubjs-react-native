@@ -6,3 +6,5 @@ export * from './Search';
 export * from './OpenExternalLink';
 export * from './Annotations';
 export * from './Bookmarks';
+export * from './TableOfContents';
+export * from './JavascriptInjection';

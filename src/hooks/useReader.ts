@@ -30,14 +30,16 @@ export function useReader() {
     removeAnnotation,
     removeSelection,
     annotations,
-    chapter,
-    chapters,
+    section,
+    toc,
+    landmarks,
     addBookmark,
     removeBookmark,
     removeBookmarks,
     updateBookmark,
     bookmarks,
     isBookmarked,
+    injectJavascript,
   } = useContext(ReaderContext);
 
   return {
@@ -68,14 +70,16 @@ export function useReader() {
     isSearching,
     searchResults,
     annotations,
-    chapter,
-    chapters,
+    section,
+    toc,
+    landmarks,
     addBookmark,
     removeBookmark,
     removeBookmarks,
     updateBookmark,
     bookmarks,
     isBookmarked,
+    injectJavascript,
   } as Pick<
     ReaderContextProps,
     | 'changeFontSize'
@@ -103,14 +107,16 @@ export function useReader() {
     | 'removeAnnotation'
     | 'removeSelection'
     | 'annotations'
-    | 'chapter'
-    | 'chapters'
+    | 'section'
+    | 'toc'
+    | 'landmarks'
     | 'addBookmark'
     | 'removeBookmark'
     | 'removeBookmarks'
     | 'updateBookmark'
     | 'bookmarks'
     | 'isBookmarked'
+    | 'injectJavascript'
     | 'clearSearchResults'
     | 'isSearching'
   >;
