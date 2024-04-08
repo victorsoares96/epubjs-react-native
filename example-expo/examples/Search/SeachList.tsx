@@ -1,17 +1,17 @@
 /* eslint-disable react-native/no-inline-styles */
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import React, { forwardRef, useState } from 'react';
-import { View, StyleSheet } from 'react-native';
-import { useReader } from '@epubjs-react-native/core';
+import { ActivityIndicator, View, StyleSheet } from 'react-native';
+import {
+  SearchResult as SearchResultType,
+  useReader,
+} from '@epubjs-react-native/core';
 import BottomSheet, {
   BottomSheetFlatList,
-  BottomSheetModal,
-  BottomSheetModalProvider,
   BottomSheetTextInput,
-  BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import { BottomSheetMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
-import { IconButton, MD3Colors, Text } from 'react-native-paper';
+import { MD3Colors, Text } from 'react-native-paper';
 import SearchResult from './SearchResult';
 
 interface Props {
@@ -26,16 +26,15 @@ export const SearchList = forwardRef<Ref, Props>(({ onClose }, ref) => {
     search,
     clearSearchResults,
     isSearching,
+    addAnnotation,
+    removeAnnotationByCfi,
   } = useReader();
 
   const [searchTerm, setSearchTerm] = useState('');
+  const [data, setData] = useState<SearchResultType[]>(searchResults.results);
+  const [page, setPage] = useState(1);
 
-  const data = React.useMemo(() => searchResults, [searchResults]);
   const snapPoints = React.useMemo(() => ['50%', '90%'], []);
-
-  const handleSearchTerm = () => {
-    search(searchTerm, 1, 20);
-  };
 
   const renderItem = React.useCallback(
     ({ item }) => (
@@ -44,49 +43,56 @@ export const SearchList = forwardRef<Ref, Props>(({ onClose }, ref) => {
         searchResult={item}
         onPress={(searchResult) => {
           goToLocation(searchResult.cfi);
+          addAnnotation('highlight', searchResult.cfi);
+          setTimeout(() => {
+            removeAnnotationByCfi(searchResult.cfi);
+          }, 3000);
+          clearSearchResults();
+          setPage(1);
+          setData([]);
+
           onClose();
         }}
       />
     ),
-    [goToLocation, onClose, searchTerm]
+    [
+      addAnnotation,
+      clearSearchResults,
+      goToLocation,
+      onClose,
+      removeAnnotationByCfi,
+      searchTerm,
+    ]
   );
-  return (
-    <BottomSheet
-      ref={ref}
-      index={-1}
-      snapPoints={snapPoints}
-      enablePanDownToClose
-    >
-      <BottomSheetView style={styles.contentContainer}>
+
+  const header = React.useCallback(
+    () => (
+      <View>
         <View style={styles.title}>
           <Text variant="titleMedium">Search Results</Text>
 
-          {searchResults.length > 0 && (
-            <Text style={{ color: MD3Colors.primary50 }}>
-              found: {searchResults.length}
-            </Text>
-          )}
+          <Text style={{ color: MD3Colors.primary50 }}>
+            found: {searchResults.totalResults}
+          </Text>
         </View>
 
-        <View
-          style={{
-            width: '100%',
-            flexDirection: 'row',
-            alignItems: 'center',
-          }}
-        >
+        <View style={{ width: '100%' }}>
           <BottomSheetTextInput
+            inputMode="search"
+            returnKeyType="search"
+            returnKeyLabel="Search"
+            autoCorrect={false}
+            autoCapitalize="none"
             defaultValue={searchTerm}
             style={styles.input}
             placeholder="Type an term here..."
-            onChangeText={(text) => setSearchTerm(text)}
-          />
-
-          <IconButton
-            icon="magnify"
-            size={20}
-            onPress={handleSearchTerm}
-            loading={isSearching}
+            onSubmitEditing={(event) => {
+              setSearchTerm(event.nativeEvent.text);
+              clearSearchResults();
+              setData([]);
+              setPage(1);
+              search(event.nativeEvent.text, 1, 20);
+            }}
           />
         </View>
 
@@ -97,120 +103,106 @@ export const SearchList = forwardRef<Ref, Props>(({ onClose }, ref) => {
             </Text>
           </View>
         )}
+      </View>
+    ),
+    [
+      clearSearchResults,
+      isSearching,
+      search,
+      searchResults.totalResults,
+      searchTerm,
+    ]
+  );
 
-        {!isSearching && searchResults.length === 0 && (
-          <View style={styles.title}>
-            <Text variant="bodyMedium" style={{ fontStyle: 'italic' }}>
-              No results...
+  const footer = React.useCallback(
+    () => (
+      <View style={styles.title}>
+        {isSearching && (
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <ActivityIndicator animating />
+
+            <Text
+              variant="bodyMedium"
+              style={{ fontStyle: 'italic', marginLeft: 5 }}
+            >
+              fetching results...
             </Text>
           </View>
         )}
 
-        <BottomSheetFlatList
-          data={data}
-          keyExtractor={(i) => i.cfi}
-          renderItem={renderItem}
-          contentContainerStyle={{
-            backgroundColor: 'white',
-          }}
-        />
-      </BottomSheetView>
-    </BottomSheet>
-  );
-  return (
-    <BottomSheetModalProvider>
-      <View style={styles.container}>
-        <BottomSheetModal
-          ref={ref}
-          index={1}
-          snapPoints={snapPoints}
-          onDismiss={clearSearchResults}
-        >
-          <BottomSheetView style={styles.contentContainer}>
-            <View style={styles.title}>
-              <Text variant="titleMedium">Search Results</Text>
-
-              {searchResults.length > 0 && (
-                <Text style={{ color: MD3Colors.primary50 }}>
-                  found: {searchResults.length}
-                </Text>
-              )}
-            </View>
-
-            <View
-              style={{
-                width: '100%',
-                flexDirection: 'row',
-                alignItems: 'center',
-              }}
-            >
-              <BottomSheetTextInput
-                defaultValue={searchTerm}
-                style={styles.input}
-                placeholder="Type an term here..."
-                onChangeText={(text) => setSearchTerm(text)}
-              />
-
-              <IconButton
-                icon="magnify"
-                size={20}
-                onPress={handleSearchTerm}
-                loading={isSearching}
-              />
-            </View>
-
-            {isSearching && (
-              <View style={styles.title}>
-                <Text variant="bodyMedium" style={{ fontStyle: 'italic' }}>
-                  Searching results...
-                </Text>
-              </View>
-            )}
-
-            {!isSearching && searchResults.length === 0 && (
-              <View style={styles.title}>
-                <Text variant="bodyMedium" style={{ fontStyle: 'italic' }}>
-                  No results...
-                </Text>
-              </View>
-            )}
-
-            <BottomSheetFlatList
-              data={searchResults}
-              keyExtractor={(i) => i.cfi}
-              renderItem={({ item }) => (
-                <SearchResult
-                  searchTerm={searchTerm}
-                  searchResult={item}
-                  onPress={(searchResult) => {
-                    goToLocation(searchResult.cfi);
-                    onClose();
-                  }}
-                />
-              )}
-              contentContainerStyle={{}}
-            />
-          </BottomSheetView>
-        </BottomSheetModal>
+        {data.length > 0 &&
+          data.length === searchResults.totalResults &&
+          !isSearching && (
+            <Text variant="bodyMedium" style={{ fontStyle: 'italic' }}>
+              No more results at the moment...
+            </Text>
+          )}
       </View>
-    </BottomSheetModalProvider>
+    ),
+    [data.length, isSearching, searchResults.totalResults]
+  );
+
+  const empty = React.useCallback(
+    () => (
+      <View style={styles.title}>
+        <Text variant="bodyMedium" style={{ fontStyle: 'italic' }}>
+          No results...
+        </Text>
+      </View>
+    ),
+    []
+  );
+
+  const handleClose = React.useCallback(() => {
+    clearSearchResults();
+    setPage(1);
+    setData([]);
+  }, [clearSearchResults]);
+
+  const fetchMoreData = React.useCallback(() => {
+    if (searchResults.results.length > 0 && !isSearching) {
+      search(searchTerm, page + 1, 20);
+      setPage(page + 1);
+    }
+  }, [isSearching, page, search, searchResults.results.length, searchTerm]);
+
+  React.useEffect(() => {
+    if (searchResults.results.length > 0) {
+      setData((oldState) => [...oldState, ...searchResults.results]);
+    }
+  }, [searchResults]);
+
+  return (
+    <BottomSheet
+      ref={ref}
+      index={-1}
+      snapPoints={snapPoints}
+      enablePanDownToClose
+      style={styles.container}
+      onClose={handleClose}
+    >
+      <BottomSheetFlatList<SearchResultType>
+        data={data}
+        showsVerticalScrollIndicator={false}
+        keyExtractor={(item, index) => item.cfi.concat(index.toString())}
+        renderItem={renderItem}
+        ListHeaderComponent={header}
+        ListFooterComponent={footer}
+        ListEmptyComponent={empty}
+        style={{ width: '100%' }}
+        maxToRenderPerBatch={20}
+        onEndReachedThreshold={0.2}
+        onEndReached={fetchMoreData}
+      />
+    </BottomSheet>
   );
 });
 
 const styles = StyleSheet.create({
   container: {
+    width: '100%',
     flex: 1,
-    padding: 24,
-    justifyContent: 'center',
-    backgroundColor: '#fff',
-  },
-  contentContainer: {
-    flex: 1,
-    alignItems: 'center',
     paddingHorizontal: 20,
-  },
-  bookmarkInfo: {
-    flexDirection: 'row',
   },
   title: {
     width: '100%',
@@ -219,11 +211,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 10,
   },
-  bookmarkLocationNumber: {
-    marginTop: -12,
-  },
   input: {
-    width: '90%',
+    width: '100%',
     borderRadius: 10,
     fontSize: 16,
     lineHeight: 20,
