@@ -94,10 +94,6 @@ export type FontSize = string;
  */
 export type ePubCfi = string;
 
-export type Themes = {
-  [key: string]: Theme;
-};
-
 export type Theme = {
   [key: string]: {
     [key: string]: string;

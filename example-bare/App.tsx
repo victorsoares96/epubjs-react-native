@@ -50,7 +50,7 @@ export const examples = [
   {
     title: 'Custom Themes',
     description: 'Loading a book with custom themes.',
-    route: 'Themes',
+    route: 'CustomThemes',
     component: CustomThemes,
   },
   {
@@ -137,6 +137,7 @@ export default function App() {
                   'TableOfContents',
                   'JavascriptInjection',
                   'Search',
+                  'CustomThemes',
                 ].includes(route),
               }}
               component={Example}
