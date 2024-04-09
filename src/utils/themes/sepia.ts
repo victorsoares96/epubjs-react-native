@@ -1,4 +1,4 @@
-import type { Theme } from '@epubjs-react-native/core';
+import type { Theme } from '../../types';
 
 export const sepia: Theme = {
   'body': {
