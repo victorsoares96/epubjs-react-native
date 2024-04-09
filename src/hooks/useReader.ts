@@ -13,6 +13,8 @@ export function useReader() {
     getCurrentLocation,
     getMeta,
     search,
+    clearSearchResults,
+    isSearching,
     theme,
     atStart,
     atEnd,
@@ -26,16 +28,19 @@ export function useReader() {
     addAnnotation,
     updateAnnotation,
     removeAnnotation,
+    removeAnnotationByCfi,
     removeSelection,
     annotations,
-    chapter,
-    chapters,
+    section,
+    toc,
+    landmarks,
     addBookmark,
     removeBookmark,
     removeBookmarks,
     updateBookmark,
     bookmarks,
     isBookmarked,
+    injectJavascript,
   } = useContext(ReaderContext);
 
   return {
@@ -49,9 +54,11 @@ export function useReader() {
     getCurrentLocation,
     getMeta,
     search,
+    clearSearchResults,
     addAnnotation,
     updateAnnotation,
     removeAnnotation,
+    removeAnnotationByCfi,
     removeSelection,
     theme,
     atStart,
@@ -62,16 +69,19 @@ export function useReader() {
     locations,
     isLoading,
     key,
+    isSearching,
     searchResults,
     annotations,
-    chapter,
-    chapters,
+    section,
+    toc,
+    landmarks,
     addBookmark,
     removeBookmark,
     removeBookmarks,
     updateBookmark,
     bookmarks,
     isBookmarked,
+    injectJavascript,
   } as Pick<
     ReaderContextProps,
     | 'changeFontSize'
@@ -97,15 +107,20 @@ export function useReader() {
     | 'addAnnotation'
     | 'updateAnnotation'
     | 'removeAnnotation'
+    | 'removeAnnotationByCfi'
     | 'removeSelection'
     | 'annotations'
-    | 'chapter'
-    | 'chapters'
+    | 'section'
+    | 'toc'
+    | 'landmarks'
     | 'addBookmark'
     | 'removeBookmark'
     | 'removeBookmarks'
     | 'updateBookmark'
     | 'bookmarks'
     | 'isBookmarked'
+    | 'injectJavascript'
+    | 'clearSearchResults'
+    | 'isSearching'
   >;
 }

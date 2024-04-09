@@ -105,11 +105,14 @@ export default function App() {
 | `onPressAnnotation`          | `function`    | Function that is invoked when annotation is pressed.                                                                   |
 | `initialAnnotations`         | `array`       | Used for load book with annotations attached                                                                           |
 | `onAddBookmark`              | `function`    |                                                              |
-| `onRemoveBookmark`              | `function`    |                                                              |
-| `onRemoveBookmarks`              | `function`    |                                                              |
-| `onUpdateBookmark`              | `function`    |                                                              |
+| `onRemoveBookmark`           | `function`    |                                                              |
+| `onRemoveBookmarks`          | `function`    |                                                              |
+| `onUpdateBookmark`           | `function`    |                                                              |
 | `onChangeBookmarks`          | `function`    | Function that is invoked when bookmarks array is modified.                                                           |
 | `initialBookmarks`           | `array`       | load bookmarks after render book                                                                           |
+| `injectedJavascript`         | `string`      | Provide JavaScript that will be injected after the book loads.                                  |
+| `getInjectionJavascriptFn`   | `function`    | Provides injectJavascript function, is same the webView function                                           |
+| `onWebViewMessage`           | `function`    | A webview event listener, is same the webView onMessage                                                                           |
 
 ## Hooks
 
@@ -132,6 +135,7 @@ const { changeFontSize, goToLocation, ... } = useReader();
 | `goPrevious`         |          | Go to previous page in the book                                           |
 | `goNext`             |          | Go to next page in the book                                               |
 | `search`             | `query`  | Search for a specific text in the book                                    |
+| `clearSearchResults` | `void`   | Clear search results                                                      |
 | `changeTheme`        | `theme`  | Change active theme                                                       |
 | `getCurrentLocation` |          | Returns the current location of the book                                  |
 | `getMeta`            |          | Returns an object containing the book's metadata.                         |
@@ -141,10 +145,11 @@ const { changeFontSize, goToLocation, ... } = useReader();
 | `removeAnnotationByCfi`  `cfi`          |          | Detach annotations in the book by provided cfi.                         |
 | `removeAnnotations`  |    `type?: optional`      | Detach all annotations in the book. Can be detach by type                 |
 | `removeSelection`    |          | Remove selection                 |
-| `addBookmark`      |    `bookmark`      | Attach bookmark                                            |
-| `updateBookmark`   |     `id, data`     | Update bookmark data                                          |
-| `removeBookmark`   |  `bookmark`        | Remove bookmark                                            |
-| `removeBookmarks`  |          | Remove all bookmarks                 |
+| `addBookmark`        |    `bookmark`      | Attach bookmark                                            |
+| `updateBookmark`     |     `id, data`     | Update bookmark data                                          |
+| `removeBookmark`     |  `bookmark`        | Remove bookmark                                            |
+| `removeBookmarks`    |          | Remove all bookmarks                 |
+| `injectJavascript`   |`function`| Provide JavaScript that will be injected after the book loads.                 |
 
 ##### States
 
@@ -159,8 +164,9 @@ const { changeFontSize, goToLocation, ... } = useReader();
 - `searchResults`: Search results.
 - `meta`: A object containing the book's metadata.
 - `annotations`: A array containing the book's annotations.
-- `chapter`: A current chapter.
-- `chapters`: A array containing the book's chapters. Also called table of contents(toc).
+- `section`: A current section(chapter) of the book.
+- `toc`: Also called table of contents, is an ordered list of links into the content.
+- `landmarks`: Containing a array of major sections of the content
 - `bookmarks`: A array containing the bookmarks.
 - `isBookmarked`: Indicates if current location is bookmarked.
 

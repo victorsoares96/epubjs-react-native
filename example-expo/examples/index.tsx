@@ -7,3 +7,5 @@ export * from './OpenExternalLink';
 export * from './Annotations';
 export * from './FullExample';
 export * from './Bookmarks';
+export { default as TableOfContents } from './TableOfContents';
+export * from './JavascriptInjection';

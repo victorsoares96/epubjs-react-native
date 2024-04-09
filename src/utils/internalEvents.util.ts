@@ -1,0 +1,27 @@
+const INTERNAL_EVENTS = [
+  'meta',
+  'onStarted',
+  'onReady',
+  'onDisplayError',
+  'onResized',
+  'onLocationChange',
+  'onSearch',
+  'onLocationsReady',
+  'onSelected',
+  'onOrientationChange',
+  'onBeginning',
+  'onFinish',
+  'onRendered',
+  'onLayout',
+  'onNavigationLoaded',
+  'onAddAnnotation',
+  'onChangeAnnotations',
+  'onSetInitialAnnotations',
+  'onPressAnnotation',
+  'onAddBookmark',
+  'onRemoveBookmark',
+  'onRemoveBookmarks',
+  'onUpdateBookmark',
+];
+
+export default INTERNAL_EVENTS;

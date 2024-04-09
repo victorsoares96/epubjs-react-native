@@ -15,8 +15,11 @@ import type {
   Theme,
   Annotation,
   AnnotationStyles,
-  Chapter,
   Bookmark,
+  SearchOptions,
+  Section,
+  Toc,
+  Landmark,
 } from './types';
 import * as webViewInjectFunctions from './utils/webViewInjectFunctions';
 
@@ -46,9 +49,11 @@ enum Types {
   SET_IS_LOADING = 'SET_IS_LOADING',
   SET_IS_RENDERING = 'SET_IS_RENDERING',
   SET_SEARCH_RESULTS = 'SET_SEARCH_RESULTS',
+  SET_IS_SEARCHING = 'SET_IS_SEARCHING',
   SET_ANNOTATIONS = 'SET_ANNOTATIONS',
-  SET_CHAPTER = 'SET_CHAPTER',
-  SET_CHAPTERS = 'SET_CHAPTERS',
+  SET_SECTION = 'SET_SECTION',
+  SET_TOC = 'SET_TOC',
+  SET_LANDMARKS = 'SET_LANDMARKS',
   SET_BOOKMARKS = 'SET_BOOKMARKS',
   SET_IS_BOOKMARKED = 'SET_IS_BOOKMARKED',
 }
@@ -75,10 +80,12 @@ type BookPayload = {
   [Types.SET_LOCATIONS]: ePubCfi[];
   [Types.SET_IS_LOADING]: boolean;
   [Types.SET_IS_RENDERING]: boolean;
-  [Types.SET_SEARCH_RESULTS]: SearchResult[];
+  [Types.SET_IS_SEARCHING]: boolean;
+  [Types.SET_SEARCH_RESULTS]: { results: SearchResult[]; totalResults: number };
   [Types.SET_ANNOTATIONS]: Annotation[];
-  [Types.SET_CHAPTER]: Chapter | null;
-  [Types.SET_CHAPTERS]: Chapter[];
+  [Types.SET_SECTION]: Section | null;
+  [Types.SET_TOC]: Toc;
+  [Types.SET_LANDMARKS]: Landmark[];
   [Types.SET_BOOKMARKS]: Bookmark[];
   [Types.SET_IS_BOOKMARKED]: boolean;
 };
@@ -107,10 +114,12 @@ type InitialState = {
   locations: ePubCfi[];
   isLoading: boolean;
   isRendering: boolean;
-  searchResults: SearchResult[];
+  isSearching: boolean;
+  searchResults: { results: SearchResult[]; totalResults: number };
   annotations: Annotation[];
-  chapter: Chapter | null;
-  chapters: Chapter[];
+  section: Section | null;
+  toc: Toc;
+  landmarks: Landmark[];
   bookmarks: Bookmark[];
   isBookmarked: boolean;
 };
@@ -163,10 +172,12 @@ const initialState: InitialState = {
   locations: [],
   isLoading: true,
   isRendering: true,
-  searchResults: [],
+  isSearching: false,
+  searchResults: { results: [], totalResults: 0 },
   annotations: [],
-  chapter: null,
-  chapters: [],
+  section: null,
+  toc: [],
+  landmarks: [],
   bookmarks: [],
   isBookmarked: false,
 };
@@ -238,6 +249,11 @@ function bookReducer(state: InitialState, action: BookActions): InitialState {
         ...state,
         isRendering: action.payload,
       };
+    case Types.SET_IS_SEARCHING:
+      return {
+        ...state,
+        isSearching: action.payload,
+      };
     case Types.SET_SEARCH_RESULTS:
       return {
         ...state,
@@ -248,15 +264,20 @@ function bookReducer(state: InitialState, action: BookActions): InitialState {
         ...state,
         annotations: action.payload,
       };
-    case Types.SET_CHAPTER:
+    case Types.SET_SECTION:
       return {
         ...state,
-        chapter: action.payload,
+        section: action.payload,
       };
-    case Types.SET_CHAPTERS:
+    case Types.SET_TOC:
       return {
         ...state,
-        chapters: action.payload,
+        toc: action.payload,
+      };
+    case Types.SET_LANDMARKS:
+      return {
+        ...state,
+        landmarks: action.payload,
       };
     case Types.SET_BOOKMARKS:
       return {
@@ -336,9 +357,17 @@ export interface ReaderContextProps {
 
   /**
    * Search for a specific text in the book
-   * @param {string} query {@link string} text to search
    */
-  search: (query: string) => void;
+  search: (
+    term: string,
+    page?: number,
+    limit?: number,
+    options?: SearchOptions
+  ) => void;
+
+  setIsSearching: (value: boolean) => void;
+
+  clearSearchResults: () => void;
 
   /**
    * @param theme {@link Theme}
@@ -415,9 +444,11 @@ export interface ReaderContextProps {
 
   setKey: (key: string) => void;
 
-  setChapter: (chapter: Chapter | null) => void;
+  setSection: (section: Section | null) => void;
 
-  setChapters: (chapters: Chapter[]) => void;
+  setToc: (toc: Toc) => void;
+
+  setLandmarks: (landmarks: Landmark[]) => void;
 
   addBookmark: (location: Location, data?: object) => void;
 
@@ -497,24 +528,27 @@ export interface ReaderContextProps {
    */
   isRendering: boolean;
 
-  /**
-   * Search results
-   * @returns {SearchResult[]} {@link SearchResult[]}
-   */
-  searchResults: SearchResult[];
+  isSearching: boolean;
 
-  setSearchResults: (results: SearchResult[]) => void;
+  searchResults: { results: SearchResult[]; totalResults: number };
+
+  setSearchResults: ({
+    results,
+    totalResults,
+  }: {
+    results: SearchResult[];
+    totalResults: number;
+  }) => void;
 
   removeSelection: () => void;
 
   annotations: Annotation[];
 
-  chapter: Chapter | null;
+  section: Section | null;
 
-  /**
-   * also called table of contents(toc)
-   */
-  chapters: Chapter[];
+  toc: Toc;
+
+  landmarks: Landmark[];
 
   bookmarks: Bookmark[];
 
@@ -522,6 +556,8 @@ export interface ReaderContextProps {
    * Indicates if current page is bookmarked
    */
   isBookmarked: boolean;
+
+  injectJavascript: (script: string) => void;
 }
 
 const ReaderContext = createContext<ReaderContextProps>({
@@ -550,7 +586,10 @@ const ReaderContext = createContext<ReaderContextProps>({
     publisher: '',
     rights: '',
   }),
+
   search: () => {},
+  clearSearchResults: () => {},
+  setIsSearching: () => {},
 
   changeTheme: () => {},
   changeFontFamily: () => {},
@@ -558,8 +597,9 @@ const ReaderContext = createContext<ReaderContextProps>({
 
   setKey: () => {},
 
-  setChapter: () => {},
-  setChapters: () => {},
+  setSection: () => {},
+  setToc: () => {},
+  setLandmarks: () => {},
 
   addBookmark: () => {},
   removeBookmark: () => {},
@@ -589,7 +629,8 @@ const ReaderContext = createContext<ReaderContextProps>({
   isLoading: true,
   isRendering: true,
 
-  searchResults: [],
+  isSearching: false,
+  searchResults: { results: [], totalResults: 0 },
   setSearchResults: () => {},
 
   removeSelection: () => {},
@@ -602,10 +643,13 @@ const ReaderContext = createContext<ReaderContextProps>({
   setAnnotations: () => {},
   setInitialAnnotations: () => {},
   annotations: [],
-  chapter: null,
-  chapters: [],
+  section: null,
+  toc: [],
+  landmarks: [],
   bookmarks: [],
   isBookmarked: false,
+
+  injectJavascript: () => {},
 });
 
 function ReaderProvider({ children }: { children: React.ReactNode }) {
@@ -707,27 +751,96 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
 
   const getMeta = useCallback(() => state.meta, [state.meta]);
 
-  const search = useCallback((query: string) => {
-    book.current?.injectJavaScript(`
-      Promise.all(
-        book.spine.spineItems.map((item) => {
-          return item.load(book.load.bind(book)).then(() => {
-            let results = item.find('${query}'.trim());
-            item.unload();
-            return Promise.resolve(results);
-          });
-        })
-      ).then((results) =>
+  const search = useCallback(
+    (term: string, page?: number, limit?: number, options?: SearchOptions) => {
+      dispatch({
+        type: Types.SET_SEARCH_RESULTS,
+        payload: { results: [], totalResults: 0 },
+      });
+      dispatch({ type: Types.SET_IS_SEARCHING, payload: true });
+
+      webViewInjectFunctions.injectJavaScript(
+        book,
+        `
+      const page = ${page || 1};
+      const limit = ${limit || 20};
+      const term = ${JSON.stringify(term)};
+      const chapterId = ${JSON.stringify(options?.sectionId)};
+
+      if (!term) {
         window.ReactNativeWebView.postMessage(
-          JSON.stringify({ type: 'onSearch', results: [].concat.apply([], results) })
-        )
-      ); true
-    `);
+          JSON.stringify({ type: 'onSearch', results: [] })
+        );
+      } else {
+        Promise.all(
+          book.spine.spineItems.map((item) => {
+            return item.load(book.load.bind(book)).then(() => {
+              let results = item.find(term.trim());
+              const locationHref = item.href;
+
+              let [match] = flatten(book.navigation.toc)
+              .filter((chapter, index) => {
+                  return book.canonical(chapter.href).includes(locationHref)
+              }, null);
+
+              if (results.length > 0) {
+                results = results.map(result => ({ ...result, chapter: { ...match, index: book.navigation.toc.findIndex(elem => elem.id === match?.id) } }));
+
+                if (chapterId) {
+                  results = results.filter(result => result.chapter.id === chapterId);
+                }
+              }
+
+              item.unload();
+              return Promise.resolve(results);
+            });
+          })
+        ).then((results) => {
+          const items = [].concat.apply([], results);
+
+          window.ReactNativeWebView.postMessage(
+            JSON.stringify({ type: 'onSearch', results: items.slice((page - 1) * limit, page * limit), totalResults: items.length })
+          );
+        }).catch(err => {
+          alert(err?.message);
+
+          window.ReactNativeWebView.postMessage(
+            JSON.stringify({ type: 'onSearch', results: [], totalResults: 0 })
+          );
+        })
+      }
+    `
+      );
+    },
+    []
+  );
+
+  const clearSearchResults = useCallback(() => {
+    dispatch({
+      type: Types.SET_SEARCH_RESULTS,
+      payload: { results: [], totalResults: 0 },
+    });
   }, []);
 
-  const setSearchResults = useCallback((results: SearchResult[]) => {
-    dispatch({ type: Types.SET_SEARCH_RESULTS, payload: results });
+  const setIsSearching = useCallback((value: boolean) => {
+    dispatch({ type: Types.SET_IS_SEARCHING, payload: value });
   }, []);
+
+  const setSearchResults = useCallback(
+    ({
+      results,
+      totalResults,
+    }: {
+      results: SearchResult[];
+      totalResults: number;
+    }) => {
+      dispatch({
+        type: Types.SET_SEARCH_RESULTS,
+        payload: { results, totalResults },
+      });
+    },
+    []
+  );
 
   const addAnnotation = useCallback(
     (
@@ -855,12 +968,16 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
     );
   }, []);
 
-  const setChapter = useCallback((chapter: Chapter | null) => {
-    dispatch({ type: Types.SET_CHAPTER, payload: chapter });
+  const setSection = useCallback((section: Section | null) => {
+    dispatch({ type: Types.SET_SECTION, payload: section });
   }, []);
 
-  const setChapters = useCallback((chapters: Chapter[]) => {
-    dispatch({ type: Types.SET_CHAPTERS, payload: chapters });
+  const setToc = useCallback((toc: Toc) => {
+    dispatch({ type: Types.SET_TOC, payload: toc });
+  }, []);
+
+  const setLandmarks = useCallback((landmarks: Landmark[]) => {
+    dispatch({ type: Types.SET_LANDMARKS, payload: landmarks });
   }, []);
 
   const addBookmark = useCallback((location: Location, data?: object) => {
@@ -961,6 +1078,10 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
     dispatch({ type: Types.SET_IS_BOOKMARKED, payload: value });
   }, []);
 
+  const injectJavascript = useCallback((script: string) => {
+    book.current?.injectJavaScript(script);
+  }, []);
+
   const contextValue = useMemo(
     () => ({
       registerBook,
@@ -980,7 +1101,10 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       getLocations,
       getCurrentLocation,
       getMeta,
+
       search,
+      clearSearchResults,
+      setIsSearching,
 
       setKey,
       key: state.key,
@@ -1000,6 +1124,7 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       isLoading: state.isLoading,
       isRendering: state.isRendering,
 
+      isSearching: state.isSearching,
       searchResults: state.searchResults,
       setSearchResults,
 
@@ -1014,10 +1139,12 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       setInitialAnnotations,
       annotations: state.annotations,
 
-      setChapter,
-      setChapters,
-      chapter: state.chapter,
-      chapters: state.chapters,
+      setSection,
+      setToc,
+      setLandmarks,
+      section: state.section,
+      toc: state.toc,
+      landmarks: state.landmarks,
 
       addBookmark,
       removeBookmark,
@@ -1027,6 +1154,7 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       bookmarks: state.bookmarks,
       setIsBookmarked,
       isBookmarked: state.isBookmarked,
+      injectJavascript,
     }),
     [
       changeFontFamily,
@@ -1040,6 +1168,8 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       goToLocation,
       registerBook,
       search,
+      clearSearchResults,
+      setIsSearching,
       setAtEnd,
       setAtStart,
       setCurrentLocation,
@@ -1068,14 +1198,17 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       state.key,
       state.locations,
       state.progress,
+      state.isSearching,
       state.searchResults,
       state.theme,
       state.totalLocations,
       state.annotations,
-      setChapter,
-      setChapters,
-      state.chapter,
-      state.chapters,
+      setSection,
+      setToc,
+      setLandmarks,
+      state.section,
+      state.toc,
+      state.landmarks,
       addBookmark,
       removeBookmark,
       removeBookmarks,
@@ -1084,6 +1217,7 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       state.bookmarks,
       state.isBookmarked,
       setIsBookmarked,
+      injectJavascript,
     ]
   );
   return (

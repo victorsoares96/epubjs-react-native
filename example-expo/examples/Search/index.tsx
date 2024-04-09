@@ -1,57 +1,52 @@
 import * as React from 'react';
-import {
-  FlatList,
-  SafeAreaView,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  useWindowDimensions,
-  View,
-} from 'react-native';
-import { Reader, ReaderProvider, useReader } from '@epubjs-react-native/core';
+import { SafeAreaView, useWindowDimensions } from 'react-native';
+import { Section, Reader, ReaderProvider } from '@epubjs-react-native/core';
 import { useFileSystem } from '@epubjs-react-native/expo-file-system';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import BottomSheet, { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { styles } from './styles';
+import { Header } from './Header';
+import { SearchList } from './SearchList';
+import { TableOfContents } from '../TableOfContents/TableOfContents';
 
 function Inner() {
   const { width, height } = useWindowDimensions();
-  const { search, searchResults, goToLocation } = useReader();
-  const [term, setTerm] = React.useState('');
 
+  const searchListRef = React.useRef<BottomSheet>(null);
+  const tableOfContentsRef = React.useRef<BottomSheet>(null);
+
+  const [section, setSection] = React.useState<Section | null>(null);
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.options}>
-        <View style={styles.form}>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter a term"
-            onChangeText={(text) => setTerm(text)}
-          />
+      <GestureHandlerRootView>
+        <Header onPressSearch={() => searchListRef.current?.snapToIndex(0)} />
 
-          <TouchableOpacity
-            onPress={() => {
-              search(term);
-            }}
-          >
-            <Text>Search</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+        <Reader
+          src="https://s3.amazonaws.com/moby-dick/OPS/package.opf"
+          width={width}
+          height={height * 0.8}
+          fileSystem={useFileSystem}
+        />
 
-      <Reader
-        src="https://s3.amazonaws.com/moby-dick/OPS/package.opf"
-        width={width}
-        height={height * 0.5}
-        fileSystem={useFileSystem}
-      />
+        <SearchList
+          ref={searchListRef}
+          section={section}
+          onOpenTableOfContents={() =>
+            tableOfContentsRef.current?.snapToIndex(0)
+          }
+          onClearFilter={() => setSection(null)}
+          onClose={() => searchListRef.current?.close()}
+        />
 
-      <FlatList
-        data={searchResults}
-        renderItem={({ item }) => (
-          <TouchableOpacity onPress={() => goToLocation(item.cfi)}>
-            <Text>{item.excerpt}</Text>
-          </TouchableOpacity>
-        )}
-      />
+        <TableOfContents
+          ref={tableOfContentsRef}
+          onClose={() => tableOfContentsRef.current?.close()}
+          onPressSection={(selectedSection) => {
+            setSection(selectedSection);
+            tableOfContentsRef.current?.close();
+          }}
+        />
+      </GestureHandlerRootView>
     </SafeAreaView>
   );
 }
@@ -59,7 +54,9 @@ function Inner() {
 export function Search() {
   return (
     <ReaderProvider>
-      <Inner />
+      <BottomSheetModalProvider>
+        <Inner />
+      </BottomSheetModalProvider>
     </ReaderProvider>
   );
 }
