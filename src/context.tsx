@@ -784,10 +784,10 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
               }, null);
 
               if (results.length > 0) {
-                results = results.map(result => ({ ...result, chapter: { ...match, index: book.navigation.toc.findIndex(elem => elem.id === match?.id) } }));
+                results = results.map(result => ({ ...result, section: { ...match, index: book.navigation.toc.findIndex(elem => elem.id === match?.id) } }));
 
                 if (chapterId) {
-                  results = results.filter(result => result.chapter.id === chapterId);
+                  results = results.filter(result => result.section.id === chapterId);
                 }
               }
 

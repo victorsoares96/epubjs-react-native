@@ -1,9 +1,13 @@
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import { SearchResult as SearchResultType } from '@epubjs-react-native/core';
+import {
+  SearchResult as SearchResultType,
+  useReader,
+} from '@epubjs-react-native/core';
 import React from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { IconButton, Text } from 'react-native-paper';
+import { contrast } from '../FullExample/utils';
 
 interface Props {
   searchTerm: string;
@@ -12,6 +16,8 @@ interface Props {
 }
 
 function SearchResult({ searchTerm, searchResult, onPress }: Props) {
+  const { theme } = useReader();
+
   const regex = new RegExp(`(${searchTerm})`, 'gi');
   const parts = searchResult.excerpt.split(regex);
   return (
@@ -21,7 +27,11 @@ function SearchResult({ searchTerm, searchResult, onPress }: Props) {
       onPress={() => onPress(searchResult)}
     >
       <View style={styles.icon}>
-        <IconButton icon="bookmark" size={20} />
+        <IconButton
+          icon="bookmark"
+          iconColor={contrast[theme.body.background]}
+          size={20}
+        />
 
         {/* <Text style={styles.bookmarkLocationNumber} variant="labelSmall">
           {location}
@@ -29,13 +39,19 @@ function SearchResult({ searchTerm, searchResult, onPress }: Props) {
       </View>
 
       <View style={styles.info}>
-        <Text numberOfLines={1} style={styles.chapter}>
-          Chapter: {searchResult.section.label}
+        <Text
+          numberOfLines={1}
+          style={{ ...styles.chapter, color: contrast[theme.body.background] }}
+        >
+          Chapter: {searchResult.section?.label}
         </Text>
 
         <View>
           <Text
-            style={styles.excerpt}
+            style={{
+              ...styles.excerpt,
+              color: contrast[theme.body.background],
+            }}
             onPress={() => {
               onPress(searchResult);
             }}
@@ -47,7 +63,12 @@ function SearchResult({ searchTerm, searchResult, onPress }: Props) {
                   {part}
                 </Text>
               ) : (
-                <Text key={`${index}-part`}>{part}</Text>
+                <Text
+                  key={`${index}-part`}
+                  style={{ color: contrast[theme.body.background] }}
+                >
+                  {part}
+                </Text>
               );
             })}
             &quot;

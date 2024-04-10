@@ -1,9 +1,10 @@
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import { Section as SectionType } from '@epubjs-react-native/core';
+import { Section as SectionType, useReader } from '@epubjs-react-native/core';
 import React from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { IconButton, MD3Colors, Text } from 'react-native-paper';
+import { contrast } from '../FullExample/utils';
 
 interface Props {
   searchTerm: string;
@@ -13,8 +14,10 @@ interface Props {
 }
 
 function Section({ searchTerm, isCurrentSection, section, onPress }: Props) {
+  const { theme } = useReader();
+
   const regex = new RegExp(`(${searchTerm})`, 'gi');
-  const parts = section.label.split(regex);
+  const parts = section?.label.split(regex);
   return (
     <TouchableOpacity
       key={section.id}
@@ -42,10 +45,10 @@ function Section({ searchTerm, isCurrentSection, section, onPress }: Props) {
               ...styles.name,
               color: isCurrentSection
                 ? MD3Colors.primary50
-                : MD3Colors.neutralVariant50,
+                : contrast[theme.body.background],
             }}
           >
-            {section.label}
+            {section?.label}
           </Text>
         )}
 
@@ -55,7 +58,7 @@ function Section({ searchTerm, isCurrentSection, section, onPress }: Props) {
               ...styles.name,
               color: isCurrentSection
                 ? MD3Colors.primary50
-                : MD3Colors.neutralVariant50,
+                : contrast[theme.body.background],
             }}
           >
             {parts.filter(String).map((part, index) => {

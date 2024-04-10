@@ -1,8 +1,14 @@
 import * as React from 'react';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { SafeAreaView, StyleSheet, Text, TouchableOpacity } from 'react-native';
-import { MD3LightTheme, PaperProvider } from 'react-native-paper';
+import {
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  useColorScheme,
+} from 'react-native';
+import { MD3DarkTheme, MD3LightTheme, PaperProvider } from 'react-native-paper';
 import {
   Basic,
   Formats,
@@ -12,12 +18,9 @@ import {
   OpenExternalLink,
   Annotations,
   Bookmarks,
-<<<<<<< HEAD
   FullExample,
-=======
   TableOfContents,
   JavascriptInjection,
->>>>>>> c6c632958d64fa35aacc502ebea54f4b497366f2
 } from './examples';
 
 const { Navigator, Screen } = createNativeStackNavigator();
@@ -88,13 +91,6 @@ export const examples = [
     component: Bookmarks,
   },
   {
-<<<<<<< HEAD
-    title: 'Full Example',
-    description:
-      'A complete reader using all (or almost all) library resources',
-    route: 'FullExample',
-    component: FullExample,
-=======
     title: 'Table of Contents',
     description: 'Ordered list of links into the content',
     route: 'TableOfContents',
@@ -105,7 +101,12 @@ export const examples = [
     description: 'Inject a script into the open ebook instance',
     route: 'JavascriptInjection',
     component: JavascriptInjection,
->>>>>>> c6c632958d64fa35aacc502ebea54f4b497366f2
+  },
+  {
+    title: 'Full Example',
+    description: 'A complete reader using library resources',
+    route: 'FullExample',
+    component: FullExample,
   },
 ];
 
@@ -128,8 +129,11 @@ function Examples() {
 }
 
 export default function App() {
+  const colorScheme = useColorScheme();
   return (
-    <PaperProvider theme={MD3LightTheme}>
+    <PaperProvider
+      theme={colorScheme === 'dark' ? MD3DarkTheme : MD3LightTheme}
+    >
       <NavigationContainer>
         <Navigator initialRouteName="Examples">
           <Screen
@@ -150,7 +154,7 @@ export default function App() {
                   'JavascriptInjection',
                   'Search',
                   'CustomThemes',
-                  'FullExample'
+                  'FullExample',
                 ].includes(route),
               }}
               component={Example}

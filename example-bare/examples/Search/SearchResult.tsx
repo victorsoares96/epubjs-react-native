@@ -30,7 +30,7 @@ function SearchResult({ searchTerm, searchResult, onPress }: Props) {
 
       <View style={styles.info}>
         <Text numberOfLines={1} style={styles.chapter}>
-          Chapter: {searchResult.section.label}
+          Chapter: {searchResult.section?.label}
         </Text>
 
         <View>

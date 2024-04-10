@@ -1,5 +1,4 @@
 import { Themes } from '@epubjs-react-native/core';
-import { light, dark, sepia } from '../CustomThemes/themes';
 
 export const MAX_FONT_SIZE = 32;
 export const MIN_FONT_SIZE = 8;
@@ -13,8 +12,10 @@ export const availableFonts: Array<string> = [
   'Times',
 ];
 
-export const themes: Themes = {
-  light,
-  dark,
-  sepia,
+export const themes = Object.values(Themes);
+
+export const contrast = {
+  '#fff': '#333',
+  '#333': '#fff',
+  '#e8dcb8': '#333',
 };

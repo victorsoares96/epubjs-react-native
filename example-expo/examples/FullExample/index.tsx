@@ -5,26 +5,49 @@ import {
   ReaderProvider,
   Reader,
   useReader,
-  Theme,
+  Themes,
+  Section,
+  Annotation,
 } from '@epubjs-react-native/core';
 import { useFileSystem } from '@epubjs-react-native/expo-file-system';
-import { BottomSheetModal } from '@gorhom/bottom-sheet';
+import BottomSheet, { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Header } from './Header';
 import { Footer } from './Footer';
 import { MAX_FONT_SIZE, MIN_FONT_SIZE, availableFonts, themes } from './utils';
-import { SearchList } from './SeachList';
+import { BookmarksList } from '../Bookmarks/BookmarksList';
+import { SearchList } from '../Search/SearchList';
+import { TableOfContents } from '../TableOfContents/TableOfContents';
+import { COLORS } from '../Annotations/AnnotationForm';
 
 function Component() {
   const { width, height } = useWindowDimensions();
 
-  const bottomSheetRef = React.useRef<BottomSheetModal>(null);
-  const { theme, changeFontSize, changeFontFamily, changeTheme } = useReader();
+  const {
+    theme,
+    changeFontSize,
+    changeFontFamily,
+    changeTheme,
+    goToLocation,
+    addAnnotation,
+  } = useReader();
+
+  const bookmarksListRef = React.useRef<BottomSheetModal>(null);
+  const searchListRef = React.useRef<BottomSheet>(null);
+  const tableOfContentsRef = React.useRef<BottomSheet>(null);
 
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [currentFontSize, setCurrentFontSize] = useState(14);
   const [currentFontFamily, setCurrentFontFamily] = useState(availableFonts[0]);
-  const [currentTheme, setCurrentTheme] = useState<Theme>(themes[0]);
+  const [section, setSection] = React.useState<Section | null>(null);
+  const [tempMark, setTempMark] = React.useState<Annotation | null>(null);
+  const [selection, setSelection] = React.useState<{
+    cfiRange: string;
+    text: string;
+  } | null>(null);
+  const [selectedAnnotation, setSelectedAnnotation] = React.useState<
+    Annotation | undefined
+  >(undefined);
 
   const increaseFontSize = () => {
     if (currentFontSize < MAX_FONT_SIZE) {
@@ -41,11 +64,10 @@ function Component() {
   };
 
   const switchTheme = () => {
-    const index = Object.values(themes).indexOf(currentTheme);
+    const index = Object.values(themes).indexOf(theme);
     const nextTheme =
       Object.values(themes)[(index + 1) % Object.values(themes).length];
 
-    setCurrentTheme(nextTheme);
     changeTheme(nextTheme);
   };
 
@@ -69,23 +91,115 @@ function Component() {
             decreaseFontSize={decreaseFontSize}
             switchTheme={switchTheme}
             switchFontFamily={switchFontFamily}
-            onPressSearch={() => bottomSheetRef.current?.present()}
+            onPressSearch={() => searchListRef.current?.snapToIndex(0)}
+            onOpenBookmarksList={() => bookmarksListRef.current?.present()}
+            onOpenTableOfContents={() =>
+              tableOfContentsRef.current.snapToIndex(0)
+            }
           />
         )}
 
         <Reader
           src="https://s3.amazonaws.com/moby-dick/OPS/package.opf"
           width={width}
-          height={!isFullScreen ? height * 0.7 : height}
+          height={!isFullScreen ? height * 0.75 : height}
           fileSystem={useFileSystem}
-          defaultTheme={themes[1]}
+          defaultTheme={Themes.DARK}
           initialLocation="introduction_001.xhtml"
+          initialAnnotations={[
+            // Chapter 1
+            {
+              cfiRange: 'epubcfi(/6/10!/4/2/4,/1:0,/1:319)',
+              data: {},
+              sectionIndex: 4,
+              styles: { color: '#23CE6B' },
+              cfiRangeText:
+                'The pale Usher—threadbare in coat, heart, body, and brain; I see him now. He was ever dusting his old lexicons and grammars, with a queer handkerchief, mockingly embellished with all the gay flags of all the known nations of the world. He loved to dust his old grammars; it somehow mildly reminded him of his mortality.',
+              type: 'highlight',
+            },
+            // Chapter 5
+            {
+              cfiRange: 'epubcfi(/6/22!/4/2/4,/1:80,/1:88)',
+              data: {},
+              sectionIndex: 3,
+              styles: { color: '#CBA135' },
+              cfiRangeText: 'landlord',
+              type: 'highlight',
+            },
+          ]}
+          onAddAnnotation={(annotation) => {
+            if (annotation.type === 'highlight' && annotation.data?.isTemp) {
+              setTempMark(annotation);
+            }
+          }}
+          onPressAnnotation={(annotation) => {
+            setSelectedAnnotation(annotation);
+            bottomSheetRef.current?.snapToIndex(0);
+          }}
+          menuItems={[
+            {
+              label: '🟡',
+              action: (cfiRange) => {
+                addAnnotation('highlight', cfiRange, undefined, {
+                  color: COLORS[2],
+                });
+                return true;
+              },
+            },
+            {
+              label: '🔴',
+              action: (cfiRange) => {
+                addAnnotation('highlight', cfiRange, undefined, {
+                  color: COLORS[0],
+                });
+                return true;
+              },
+            },
+            {
+              label: '🟢',
+              action: (cfiRange) => {
+                addAnnotation('highlight', cfiRange, undefined, {
+                  color: COLORS[3],
+                });
+                return true;
+              },
+            },
+            {
+              label: 'Add Note',
+              action: (cfiRange, text) => {
+                setSelection({ cfiRange, text });
+                addAnnotation('highlight', cfiRange, { isTemp: true });
+                bottomSheetRef.current?.snapToIndex(0);
+                return true;
+              },
+            },
+          ]}
           onDoublePress={() => setIsFullScreen((oldState) => !oldState)}
         />
 
+        <BookmarksList
+          ref={bookmarksListRef}
+          onClose={() => bookmarksListRef.current?.dismiss()}
+        />
+
         <SearchList
-          ref={bottomSheetRef}
-          onClose={() => bottomSheetRef.current?.dismiss()}
+          ref={searchListRef}
+          section={section}
+          onOpenTableOfContents={() =>
+            tableOfContentsRef.current?.snapToIndex(0)
+          }
+          onClearFilter={() => setSection(null)}
+          onClose={() => searchListRef.current?.close()}
+        />
+
+        <TableOfContents
+          ref={tableOfContentsRef}
+          onClose={() => tableOfContentsRef.current?.close()}
+          onPressSection={(selectedSection) => {
+            setSection(selectedSection);
+            goToLocation(selectedSection.href.split('/')[1]);
+            tableOfContentsRef.current?.close();
+          }}
         />
 
         {!isFullScreen && <Footer />}

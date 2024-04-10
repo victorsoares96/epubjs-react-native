@@ -11,6 +11,7 @@ import {
 } from '@gorhom/bottom-sheet';
 import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
 import { Button, IconButton, MD3Colors, Text } from 'react-native-paper';
+import { contrast } from '../FullExample/utils';
 
 interface Props {
   onClose: () => void;
@@ -26,6 +27,7 @@ export const BookmarksList = forwardRef<Ref, Props>(({ onClose }, ref) => {
     updateBookmark,
     goToLocation,
     currentLocation,
+    theme,
   } = useReader();
 
   const snapPoints = React.useMemo(() => ['50%', '75%'], []);
@@ -51,13 +53,31 @@ export const BookmarksList = forwardRef<Ref, Props>(({ onClose }, ref) => {
     currentLocation?.start.cfi,
     isBookmarked,
   ]);
+
   return (
     <BottomSheetModalProvider>
-      <View style={styles.container}>
-        <BottomSheetModal ref={ref} index={1} snapPoints={snapPoints}>
-          <BottomSheetView style={styles.contentContainer}>
+      <View
+        style={{ ...styles.container, backgroundColor: theme.body.background }}
+      >
+        <BottomSheetModal
+          ref={ref}
+          index={1}
+          snapPoints={snapPoints}
+          handleStyle={{ backgroundColor: theme.body.background }}
+        >
+          <BottomSheetView
+            style={{
+              ...styles.contentContainer,
+              backgroundColor: theme.body.background,
+            }}
+          >
             <View style={styles.title}>
-              <Text variant="titleMedium">Bookmarks</Text>
+              <Text
+                variant="titleMedium"
+                style={{ color: contrast[theme.body.background] }}
+              >
+                Bookmarks
+              </Text>
 
               {bookmarks.length > 0 && (
                 <Button
@@ -66,6 +86,7 @@ export const BookmarksList = forwardRef<Ref, Props>(({ onClose }, ref) => {
                     removeBookmarks();
                     onClose();
                   }}
+                  textColor={contrast[theme.body.background]}
                 >
                   Clear All
                 </Button>
@@ -74,7 +95,13 @@ export const BookmarksList = forwardRef<Ref, Props>(({ onClose }, ref) => {
 
             {bookmarks.length === 0 && (
               <View style={styles.title}>
-                <Text variant="bodyMedium" style={{ fontStyle: 'italic' }}>
+                <Text
+                  variant="bodyMedium"
+                  style={{
+                    fontStyle: 'italic',
+                    color: contrast[theme.body.background],
+                  }}
+                >
                   No bookmarks...
                 </Text>
               </View>
@@ -87,6 +114,7 @@ export const BookmarksList = forwardRef<Ref, Props>(({ onClose }, ref) => {
                   style={styles.input}
                   multiline
                   placeholder="Type an annotation here..."
+                  placeholderTextColor={contrast[theme.body.background]}
                   onChangeText={(text) => setNote(text)}
                 />
 
@@ -94,6 +122,7 @@ export const BookmarksList = forwardRef<Ref, Props>(({ onClose }, ref) => {
                   mode="text"
                   style={{ alignSelf: 'flex-end' }}
                   onPress={() => updateBookmark(currentBookmark!.id, { note })}
+                  textColor={contrast[theme.body.background]}
                 >
                   Update Annotation
                 </Button>
@@ -110,9 +139,17 @@ export const BookmarksList = forwardRef<Ref, Props>(({ onClose }, ref) => {
                   }}
                 >
                   <View style={styles.bookmarkIcon}>
-                    <IconButton icon="bookmark" size={20} />
+                    <IconButton
+                      icon="bookmark"
+                      size={20}
+                      iconColor={MD3Colors.neutral50}
+                    />
+
                     <Text
-                      style={styles.bookmarkLocationNumber}
+                      style={{
+                        ...styles.bookmarkLocationNumber,
+                        color: contrast[theme.body.background],
+                      }}
                       variant="labelSmall"
                     >
                       {bookmark.location.start.location}
@@ -120,11 +157,23 @@ export const BookmarksList = forwardRef<Ref, Props>(({ onClose }, ref) => {
                   </View>
 
                   <View style={styles.bookmarkInfoText}>
-                    <Text numberOfLines={1} style={{ marginBottom: 2 }}>
-                      Chapter: {bookmark.section.label}
+                    <Text
+                      numberOfLines={1}
+                      style={{
+                        marginBottom: 2,
+                        color: contrast[theme.body.background],
+                      }}
+                    >
+                      Chapter: {bookmark.section?.label}
                     </Text>
 
-                    <Text numberOfLines={2} style={{ fontStyle: 'italic' }}>
+                    <Text
+                      numberOfLines={2}
+                      style={{
+                        fontStyle: 'italic',
+                        color: contrast[theme.body.background],
+                      }}
+                    >
                       &quot;{bookmark.text}&quot;
                     </Text>
                   </View>
@@ -153,7 +202,6 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 24,
     justifyContent: 'center',
-    backgroundColor: '#fff',
   },
   contentContainer: {
     flex: 1,

@@ -45,7 +45,7 @@ function Section({ searchTerm, isCurrentSection, section, onPress }: Props) {
                 : MD3Colors.neutralVariant50,
             }}
           >
-            {section.label}
+            {section?.label}
           </Text>
         )}
 

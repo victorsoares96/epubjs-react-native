@@ -14,6 +14,7 @@ import BottomSheet, {
 import { BottomSheetMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
 import { Text, Button } from 'react-native-paper';
 import SearchResult from './SearchResult';
+import { contrast } from '../FullExample/utils';
 
 interface Props {
   section: Section | null;
@@ -33,6 +34,7 @@ export const SearchList = forwardRef<Ref, Props>(
       isSearching,
       addAnnotation,
       removeAnnotationByCfi,
+      theme,
     } = useReader();
 
     const [searchTerm, setSearchTerm] = useState('');
@@ -74,7 +76,12 @@ export const SearchList = forwardRef<Ref, Props>(
       () => (
         <View>
           <View style={styles.title}>
-            <Text variant="titleMedium">Search Results</Text>
+            <Text
+              variant="titleMedium"
+              style={{ color: contrast[theme.body.background] }}
+            >
+              Search Results
+            </Text>
 
             <Button
               mode="text"
@@ -96,6 +103,7 @@ export const SearchList = forwardRef<Ref, Props>(
               defaultValue={searchTerm}
               style={styles.input}
               placeholder="Type an term here..."
+              placeholderTextColor={contrast[theme.body.background]}
               onSubmitEditing={(event) => {
                 setSearchTerm(event.nativeEvent.text);
                 clearSearchResults();
@@ -110,7 +118,13 @@ export const SearchList = forwardRef<Ref, Props>(
 
           {isSearching && (
             <View style={styles.title}>
-              <Text variant="bodyMedium" style={{ fontStyle: 'italic' }}>
+              <Text
+                variant="bodyMedium"
+                style={{
+                  fontStyle: 'italic',
+                  color: contrast[theme.body.background],
+                }}
+              >
                 Searching results...
               </Text>
             </View>
@@ -125,6 +139,7 @@ export const SearchList = forwardRef<Ref, Props>(
         search,
         searchTerm,
         section,
+        theme.body.background,
       ]
     );
 
@@ -137,7 +152,11 @@ export const SearchList = forwardRef<Ref, Props>(
 
               <Text
                 variant="bodyMedium"
-                style={{ fontStyle: 'italic', marginLeft: 5 }}
+                style={{
+                  fontStyle: 'italic',
+                  marginLeft: 5,
+                  color: contrast[theme.body.background],
+                }}
               >
                 fetching results...
               </Text>
@@ -147,24 +166,41 @@ export const SearchList = forwardRef<Ref, Props>(
           {data.length > 0 &&
             data.length === searchResults.totalResults &&
             !isSearching && (
-              <Text variant="bodyMedium" style={{ fontStyle: 'italic' }}>
+              <Text
+                variant="bodyMedium"
+                style={{
+                  fontStyle: 'italic',
+                  color: contrast[theme.body.background],
+                }}
+              >
                 No more results at the moment...
               </Text>
             )}
         </View>
       ),
-      [data.length, isSearching, searchResults.totalResults]
+      [
+        data.length,
+        isSearching,
+        searchResults.totalResults,
+        theme.body.background,
+      ]
     );
 
     const empty = React.useCallback(
       () => (
         <View style={styles.title}>
-          <Text variant="bodyMedium" style={{ fontStyle: 'italic' }}>
+          <Text
+            variant="bodyMedium"
+            style={{
+              fontStyle: 'italic',
+              color: contrast[theme.body.background],
+            }}
+          >
             No results...
           </Text>
         </View>
       ),
-      []
+      [theme.body.background]
     );
 
     const handleClose = React.useCallback(() => {
@@ -200,6 +236,7 @@ export const SearchList = forwardRef<Ref, Props>(
         snapPoints={snapPoints}
         enablePanDownToClose
         style={styles.container}
+        backgroundStyle={{ backgroundColor: theme.body.background }}
         onClose={handleClose}
       >
         <BottomSheetFlatList<SearchResultType>
