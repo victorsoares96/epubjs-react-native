@@ -1,6 +1,5 @@
-/* eslint-disable @typescript-eslint/no-use-before-define */
 import React, { useState } from 'react';
-import { SafeAreaView, useWindowDimensions, StyleSheet } from 'react-native';
+import { useWindowDimensions } from 'react-native';
 import {
   ReaderProvider,
   Reader,
@@ -84,148 +83,142 @@ function Component() {
   };
 
   return (
-    <SafeAreaView
-      style={{ ...styles.container, backgroundColor: theme.body.background }}
-    >
-      <GestureHandlerRootView>
-        {!isFullScreen && (
-          <Header
-            currentFontSize={currentFontSize}
-            increaseFontSize={increaseFontSize}
-            decreaseFontSize={decreaseFontSize}
-            switchTheme={switchTheme}
-            switchFontFamily={switchFontFamily}
-            onPressSearch={() => searchListRef.current?.snapToIndex(0)}
-            onOpenBookmarksList={() => bookmarksListRef.current?.present()}
-            onOpenTableOfContents={() =>
-              tableOfContentsRef.current?.snapToIndex(0)
-            }
-            onOpenAnnotationsList={() =>
-              annotationsListRef.current?.snapToIndex(0)
-            }
-          />
-        )}
-
-        <Reader
-          src="https://s3.amazonaws.com/moby-dick/OPS/package.opf"
-          width={width}
-          height={!isFullScreen ? height * 0.75 : height}
-          fileSystem={useFileSystem}
-          defaultTheme={Themes.DARK}
-          initialLocation="introduction_001.xhtml"
-          initialAnnotations={[
-            // Chapter 1
-            {
-              cfiRange: 'epubcfi(/6/10!/4/2/4,/1:0,/1:319)',
-              data: {},
-              sectionIndex: 4,
-              styles: { color: '#23CE6B' },
-              cfiRangeText:
-                'The pale Usher—threadbare in coat, heart, body, and brain; I see him now. He was ever dusting his old lexicons and grammars, with a queer handkerchief, mockingly embellished with all the gay flags of all the known nations of the world. He loved to dust his old grammars; it somehow mildly reminded him of his mortality.',
-              type: 'highlight',
-            },
-            // Chapter 5
-            {
-              cfiRange: 'epubcfi(/6/22!/4/2/4,/1:80,/1:88)',
-              data: {},
-              sectionIndex: 3,
-              styles: { color: '#CBA135' },
-              cfiRangeText: 'landlord',
-              type: 'highlight',
-            },
-          ]}
-          onAddAnnotation={(annotation) => {
-            if (annotation.type === 'highlight' && annotation.data?.isTemp) {
-              setTempMark(annotation);
-            }
-          }}
-          onPressAnnotation={(annotation) => {
-            setSelectedAnnotation(annotation);
-            annotationsListRef.current?.snapToIndex(0);
-          }}
-          menuItems={[
-            {
-              label: '🟡',
-              action: (cfiRange) => {
-                addAnnotation('highlight', cfiRange, undefined, {
-                  color: COLORS[2],
-                });
-                return true;
-              },
-            },
-            {
-              label: '🔴',
-              action: (cfiRange) => {
-                addAnnotation('highlight', cfiRange, undefined, {
-                  color: COLORS[0],
-                });
-                return true;
-              },
-            },
-            {
-              label: '🟢',
-              action: (cfiRange) => {
-                addAnnotation('highlight', cfiRange, undefined, {
-                  color: COLORS[3],
-                });
-                return true;
-              },
-            },
-            {
-              label: 'Add Note',
-              action: (cfiRange, text) => {
-                setSelection({ cfiRange, text });
-                addAnnotation('highlight', cfiRange, { isTemp: true });
-                annotationsListRef.current?.snapToIndex(0);
-                return true;
-              },
-            },
-          ]}
-          onDoublePress={() => setIsFullScreen((oldState) => !oldState)}
-        />
-
-        <BookmarksList
-          ref={bookmarksListRef}
-          onClose={() => bookmarksListRef.current?.dismiss()}
-        />
-
-        <SearchList
-          ref={searchListRef}
-          section={section}
+    <GestureHandlerRootView>
+      {!isFullScreen && (
+        <Header
+          currentFontSize={currentFontSize}
+          increaseFontSize={increaseFontSize}
+          decreaseFontSize={decreaseFontSize}
+          switchTheme={switchTheme}
+          switchFontFamily={switchFontFamily}
+          onPressSearch={() => searchListRef.current?.snapToIndex(0)}
+          onOpenBookmarksList={() => bookmarksListRef.current?.present()}
           onOpenTableOfContents={() =>
             tableOfContentsRef.current?.snapToIndex(0)
           }
-          onClearFilter={() => setSection(null)}
-          onClose={() => searchListRef.current?.close()}
+          onOpenAnnotationsList={() =>
+            annotationsListRef.current?.snapToIndex(0)
+          }
         />
+      )}
 
-        <TableOfContents
-          ref={tableOfContentsRef}
-          onClose={() => tableOfContentsRef.current?.close()}
-          onPressSection={(selectedSection) => {
-            setSection(selectedSection);
-            goToLocation(selectedSection.href.split('/')[1]);
-            tableOfContentsRef.current?.close();
-          }}
-        />
+      <Reader
+        src="https://s3.amazonaws.com/moby-dick/OPS/package.opf"
+        width={width}
+        height={!isFullScreen ? height * 0.75 : height}
+        fileSystem={useFileSystem}
+        defaultTheme={Themes.DARK}
+        initialLocation="introduction_001.xhtml"
+        initialAnnotations={[
+          // Chapter 1
+          {
+            cfiRange: 'epubcfi(/6/10!/4/2/4,/1:0,/1:319)',
+            data: {},
+            sectionIndex: 4,
+            styles: { color: '#23CE6B' },
+            cfiRangeText:
+              'The pale Usher—threadbare in coat, heart, body, and brain; I see him now. He was ever dusting his old lexicons and grammars, with a queer handkerchief, mockingly embellished with all the gay flags of all the known nations of the world. He loved to dust his old grammars; it somehow mildly reminded him of his mortality.',
+            type: 'highlight',
+          },
+          // Chapter 5
+          {
+            cfiRange: 'epubcfi(/6/22!/4/2/4,/1:80,/1:88)',
+            data: {},
+            sectionIndex: 3,
+            styles: { color: '#CBA135' },
+            cfiRangeText: 'landlord',
+            type: 'highlight',
+          },
+        ]}
+        onAddAnnotation={(annotation) => {
+          if (annotation.type === 'highlight' && annotation.data?.isTemp) {
+            setTempMark(annotation);
+          }
+        }}
+        onPressAnnotation={(annotation) => {
+          setSelectedAnnotation(annotation);
+          annotationsListRef.current?.snapToIndex(0);
+        }}
+        menuItems={[
+          {
+            label: '🟡',
+            action: (cfiRange) => {
+              addAnnotation('highlight', cfiRange, undefined, {
+                color: COLORS[2],
+              });
+              return true;
+            },
+          },
+          {
+            label: '🔴',
+            action: (cfiRange) => {
+              addAnnotation('highlight', cfiRange, undefined, {
+                color: COLORS[0],
+              });
+              return true;
+            },
+          },
+          {
+            label: '🟢',
+            action: (cfiRange) => {
+              addAnnotation('highlight', cfiRange, undefined, {
+                color: COLORS[3],
+              });
+              return true;
+            },
+          },
+          {
+            label: 'Add Note',
+            action: (cfiRange, text) => {
+              setSelection({ cfiRange, text });
+              addAnnotation('highlight', cfiRange, { isTemp: true });
+              annotationsListRef.current?.snapToIndex(0);
+              return true;
+            },
+          },
+        ]}
+        onDoublePress={() => setIsFullScreen((oldState) => !oldState)}
+      />
 
-        <AnnotationsList
-          ref={annotationsListRef}
-          selection={selection}
-          selectedAnnotation={selectedAnnotation}
-          annotations={annotations}
-          onClose={() => {
-            setTempMark(null);
-            setSelection(null);
-            setSelectedAnnotation(undefined);
-            if (tempMark) removeAnnotation(tempMark);
-            annotationsListRef.current?.close();
-          }}
-        />
+      <BookmarksList
+        ref={bookmarksListRef}
+        onClose={() => bookmarksListRef.current?.dismiss()}
+      />
 
-        {!isFullScreen && <Footer />}
-      </GestureHandlerRootView>
-    </SafeAreaView>
+      <SearchList
+        ref={searchListRef}
+        section={section}
+        onOpenTableOfContents={() => tableOfContentsRef.current?.snapToIndex(0)}
+        onClearFilter={() => setSection(null)}
+        onClose={() => searchListRef.current?.close()}
+      />
+
+      <TableOfContents
+        ref={tableOfContentsRef}
+        onClose={() => tableOfContentsRef.current?.close()}
+        onPressSection={(selectedSection) => {
+          setSection(selectedSection);
+          goToLocation(selectedSection.href.split('/')[1]);
+          tableOfContentsRef.current?.close();
+        }}
+      />
+
+      <AnnotationsList
+        ref={annotationsListRef}
+        selection={selection}
+        selectedAnnotation={selectedAnnotation}
+        annotations={annotations}
+        onClose={() => {
+          setTempMark(null);
+          setSelection(null);
+          setSelectedAnnotation(undefined);
+          if (tempMark) removeAnnotation(tempMark);
+          annotationsListRef.current?.close();
+        }}
+      />
+
+      {!isFullScreen && <Footer />}
+    </GestureHandlerRootView>
   );
 }
 
@@ -236,25 +229,3 @@ export function FullExample() {
     </ReaderProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'space-between',
-  },
-  themeIcon: {
-    width: 24,
-    height: 24,
-    borderRadius: 32,
-    borderColor: '#000',
-    borderWidth: 2,
-    marginRight: 10,
-  },
-  actions: {
-    width: '100%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    paddingRight: 20,
-  },
-});

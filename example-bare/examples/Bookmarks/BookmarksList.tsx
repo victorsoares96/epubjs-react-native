@@ -53,97 +53,95 @@ export const BookmarksList = forwardRef<Ref, Props>(({ onClose }, ref) => {
   ]);
   return (
     <BottomSheetModalProvider>
-      <View style={styles.container}>
-        <BottomSheetModal ref={ref} index={1} snapPoints={snapPoints}>
-          <BottomSheetView style={styles.contentContainer}>
+      <BottomSheetModal ref={ref} index={1} snapPoints={snapPoints}>
+        <BottomSheetView style={styles.contentContainer}>
+          <View style={styles.title}>
+            <Text variant="titleMedium">Bookmarks</Text>
+
+            {bookmarks.length > 0 && (
+              <Button
+                mode="text"
+                onPress={() => {
+                  removeBookmarks();
+                  onClose();
+                }}
+              >
+                Clear All
+              </Button>
+            )}
+          </View>
+
+          {bookmarks.length === 0 && (
             <View style={styles.title}>
-              <Text variant="titleMedium">Bookmarks</Text>
-
-              {bookmarks.length > 0 && (
-                <Button
-                  mode="text"
-                  onPress={() => {
-                    removeBookmarks();
-                    onClose();
-                  }}
-                >
-                  Clear All
-                </Button>
-              )}
+              <Text variant="bodyMedium" style={{ fontStyle: 'italic' }}>
+                No bookmarks...
+              </Text>
             </View>
+          )}
 
-            {bookmarks.length === 0 && (
-              <View style={styles.title}>
-                <Text variant="bodyMedium" style={{ fontStyle: 'italic' }}>
-                  No bookmarks...
-                </Text>
-              </View>
-            )}
+          {isBookmarked && (
+            <View style={{ width: '100%' }}>
+              <BottomSheetTextInput
+                defaultValue={note}
+                style={styles.input}
+                multiline
+                placeholder="Type an annotation here..."
+                onChangeText={(text) => setNote(text)}
+              />
 
-            {isBookmarked && (
-              <View style={{ width: '100%' }}>
-                <BottomSheetTextInput
-                  defaultValue={note}
-                  style={styles.input}
-                  multiline
-                  placeholder="Type an annotation here..."
-                  onChangeText={(text) => setNote(text)}
-                />
+              <Button
+                mode="text"
+                style={{ alignSelf: 'flex-end' }}
+                onPress={() => updateBookmark(currentBookmark!.id, { note })}
+              >
+                Update Annotation
+              </Button>
+            </View>
+          )}
 
-                <Button
-                  mode="text"
-                  style={{ alignSelf: 'flex-end' }}
-                  onPress={() => updateBookmark(currentBookmark!.id, { note })}
-                >
-                  Update Annotation
-                </Button>
-              </View>
-            )}
+          {bookmarks.map((bookmark) => (
+            <View key={bookmark.id} style={styles.bookmarkContainer}>
+              <TouchableOpacity
+                style={styles.bookmarkInfo}
+                onPress={() => {
+                  goToLocation(bookmark.location.start.cfi);
+                  onClose();
+                }}
+              >
+                <View style={styles.bookmarkIcon}>
+                  <IconButton icon="bookmark" size={20} />
+                  <Text
+                    style={styles.bookmarkLocationNumber}
+                    variant="labelSmall"
+                  >
+                    {bookmark.location.start.location}
+                  </Text>
+                </View>
 
-            {bookmarks.map((bookmark) => (
-              <View key={bookmark.id} style={styles.bookmarkContainer}>
-                <TouchableOpacity
-                  style={styles.bookmarkInfo}
-                  onPress={() => {
-                    goToLocation(bookmark.location.start.cfi);
-                    onClose();
-                  }}
-                >
-                  <View style={styles.bookmarkIcon}>
-                    <IconButton icon="bookmark" size={20} />
-                    <Text
-                      style={styles.bookmarkLocationNumber}
-                      variant="labelSmall"
-                    >
-                      {bookmark.location.start.location}
-                    </Text>
-                  </View>
+                <View style={styles.bookmarkInfoText}>
+                  <Text numberOfLines={1} style={{ marginBottom: 2 }}>
+                    Chapter: {bookmark.section?.label}
+                  </Text>
 
-                  <View style={styles.bookmarkInfoText}>
-                    <Text numberOfLines={1} style={{ marginBottom: 2 }}>
-                      Chapter: {bookmark.section?.label}
-                    </Text>
+                  <Text numberOfLines={2} style={{ fontStyle: 'italic' }}>
+                    &quot;{bookmark.text}&quot;
+                  </Text>
+                </View>
+              </TouchableOpacity>
 
-                    <Text numberOfLines={2} style={{ fontStyle: 'italic' }}>
-                      &quot;{bookmark.text}&quot;
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-
-                <IconButton
-                  icon="trash-can-outline"
-                  size={20}
-                  iconColor={MD3Colors.error50}
-                  onPress={() => {
-                    removeBookmark(bookmark);
-                    onClose();
-                  }}
-                />
-              </View>
-            ))}
-          </BottomSheetView>
-        </BottomSheetModal>
-      </View>
+              <IconButton
+                icon="trash-can-outline"
+                size={20}
+                iconColor={MD3Colors.error50}
+                onPress={() => {
+                  removeBookmark(bookmark);
+                  onClose();
+                }}
+              />
+            </View>
+          ))}
+        </BottomSheetView>
+      </BottomSheetModal>
     </BottomSheetModalProvider>
   );
 });

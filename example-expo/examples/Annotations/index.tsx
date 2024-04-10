@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { SafeAreaView, useWindowDimensions } from 'react-native';
+import { useWindowDimensions } from 'react-native';
 import {
   Annotation,
   Reader,
@@ -28,7 +28,7 @@ function Book() {
       <Reader
         src="https://s3.amazonaws.com/moby-dick/OPS/package.opf"
         width={width}
-        height={height}
+        height={height * 0.85}
         fileSystem={useFileSystem}
         initialLocation="introduction_001.xhtml"
         initialAnnotations={[
@@ -123,10 +123,8 @@ function Book() {
 
 export function Annotations() {
   return (
-    <SafeAreaView>
-      <ReaderProvider>
-        <Book />
-      </ReaderProvider>
-    </SafeAreaView>
+    <ReaderProvider>
+      <Book />
+    </ReaderProvider>
   );
 }
