@@ -9,7 +9,7 @@ import {
   Section,
   Annotation,
 } from '@epubjs-react-native/core';
-import { useFileSystem } from '@epubjs-react-native/expo-file-system';
+import { useFileSystem } from '@epubjs-react-native/file-system';
 import BottomSheet, { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Header } from './Header';

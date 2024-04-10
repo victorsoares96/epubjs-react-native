@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unused-prop-types */
 /* eslint-disable react-native/no-inline-styles */
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import React, { forwardRef, useState } from 'react';
@@ -44,7 +45,7 @@ export const SearchList = forwardRef<Ref, Props>(
     const snapPoints = React.useMemo(() => ['50%', '90%'], []);
 
     const renderItem = React.useCallback(
-      ({ item }) => (
+      ({ item }: { item: SearchResultType }) => (
         <SearchResult
           searchTerm={searchTerm}
           searchResult={item}

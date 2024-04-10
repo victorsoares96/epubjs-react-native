@@ -1,8 +1,14 @@
 import * as React from 'react';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { SafeAreaView, StyleSheet, Text, TouchableOpacity } from 'react-native';
-import { MD3LightTheme, PaperProvider } from 'react-native-paper';
+import {
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  useColorScheme,
+} from 'react-native';
+import { MD3DarkTheme, MD3LightTheme, PaperProvider } from 'react-native-paper';
 import {
   Basic,
   Formats,
@@ -12,6 +18,7 @@ import {
   OpenExternalLink,
   Annotations,
   Bookmarks,
+  FullExample,
   TableOfContents,
   JavascriptInjection,
 } from './examples';
@@ -95,6 +102,12 @@ export const examples = [
     route: 'JavascriptInjection',
     component: JavascriptInjection,
   },
+  {
+    title: 'Full Example',
+    description: 'A complete reader using library resources',
+    route: 'FullExample',
+    component: FullExample,
+  },
 ];
 
 function Examples() {
@@ -116,8 +129,11 @@ function Examples() {
 }
 
 export default function App() {
+  const colorScheme = useColorScheme();
   return (
-    <PaperProvider theme={MD3LightTheme}>
+    <PaperProvider
+      theme={colorScheme === 'dark' ? MD3DarkTheme : MD3LightTheme}
+    >
       <NavigationContainer>
         <Navigator initialRouteName="Examples">
           <Screen
@@ -138,6 +154,7 @@ export default function App() {
                   'JavascriptInjection',
                   'Search',
                   'CustomThemes',
+                  'FullExample',
                 ].includes(route),
               }}
               component={Example}

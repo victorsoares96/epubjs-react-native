@@ -8,3 +8,4 @@ export * from './Annotations';
 export * from './Bookmarks';
 export { default as TableOfContents } from './TableOfContents';
 export * from './JavascriptInjection';
+export * from './FullExample';

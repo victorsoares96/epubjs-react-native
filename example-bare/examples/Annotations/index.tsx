@@ -1,6 +1,5 @@
-/* eslint-disable @typescript-eslint/no-use-before-define */
 import * as React from 'react';
-import { SafeAreaView, StyleSheet, useWindowDimensions } from 'react-native';
+import { SafeAreaView, useWindowDimensions } from 'react-native';
 import {
   Annotation,
   Reader,
@@ -8,26 +7,22 @@ import {
   useReader,
 } from '@epubjs-react-native/core';
 import { useFileSystem } from '@epubjs-react-native/file-system';
-import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
+import BottomSheet from '@gorhom/bottom-sheet';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import AnnotationsList from './AnnotationsList';
-import AnnotationForm, { COLORS } from './AnnotationForm';
+import { COLORS } from './AnnotationForm';
+import { AnnotationsList } from './AnnotationsList';
+import { Selection } from './utils';
 
 function Book() {
   const { width, height } = useWindowDimensions();
   const { addAnnotation, removeAnnotation, annotations } = useReader();
-  const [selection, setSelection] = React.useState<{
-    cfiRange: string;
-    text: string;
-  } | null>(null);
+  const [selection, setSelection] = React.useState<Selection | null>(null);
   const [selectedAnnotation, setSelectedAnnotation] = React.useState<
     Annotation | undefined
   >(undefined);
   const [tempMark, setTempMark] = React.useState<Annotation | null>(null);
 
-  const bottomSheetRef = React.useRef<BottomSheet>(null);
-  const snapPoints = React.useMemo(() => ['50%', '75%', '100%'], []);
-
+  const annotationsListRef = React.useRef<BottomSheet>(null);
   return (
     <GestureHandlerRootView>
       <Reader
@@ -35,7 +30,6 @@ function Book() {
         width={width}
         height={height}
         fileSystem={useFileSystem}
-        enableSelection
         initialLocation="introduction_001.xhtml"
         initialAnnotations={[
           // Chapter 1
@@ -65,7 +59,7 @@ function Book() {
         }}
         onPressAnnotation={(annotation) => {
           setSelectedAnnotation(annotation);
-          bottomSheetRef.current?.snapToIndex(0);
+          annotationsListRef.current?.snapToIndex(0);
         }}
         onChangeAnnotations={(annotation) => {
           console.log('onChangeAnnotations', annotation);
@@ -103,43 +97,26 @@ function Book() {
             action: (cfiRange, text) => {
               setSelection({ cfiRange, text });
               addAnnotation('highlight', cfiRange, { isTemp: true });
-              bottomSheetRef.current?.snapToIndex(0);
+              annotationsListRef.current?.snapToIndex(0);
               return true;
             },
           },
         ]}
       />
 
-      <BottomSheet
-        ref={bottomSheetRef}
-        index={-1}
-        snapPoints={snapPoints}
-        keyboardBehavior="fillParent"
-        enablePanDownToClose
+      <AnnotationsList
+        ref={annotationsListRef}
+        selection={selection}
+        selectedAnnotation={selectedAnnotation}
+        annotations={annotations}
         onClose={() => {
-          setSelection(null);
-          if (tempMark) removeAnnotation(tempMark);
           setTempMark(null);
+          setSelection(null);
           setSelectedAnnotation(undefined);
+          if (tempMark) removeAnnotation(tempMark);
+          annotationsListRef.current?.close();
         }}
-      >
-        <BottomSheetView style={styles.contentContainer}>
-          <AnnotationForm
-            annotation={selectedAnnotation}
-            selection={selection}
-            onClose={() => {
-              bottomSheetRef.current?.close();
-              if (tempMark) removeAnnotation(tempMark);
-              setTempMark(null);
-            }}
-          />
-
-          <AnnotationsList
-            annotations={annotations}
-            onClose={() => bottomSheetRef.current?.close()}
-          />
-        </BottomSheetView>
-      </BottomSheet>
+      />
     </GestureHandlerRootView>
   );
 }
@@ -153,43 +130,3 @@ export function Annotations() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 24,
-    backgroundColor: 'grey',
-  },
-  contentContainer: {
-    flex: 1,
-    alignItems: 'center',
-    paddingHorizontal: 24,
-  },
-  input: {
-    width: '100%',
-    height: 64,
-    marginTop: 8,
-    marginBottom: 10,
-    borderRadius: 10,
-    fontSize: 16,
-    lineHeight: 20,
-    padding: 8,
-    backgroundColor: 'rgba(151, 151, 151, 0.25)',
-  },
-  title: {
-    textAlign: 'left',
-    fontSize: 18,
-    alignSelf: 'flex-start',
-  },
-  circle: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    marginRight: 10,
-    borderColor: '#000',
-    borderStyle: 'solid',
-    borderWidth: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-});

@@ -5,6 +5,7 @@ import React, { useEffect } from 'react';
 import { Annotation, useReader } from '@epubjs-react-native/core';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { BottomSheetTextInput } from '@gorhom/bottom-sheet';
+import { contrast } from '../FullExample/utils';
 
 interface Props {
   annotation?: Annotation;
@@ -18,7 +19,7 @@ function AnnotationForm({ annotation, selection, onClose }: Props) {
   const [observation, setObservation] = React.useState('');
   const [color, setColor] = React.useState(COLORS[0]);
 
-  const { addAnnotation, updateAnnotation, annotations } = useReader();
+  const { addAnnotation, updateAnnotation, annotations, theme } = useReader();
 
   useEffect(() => {
     if (annotation) {
@@ -33,14 +34,13 @@ function AnnotationForm({ annotation, selection, onClose }: Props) {
   }, [annotation]);
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Annotations</Text>
-
       {annotation?.type !== 'highlight' && (
         <BottomSheetTextInput
           value={observation}
           style={styles.input}
           multiline
           placeholder="Type an annotation here..."
+          placeholderTextColor={contrast[theme.body.background]}
           onChangeText={(text) => setObservation(text)}
         />
       )}
@@ -169,6 +169,7 @@ function AnnotationForm({ annotation, selection, onClose }: Props) {
 const styles = StyleSheet.create({
   container: {
     width: '100%',
+    marginBottom: 10,
   },
   input: {
     width: '100%',

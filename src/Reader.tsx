@@ -225,6 +225,7 @@ export function Reader({
       defaultTheme={defaultTheme || initialTheme}
       onPressExternalLink={onPressExternalLink}
       enableSelection={enableSelection}
+      menuItems={menuItems}
       {...rest}
     />
   );
