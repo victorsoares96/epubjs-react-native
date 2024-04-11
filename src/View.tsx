@@ -1,20 +1,15 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import {
-  TouchableWithoutFeedback,
-  I18nManager,
-  View as RNView,
-} from 'react-native';
-import {
-  Directions,
-  FlingGestureHandler,
-  GestureHandlerRootView,
-  State,
-} from 'react-native-gesture-handler';
-import { WebView, WebViewMessageEvent } from 'react-native-webview';
+import { View as RNView } from 'react-native';
+import { WebView } from 'react-native-webview';
+import type {
+  ShouldStartLoadRequest,
+  WebViewMessageEvent,
+} from 'react-native-webview/lib/WebViewTypes';
 import { defaultTheme as initialTheme, ReaderContext } from './context';
 import type { Bookmark, ReaderProps } from './types';
 import { OpeningBook } from './utils/OpeningBook';
 import INTERNAL_EVENTS from './utils/internalEvents.util';
+import { GestureHandler } from './utils/GestureHandler';
 
 export type ViewProps = Omit<ReaderProps, 'src' | 'fileSystem'> & {
   templateUri: string;
@@ -40,13 +35,18 @@ export function View({
   onBeginning = () => {},
   onFinish = () => {},
   onPress = () => {},
+  onSingleTap = () => {},
   onDoublePress = () => {},
+  onDoubleTap = () => {},
+  onLongPress = () => {},
   width,
   height,
   initialLocation,
   enableSwipe = true,
   onSwipeLeft = () => {},
   onSwipeRight = () => {},
+  onSwipeUp = () => {},
+  onSwipeDown = () => {},
   defaultTheme = initialTheme,
   renderOpeningBookComponent = () => (
     <OpeningBook width={width} height={height} />
@@ -332,6 +332,48 @@ export function View({
     return () => {};
   };
 
+  const handleOnCustomMenuSelection = (event: {
+    nativeEvent: {
+      label: string;
+      key: string;
+      selectedText: string;
+    };
+  }) => {
+    menuItems?.forEach((item) => {
+      if (event.nativeEvent.label === item.label) {
+        const removeSelectionMenu = item.action(
+          selectedText.cfiRange,
+          selectedText.cfiRangeText
+        );
+
+        if (removeSelectionMenu) {
+          removeSelection();
+        }
+      }
+    });
+  };
+
+  const handleOnShouldStartLoadWithRequest = (
+    request: ShouldStartLoadRequest
+  ) => {
+    if (
+      !isRendering &&
+      request.mainDocumentURL &&
+      request.url !== request.mainDocumentURL
+    ) {
+      goToLocation(request.url.replace(request.mainDocumentURL, ''));
+    }
+
+    if (
+      (request.url.includes('mailto:') || request.url.includes('tel:')) &&
+      onPressExternalLink
+    ) {
+      onPressExternalLink(request.url);
+    }
+
+    return true;
+  };
+
   useEffect(() => {
     if (initialBookmarks) {
       setBookmarks(initialBookmarks);
@@ -342,136 +384,89 @@ export function View({
     if (book.current) registerBook(book.current);
   }, [registerBook]);
 
-  let lastTap: number | null = null;
-  let timer: NodeJS.Timeout;
-
-  const handleDoublePress = () => {
-    if (lastTap) {
-      onDoublePress();
-      clearTimeout(timer);
-      lastTap = null;
-    } else {
-      lastTap = Date.now();
-      timer = setTimeout(() => {
-        onPress();
-        lastTap = null;
-        clearTimeout(timer);
-      }, 300);
-    }
-  };
-
   return (
-    <GestureHandlerRootView style={{ width, height }}>
-      <FlingGestureHandler
-        direction={I18nManager.isRTL ? Directions.LEFT : Directions.RIGHT}
-        onHandlerStateChange={({ nativeEvent }) => {
-          if (nativeEvent.state === State.ACTIVE && enableSwipe) {
-            goPrevious();
-            onSwipeRight();
-          }
-        }}
-      >
-        <FlingGestureHandler
-          direction={I18nManager.isRTL ? Directions.RIGHT : Directions.LEFT}
-          onHandlerStateChange={({ nativeEvent }) => {
-            if (nativeEvent.state === State.ACTIVE && enableSwipe) {
-              goNext();
-              onSwipeLeft();
-            }
+    <GestureHandler
+      width={width}
+      height={height}
+      onSingleTap={() => {
+        onPress();
+        onSingleTap();
+      }}
+      onDoubleTap={() => {
+        onDoublePress();
+        onDoubleTap();
+      }}
+      onLongPress={onLongPress}
+      onSwipeLeft={() => {
+        if (enableSwipe) {
+          goNext();
+          onSwipeLeft();
+        }
+      }}
+      onSwipeRight={() => {
+        if (enableSwipe) {
+          goPrevious();
+          onSwipeRight();
+        }
+      }}
+      onSwipeUp={() => {
+        if (enableSwipe) {
+          onSwipeUp();
+        }
+      }}
+      onSwipeDown={() => {
+        if (enableSwipe) {
+          onSwipeDown();
+        }
+      }}
+    >
+      {isRendering && (
+        <RNView
+          style={{
+            width: '100%',
+            height: '100%',
+            position: 'absolute',
+            top: 0,
+            zIndex: 2,
           }}
         >
-          <RNView
-            style={{
-              height: '100%',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
-          >
-            {isRendering && (
-              <RNView
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  position: 'absolute',
-                  top: 0,
-                  zIndex: 2,
-                }}
-              >
-                {renderOpeningBookComponent()}
-              </RNView>
-            )}
+          {renderOpeningBookComponent()}
+        </RNView>
+      )}
 
-            <TouchableWithoutFeedback onPress={handleDoublePress}>
-              <WebView
-                ref={book}
-                source={{ uri: templateUri }}
-                showsVerticalScrollIndicator={false}
-                javaScriptEnabled
-                originWhitelist={['*']}
-                scrollEnabled={false}
-                mixedContentMode="compatibility"
-                onMessage={onMessage}
-                menuItems={menuItems?.map((item, key) => ({
-                  label: item.label,
-                  key: key.toString(),
-                }))}
-                onCustomMenuSelection={(event) => {
-                  menuItems?.forEach((item) => {
-                    if (event.nativeEvent.label === item.label) {
-                      const removeSelectionMenu = item.action(
-                        selectedText.cfiRange,
-                        selectedText.cfiRangeText
-                      );
+      <WebView
+        ref={book}
+        source={{ uri: templateUri }}
+        showsVerticalScrollIndicator={false}
+        javaScriptEnabled
+        originWhitelist={['*']}
+        scrollEnabled={false}
+        mixedContentMode="compatibility"
+        onMessage={onMessage}
+        menuItems={menuItems?.map((item, key) => ({
+          label: item.label,
+          key: key.toString(),
+        }))}
+        onCustomMenuSelection={handleOnCustomMenuSelection}
+        allowingReadAccessToURL={allowedUris}
+        allowUniversalAccessFromFileURLs
+        allowFileAccessFromFileURLs
+        allowFileAccess
+        javaScriptCanOpenWindowsAutomatically
+        onOpenWindow={(event) => {
+          event.preventDefault();
 
-                      if (removeSelectionMenu) {
-                        removeSelection();
-                      }
-                    }
-                  });
-                }}
-                allowingReadAccessToURL={allowedUris}
-                allowUniversalAccessFromFileURLs
-                allowFileAccessFromFileURLs
-                allowFileAccess
-                javaScriptCanOpenWindowsAutomatically
-                onOpenWindow={(event) => {
-                  event.preventDefault();
-
-                  if (onPressExternalLink) {
-                    onPressExternalLink(event.nativeEvent.targetUrl);
-                  }
-                }}
-                onShouldStartLoadWithRequest={(request) => {
-                  if (
-                    !isRendering &&
-                    request.mainDocumentURL &&
-                    request.url !== request.mainDocumentURL
-                  ) {
-                    goToLocation(
-                      request.url.replace(request.mainDocumentURL, '')
-                    );
-                  }
-
-                  if (
-                    (request.url.includes('mailto:') ||
-                      request.url.includes('tel:')) &&
-                    onPressExternalLink
-                  ) {
-                    onPressExternalLink(request.url);
-                  }
-
-                  return true;
-                }}
-                style={{
-                  width,
-                  backgroundColor: theme.body.background,
-                  height,
-                }}
-              />
-            </TouchableWithoutFeedback>
-          </RNView>
-        </FlingGestureHandler>
-      </FlingGestureHandler>
-    </GestureHandlerRootView>
+          if (onPressExternalLink) {
+            onPressExternalLink(event.nativeEvent.targetUrl);
+          }
+        }}
+        onShouldStartLoadWithRequest={handleOnShouldStartLoadWithRequest}
+        style={{
+          width,
+          backgroundColor: theme.body.background,
+          height,
+        }}
+      />
+    </GestureHandler>
   );
 }
