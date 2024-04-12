@@ -62,7 +62,6 @@ export default `
       if (type === 'epub' || type === 'opf' || type === 'binary') {
         book = ePub(file);
       } else if (type === 'base64') {
-        alert('base64');
         book = ePub(file, { encoding: "base64" });
       } else {
         alert('Missing file type');
