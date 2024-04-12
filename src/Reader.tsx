@@ -15,8 +15,8 @@ import epubjs from './epubjs';
 
 export function Reader({
   src,
-  width,
-  height,
+  width = '100%',
+  height = '100%',
   defaultTheme = initialTheme,
   initialLocations,
   allowScriptedContent = Platform.OS === 'ios',

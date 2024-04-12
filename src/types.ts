@@ -1,3 +1,5 @@
+import { DimensionValue } from 'react-native';
+
 export type Location = {
   atStart?: boolean;
   atEnd?: boolean;
@@ -299,16 +301,8 @@ export interface ReaderProps {
    * Called when book is long pressed
    */
   onLongPress?: () => void;
-  /**
-   * width of the ePub Rendition
-   * @param {number} width
-   */
-  width: number;
-  /**
-   * height of the ePub Rendition
-   * @param {number} height
-   */
-  height: number;
+  width?: DimensionValue;
+  height?: DimensionValue;
   /**
    * Can be an ePubCfi or toc href
    */

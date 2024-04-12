@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  DimensionValue,
   I18nManager,
   Platform,
   TouchableWithoutFeedback,
@@ -13,8 +14,8 @@ import {
 } from 'react-native-gesture-handler';
 
 interface Props {
-  width: number;
-  height: number;
+  width?: DimensionValue;
+  height?: DimensionValue;
   onSingleTap: () => void;
   onDoubleTap: () => void;
   onSwipeLeft: () => void;
@@ -26,8 +27,8 @@ interface Props {
 }
 
 export function GestureHandler({
-  width,
-  height,
+  width = '100%',
+  height = '100%',
   onSingleTap,
   onDoubleTap,
   onSwipeLeft,
