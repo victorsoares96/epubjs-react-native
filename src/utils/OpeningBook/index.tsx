@@ -12,7 +12,7 @@ export function OpeningBook({
     <View style={[styles.container, { width, height }]}>
       <ActivityIndicator size="large" />
 
-      <Text style={styles.text}>Openingadsada</Text>
+      <Text style={styles.text}>Opening</Text>
     </View>
   );
 }

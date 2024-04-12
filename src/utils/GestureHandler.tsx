@@ -55,6 +55,23 @@ export function GestureHandler({
     .direction(Directions.DOWN)
     .onStart(onSwipeDown);
 
+  let lastTap: number | null = null;
+  let timer: NodeJS.Timeout;
+
+  const handleDoubleTap = () => {
+    if (lastTap) {
+      onDoubleTap();
+      clearTimeout(timer);
+      lastTap = null;
+    } else {
+      lastTap = Date.now();
+      timer = setTimeout(() => {
+        onSingleTap();
+        lastTap = null;
+        clearTimeout(timer);
+      }, 500);
+    }
+  };
   return (
     <GestureHandlerRootView>
       <GestureDetector
@@ -70,7 +87,7 @@ export function GestureHandler({
       >
         <Pressable
           style={{ width, height }}
-          onPress={() => Platform.OS === 'ios' && onSingleTap()}
+          onPress={() => Platform.OS === 'ios' && handleDoubleTap()}
           onLongPress={() => Platform.OS === 'ios' && onLongPress()}
         >
           {children}
