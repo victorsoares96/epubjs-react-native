@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { View as RNView } from 'react-native';
+import { Dimensions, View as RNView } from 'react-native';
 import { WebView } from 'react-native-webview';
 import type {
   ShouldStartLoadRequest,
@@ -51,6 +51,10 @@ export function View({
   renderOpeningBookComponent = () => (
     <OpeningBook width={width} height={height} />
   ),
+  openingBookComponentContainerStyle = {
+    width: Dimensions.get('screen').width,
+    height: Dimensions.get('screen').height,
+  },
   onPressExternalLink,
   menuItems,
   onAddAnnotation = () => {},
@@ -423,8 +427,9 @@ export function View({
       {isRendering && (
         <RNView
           style={{
-            width: '100%',
-            height: '100%',
+            ...openingBookComponentContainerStyle,
+            position: 'absolute',
+            zIndex: 2,
           }}
         >
           {renderOpeningBookComponent()}

@@ -1,4 +1,4 @@
-import { DimensionValue } from 'react-native';
+import { DimensionValue, ViewStyle } from 'react-native';
 
 export type Location = {
   atStart?: boolean;
@@ -342,6 +342,7 @@ export interface ReaderProps {
    * @returns {JSX.Element} JSX.Element
    */
   renderOpeningBookComponent?: () => JSX.Element;
+  openingBookComponentContainerStyle?: ViewStyle;
   /**
    * Enable text selection feature on the book.
    * Default is `false`
