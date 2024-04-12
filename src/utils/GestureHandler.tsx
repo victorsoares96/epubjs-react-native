@@ -1,5 +1,10 @@
 import React from 'react';
-import { I18nManager, Platform, Pressable } from 'react-native';
+import {
+  I18nManager,
+  Platform,
+  TouchableWithoutFeedback,
+  View,
+} from 'react-native';
 import {
   GestureHandlerRootView,
   GestureDetector,
@@ -73,7 +78,7 @@ export function GestureHandler({
     }
   };
   return (
-    <GestureHandlerRootView>
+    <GestureHandlerRootView style={{ width, height }}>
       <GestureDetector
         gesture={Gesture.Exclusive(
           swipeLeft,
@@ -85,13 +90,13 @@ export function GestureHandler({
           singleTap
         )}
       >
-        <Pressable
+        <TouchableWithoutFeedback
           style={{ width, height }}
           onPress={() => Platform.OS === 'ios' && handleDoubleTap()}
           onLongPress={() => Platform.OS === 'ios' && onLongPress()}
         >
-          {children}
-        </Pressable>
+          <View style={{ width, height }}>{children}</View>
+        </TouchableWithoutFeedback>
       </GestureDetector>
     </GestureHandlerRootView>
   );
