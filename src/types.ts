@@ -1,3 +1,5 @@
+import { DimensionValue, ViewStyle } from 'react-native';
+
 export type Location = {
   atStart?: boolean;
   atEnd?: boolean;
@@ -279,24 +281,28 @@ export interface ReaderProps {
   }) => void;
   /**
    * Called when the book was pressed
-   * @returns {void} void
+   * @deprecated use **onSingleTap** instead
    */
   onPress?: () => void;
   /**
+   * Called when book is tapped once
+   */
+  onSingleTap?: () => void;
+  /**
    * Called when the book was double pressed
-   * @returns {void} void
+   * @deprecated use **onDoubleTap** instead
    */
   onDoublePress?: () => void;
   /**
-   * width of the ePub Rendition
-   * @param {number} width
+   * Called when book is tapped twice
    */
-  width: number;
+  onDoubleTap?: () => void;
   /**
-   * height of the ePub Rendition
-   * @param {number} height
+   * Called when book is long pressed
    */
-  height: number;
+  onLongPress?: () => void;
+  width?: DimensionValue;
+  height?: DimensionValue;
   /**
    * Can be an ePubCfi or toc href
    */
@@ -317,6 +323,16 @@ export interface ReaderProps {
    */
   onSwipeRight?: () => void;
   /**
+   * Called when swipe up gesture is detected
+   * @returns {void} void
+   */
+  onSwipeUp?: () => void;
+  /**
+   * Called when swipe down gesture is detected
+   * @returns {void} void
+   */
+  onSwipeDown?: () => void;
+  /**
    * Render when the book is loading
    * @returns {JSX.Element} JSX.Element
    */
@@ -326,6 +342,7 @@ export interface ReaderProps {
    * @returns {JSX.Element} JSX.Element
    */
   renderOpeningBookComponent?: () => JSX.Element;
+  openingBookComponentContainerStyle?: ViewStyle;
   /**
    * Enable text selection feature on the book.
    *
