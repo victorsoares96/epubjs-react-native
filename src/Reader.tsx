@@ -26,6 +26,9 @@ export function Reader({
     <LoadingFile {...props} width={width} height={height} />
   ),
   fileSystem: useFileSystem,
+  manager = 'default',
+  flow = 'auto',
+  snap = false,
   ...rest
 }: ReaderProps) {
   const {
@@ -91,6 +94,9 @@ export function Reader({
                 enableSelection,
                 allowScriptedContent,
                 allowPopups,
+                manager,
+                flow,
+                snap,
               })
             );
 
@@ -107,6 +113,9 @@ export function Reader({
                 enableSelection,
                 allowScriptedContent,
                 allowPopups,
+                manager,
+                flow,
+                snap,
               })
             );
 
@@ -133,6 +142,9 @@ export function Reader({
                 enableSelection,
                 allowScriptedContent,
                 allowPopups,
+                manager,
+                flow,
+                snap,
               })
             );
 
@@ -155,6 +167,9 @@ export function Reader({
                 enableSelection,
                 allowScriptedContent,
                 allowPopups,
+                manager,
+                flow,
+                snap,
               })
             );
 
@@ -223,6 +238,9 @@ export function Reader({
       height={height}
       defaultTheme={defaultTheme || initialTheme}
       onPressExternalLink={onPressExternalLink}
+      manager={manager}
+      flow={flow}
+      snap={snap}
       {...rest}
     />
   );

@@ -70,6 +70,9 @@ export default `
       rendition = book.renderTo("viewer", {
         width: "100%",
         height: "100%",
+        manager: "default",
+        flow: "auto",
+        snap: false,
         allowPopups: allowPopups,
         allowScriptedContent: allowScriptedContent
       });

@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import type { Theme, ePubCfi } from '../types';
+import type { Flow, Manager, Theme, ePubCfi } from '../types';
 import template from '../template';
 import type { SourceType } from '../utils/enums/source-type.enum';
 
@@ -15,6 +15,9 @@ export function useInjectWebVieWVariables() {
       locations,
       allowScriptedContent,
       allowPopups,
+      manager,
+      flow,
+      snap,
     }: {
       jszip: string;
       epubjs: string;
@@ -25,6 +28,9 @@ export function useInjectWebVieWVariables() {
       locations?: ePubCfi[];
       allowScriptedContent?: boolean;
       allowPopups?: boolean;
+      manager: Manager;
+      flow: Flow;
+      snap: boolean;
     }) => {
       return template
         .replace(
@@ -53,7 +59,10 @@ export function useInjectWebVieWVariables() {
           /allowScriptedContent: allowScriptedContent/,
           `allowScriptedContent: ${allowScriptedContent}`
         )
-        .replace(/allowPopups: allowPopups/, `allowPopups: ${allowPopups}`);
+        .replace(/allowPopups: allowPopups/, `allowPopups: ${allowPopups}`)
+        .replace(/manager: "default"/, `manager: ${JSON.stringify(manager)}`)
+        .replace(/flow: "auto"/, `flow: ${JSON.stringify(flow)}`)
+        .replace(/snap: false/, `snap: ${snap}`);
     },
     []
   );
