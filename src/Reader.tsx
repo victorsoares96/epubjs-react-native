@@ -28,7 +28,9 @@ export function Reader({
   fileSystem: useFileSystem,
   manager = 'default',
   flow = 'auto',
-  snap = false,
+  snap,
+  spread,
+  fullsize,
   ...rest
 }: ReaderProps) {
   const {
@@ -40,7 +42,7 @@ export function Reader({
     documentDirectory,
     writeAsStringAsync,
   } = useFileSystem();
-  const allowPopups = onPressExternalLink ? true : rest.allowPopups;
+  const allowPopups = onPressExternalLink ? true : rest.allowPopups || false;
 
   const { setIsLoading, isLoading } = useContext(ReaderContext);
   const { injectWebVieWVariables } = useInjectWebVieWVariables();
@@ -97,6 +99,8 @@ export function Reader({
                 manager,
                 flow,
                 snap,
+                spread,
+                fullsize,
               })
             );
 
@@ -116,6 +120,8 @@ export function Reader({
                 manager,
                 flow,
                 snap,
+                spread,
+                fullsize,
               })
             );
 
@@ -145,6 +151,8 @@ export function Reader({
                 manager,
                 flow,
                 snap,
+                spread,
+                fullsize,
               })
             );
 
@@ -170,6 +178,8 @@ export function Reader({
                 manager,
                 flow,
                 snap,
+                spread,
+                fullsize,
               })
             );
 

@@ -72,7 +72,9 @@ export default `
         height: "100%",
         manager: "default",
         flow: "auto",
-        snap: false,
+        snap: undefined,
+        spread: undefined,
+        fullsize: undefined,
         allowPopups: allowPopups,
         allowScriptedContent: allowScriptedContent
       });

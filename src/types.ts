@@ -36,6 +36,8 @@ export type Flow =
   | 'scrolled-doc'
   | 'scrolled-continuous';
 
+export type Spread = 'none' | 'always' | 'auto';
+
 export type AnnotationType = 'mark' | 'highlight' | 'underline';
 
 export type AnnotationStyles = {
@@ -445,4 +447,8 @@ export interface ReaderProps {
   flow?: Flow;
 
   snap?: boolean;
+
+  spread?: Spread;
+
+  fullsize?: boolean;
 }
