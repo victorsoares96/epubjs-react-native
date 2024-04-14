@@ -27,6 +27,17 @@ export type Location = {
   };
 };
 
+export type Manager = 'default' | 'continuous';
+
+export type Flow =
+  | 'auto'
+  | 'paginated'
+  | 'scrolled'
+  | 'scrolled-doc'
+  | 'scrolled-continuous';
+
+export type Spread = 'none' | 'always' | 'auto';
+
 export type AnnotationType = 'mark' | 'highlight' | 'underline';
 
 export type AnnotationStyles = {
@@ -430,4 +441,14 @@ export interface ReaderProps {
   ) => void;
 
   onWebViewMessage?: (event: any) => void;
+
+  manager?: Manager;
+
+  flow?: Flow;
+
+  snap?: boolean;
+
+  spread?: Spread;
+
+  fullsize?: boolean;
 }
