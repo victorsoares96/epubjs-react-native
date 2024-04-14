@@ -20,6 +20,7 @@ import type {
   Section,
   Toc,
   Landmark,
+  Flow,
 } from './types';
 import * as webViewInjectFunctions from './utils/webViewInjectFunctions';
 
@@ -558,6 +559,8 @@ export interface ReaderContextProps {
   isBookmarked: boolean;
 
   injectJavascript: (script: string) => void;
+
+  changeFlow: (flow: Flow) => void;
 }
 
 const ReaderContext = createContext<ReaderContextProps>({
@@ -650,6 +653,7 @@ const ReaderContext = createContext<ReaderContextProps>({
   isBookmarked: false,
 
   injectJavascript: () => {},
+  changeFlow: () => {},
 });
 
 function ReaderProvider({ children }: { children: React.ReactNode }) {
@@ -1082,6 +1086,13 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
     book.current?.injectJavaScript(script);
   }, []);
 
+  const changeFlow = useCallback((flow: Flow) => {
+    webViewInjectFunctions.injectJavaScript(
+      book,
+      `rendition.flow(${JSON.stringify(flow)}); true`
+    );
+  }, []);
+
   const contextValue = useMemo(
     () => ({
       registerBook,
@@ -1155,6 +1166,7 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       setIsBookmarked,
       isBookmarked: state.isBookmarked,
       injectJavascript,
+      changeFlow,
     }),
     [
       changeFontFamily,
@@ -1218,6 +1230,7 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       state.isBookmarked,
       setIsBookmarked,
       injectJavascript,
+      changeFlow,
     ]
   );
   return (

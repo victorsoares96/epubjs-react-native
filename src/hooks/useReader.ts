@@ -41,6 +41,7 @@ export function useReader() {
     bookmarks,
     isBookmarked,
     injectJavascript,
+    changeFlow,
   } = useContext(ReaderContext);
 
   return {
@@ -82,6 +83,7 @@ export function useReader() {
     bookmarks,
     isBookmarked,
     injectJavascript,
+    changeFlow,
   } as Pick<
     ReaderContextProps,
     | 'changeFontSize'
@@ -122,5 +124,6 @@ export function useReader() {
     | 'injectJavascript'
     | 'clearSearchResults'
     | 'isSearching'
+    | 'changeFlow'
   >;
 }

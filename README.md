@@ -70,8 +70,8 @@ export default function App() {
 | Param                        | Type          | Description                                                  |
 | ---------------------------- | ------------- | ------------------------------------------------------------ |
 | `src`                        | `string`      | Can be a `base64`, `epub`, `opf`. Required.                  |
-| `width`                      | `number`      | The width of the ePub Rendition. Required.                   |
-| `height`                     | `number`      | The height of the ePub Rendition. Required.                  |
+| `width`                      | `number` `string`      | The width of the ePub Rendition. Optional.                   |
+| `height`                     | `number` `string`      | The height of the ePub Rendition. Optional.                  |
 | `fileSystem`                 | `function`    | A function that returns a `FileSystem` object. Required.     |
 | `initialLocation`            | `ePubCfi`     | Can be an ePubCfi or chapter url. Optional.                  |
 | `enableSwipe`                | `boolean`     | Enable swipe actions. Default is `true`.                     |
@@ -113,6 +113,11 @@ export default function App() {
 | `injectedJavascript`         | `string`      | Provide JavaScript that will be injected after the book loads.                                  |
 | `getInjectionJavascriptFn`   | `function`    | Provides injectJavascript function, is same the webView function                                           |
 | `onWebViewMessage`           | `function`    | A webview event listener, is same the webView onMessage                                                                           |
+| `manager`                    | `default` `continuous`    |                                                                            |
+| `flow`           | `auto` `paginated` `scrolled` `scrolled-doc` `scrolled-continuous`    |                                                                   |
+| `snap`           | `boolean`    |                                                          |
+| `spread`           | `auto` `none` `always`    |                                                                           |
+| `fullsize`           | `boolean`    |                                                                           |
 
 ## Hooks
 
@@ -150,6 +155,7 @@ const { changeFontSize, goToLocation, ... } = useReader();
 | `removeBookmark`     |  `bookmark`        | Remove bookmark                                            |
 | `removeBookmarks`    |          | Remove all bookmarks                 |
 | `injectJavascript`   |`function`| Provide JavaScript that will be injected after the book loads.                 |
+| `changeFlow`   |`Flow`| Adjust the flow of the rendition to paginated or scrolled (scrolled-continuous vs scrolled-doc are handled by different view managers)                 |
 
 ##### States
 

@@ -70,6 +70,11 @@ export default `
       rendition = book.renderTo("viewer", {
         width: "100%",
         height: "100%",
+        manager: "default",
+        flow: "auto",
+        snap: undefined,
+        spread: undefined,
+        fullsize: undefined,
         allowPopups: allowPopups,
         allowScriptedContent: allowScriptedContent
       });

@@ -53,6 +53,8 @@
         "argsIgnorePattern": "_"
       }
     ],
-    "@typescript-eslint/no-explicit-any": "warn"
+    "@typescript-eslint/no-explicit-any": "warn",
+    "react-native/no-inline-styles": "off",
+    "react/require-default-props": "off"
   }
 }

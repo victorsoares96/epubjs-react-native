@@ -15,8 +15,8 @@ import epubjs from './epubjs';
 
 export function Reader({
   src,
-  width,
-  height,
+  width = '100%',
+  height = '100%',
   defaultTheme = initialTheme,
   initialLocations,
   allowScriptedContent = Platform.OS === 'ios',
@@ -26,6 +26,11 @@ export function Reader({
   ),
   fileSystem: useFileSystem,
   menuItems,
+  manager = 'default',
+  flow = 'auto',
+  snap,
+  spread,
+  fullsize,
   ...rest
 }: ReaderProps) {
   const {
@@ -37,8 +42,8 @@ export function Reader({
     documentDirectory,
     writeAsStringAsync,
   } = useFileSystem();
-  const allowPopups = onPressExternalLink ? true : rest.allowPopups;
   const enableSelection = menuItems ? true : rest.enableSelection || false;
+  const allowPopups = onPressExternalLink ? true : rest.allowPopups || false;
 
   const { setIsLoading, isLoading } = useContext(ReaderContext);
   const { injectWebVieWVariables } = useInjectWebVieWVariables();
@@ -92,6 +97,11 @@ export function Reader({
                 enableSelection,
                 allowScriptedContent,
                 allowPopups,
+                manager,
+                flow,
+                snap,
+                spread,
+                fullsize,
               })
             );
 
@@ -108,6 +118,11 @@ export function Reader({
                 enableSelection,
                 allowScriptedContent,
                 allowPopups,
+                manager,
+                flow,
+                snap,
+                spread,
+                fullsize,
               })
             );
 
@@ -134,6 +149,11 @@ export function Reader({
                 enableSelection,
                 allowScriptedContent,
                 allowPopups,
+                manager,
+                flow,
+                snap,
+                spread,
+                fullsize,
               })
             );
 
@@ -156,6 +176,11 @@ export function Reader({
                 enableSelection,
                 allowScriptedContent,
                 allowPopups,
+                manager,
+                flow,
+                snap,
+                spread,
+                fullsize,
               })
             );
 
@@ -226,6 +251,9 @@ export function Reader({
       onPressExternalLink={onPressExternalLink}
       enableSelection={enableSelection}
       menuItems={menuItems}
+      manager={manager}
+      flow={flow}
+      snap={snap}
       {...rest}
     />
   );
