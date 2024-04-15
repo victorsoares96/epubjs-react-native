@@ -21,18 +21,21 @@ export function JavascriptInjection() {
             function highlightTextByTagId(tagId) {
               return Promise.all(book.spine.spineItems.map((item) => {
                 return item.load(book.load.bind(book)).then(() => {
-                  const element = item.document.getElementById('c001p0005');
+                  const element = item.document.getElementById(tagId);
 
                   if (!element) return null;
 
-                  const cfi = item.cfiFromElement(element).split(')')[0].concat(',/1:0,/1:').concat(element.textContent.length).concat(')');
-                  rendition.annotations.add('highlight', cfi);
+                  const range = item.document.createRange();
+                  range.selectNodeContents(element);
 
-                  console.log({
-                    cfi,
-                    text: element.textContent,
-                    element,
-                  });
+                  let textOffset = element.textContent.length;
+                  if (element.childNodes.length > 1) {
+                    const lastChildNode = element.childNodes[element.childNodes.length - 1];
+                    textOffset = lastChildNode.textContent.length;
+                  }
+
+                  const cfi = item.cfiFromElement(element).split(')')[0].concat(',/1:0,/').concat(range.endOffset).concat(':').concat(textOffset).concat(')');
+                  rendition.annotations.add('highlight', cfi);
 
                   item.unload();
                   return Promise.resolve();

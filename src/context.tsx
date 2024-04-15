@@ -676,13 +676,15 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
   const changeFontFamily = useCallback((fontFamily: string) => {
     book.current?.injectJavaScript(`
       rendition.themes.font('${fontFamily}');
+      rendition.views().forEach(view => view.pane ? view.pane.render() : null); true;
     `);
     dispatch({ type: Types.CHANGE_FONT_FAMILY, payload: fontFamily });
   }, []);
 
   const changeFontSize = useCallback((size: FontSize) => {
     book.current?.injectJavaScript(`
-      rendition.themes.fontSize('${size}'); true
+      rendition.themes.fontSize('${size}');
+      rendition.views().forEach(view => view.pane ? view.pane.render() : null); true;
     `);
     dispatch({ type: Types.CHANGE_FONT_SIZE, payload: size });
   }, []);

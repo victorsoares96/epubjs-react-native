@@ -131,6 +131,8 @@ export function View({
 
     const { type } = parsedEvent;
 
+    console.log({ type });
+
     if (!INTERNAL_EVENTS.includes(type) && onWebViewMessage) {
       return onWebViewMessage(parsedEvent);
     }
@@ -153,9 +155,6 @@ export function View({
     if (type === 'onReady') {
       const { totalLocations, currentLocation, progress } = parsedEvent;
       setIsRendering(false);
-      setTotalLocations(totalLocations);
-      setCurrentLocation(currentLocation);
-      setProgress(progress);
 
       if (initialAnnotations) {
         setInitialAnnotations(initialAnnotations);
@@ -218,9 +217,13 @@ export function View({
     }
 
     if (type === 'onLocationsReady') {
-      const { epubKey } = parsedEvent;
+      const { epubKey, totalLocations, currentLocation, progress } =
+        parsedEvent;
       setLocations(parsedEvent.locations);
       setKey(epubKey);
+      setTotalLocations(totalLocations);
+      setCurrentLocation(currentLocation);
+      setProgress(progress);
 
       return onLocationsReady(epubKey, parsedEvent.locations);
     }
