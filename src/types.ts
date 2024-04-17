@@ -452,4 +452,6 @@ export interface ReaderProps {
   spread?: Spread;
 
   fullsize?: boolean;
+
+  waitForLocationsReady?: boolean;
 }

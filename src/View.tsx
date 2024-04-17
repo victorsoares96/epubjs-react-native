@@ -69,6 +69,7 @@ export function View({
   injectedJavascript,
   getInjectionJavascriptFn,
   onWebViewMessage,
+  waitForLocationsReady = false,
 }: ViewProps) {
   const {
     registerBook,
@@ -154,7 +155,9 @@ export function View({
 
     if (type === 'onReady') {
       const { totalLocations, currentLocation, progress } = parsedEvent;
-      setIsRendering(false);
+      if (!waitForLocationsReady) {
+        setIsRendering(false);
+      }
 
       if (initialAnnotations) {
         setInitialAnnotations(initialAnnotations);
@@ -224,6 +227,10 @@ export function View({
       setTotalLocations(totalLocations);
       setCurrentLocation(currentLocation);
       setProgress(progress);
+
+      if (waitForLocationsReady) {
+        setIsRendering(false);
+      }
 
       return onLocationsReady(epubKey, parsedEvent.locations);
     }

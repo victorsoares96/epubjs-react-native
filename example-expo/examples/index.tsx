@@ -13,3 +13,4 @@ export * from './ScrolledDoc';
 export * from './ContinuousSpreads';
 export * from './ContinuousScrolled';
 export * from './FullExample';
+export * from './WithSlider';
