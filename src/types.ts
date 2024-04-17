@@ -454,4 +454,6 @@ export interface ReaderProps {
   fullsize?: boolean;
 
   waitForLocationsReady?: boolean;
+
+  cacheLocations?: boolean;
 }
