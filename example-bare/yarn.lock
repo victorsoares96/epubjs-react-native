@@ -1219,10 +1219,10 @@
   dependencies:
     "@types/hammerjs" "^2.0.36"
 
-"@epubjs-react-native/core@1.4.0-beta.50":
-  version "1.4.0-beta.50"
-  resolved "https://registry.yarnpkg.com/@epubjs-react-native/core/-/core-1.4.0-beta.50.tgz#01bfd52a0456ff4e661d25318261a429dab63cd5"
-  integrity sha512-3WlqC24Dpmww3xE2Hw3L5dyaVpww2PIbajPntfk1XMT0J32mrbbWtaYyJGAKUWVVpYNz2aY0y6hpzw5Q8q/Pzw==
+"@epubjs-react-native/core@1.4.0":
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/@epubjs-react-native/core/-/core-1.4.0.tgz#e2c4183bd07bbc896129059280b3ac0d47825d01"
+  integrity sha512-QB1qH9nCjcjL/IxqGZhDJozIq8EZbZ1d9m5Yt5clZlff37oPbgmTT7Kax0d32/ArCcWmi+JTz3ANZ3CTKjWrFQ==
 
 "@epubjs-react-native/file-system@^1.1.2":
   version "1.1.2"
