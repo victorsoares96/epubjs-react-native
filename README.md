@@ -40,26 +40,47 @@ npx pod install
 
 ## Usage
 
+Wrap your root component in ReaderProvider. If you have a vanilla React Native project, it's a good idea to add it in the component which is passed to AppRegistry.registerComponent. This will usually be in the index.js file. If you have an Expo project, you can do this inside the exported component in the App.js file.
+
+```tsx
+import * as React from 'react';
+import { AppRegistry } from 'react-native';
+import { ReaderProvider } from '@epubjs-react-native/core';
+import { name as appName } from './app.json';
+import App from './src/App';
+
+export default function Main() {
+  return (
+    <ReaderProvider>
+      <App />
+    </ReaderProvider>
+  );
+}
+
+AppRegistry.registerComponent(appName, () => Main);
+```
+
+The `<ReaderProvider>` component provides `<Reader>` manipulation methods for all components of the framework.
+**Without this the `useReader` hook will not work.**
+
+After the above step you can initialize the reader as follows:
+
 ```tsx
 import * as React from 'react';
 
-import { SafeAreaView, useWindowDimensions } from 'react-native';
-import { Reader, ReaderProvider } from '@epubjs-react-native/core';
+import { SafeAreaView } from 'react-native';
+import { Reader, useReader } from '@epubjs-react-native/core';
 // import { useFileSystem } from '@epubjs-react-native/file-system'; // for Bare React Native project
 // import { useFileSystem } from '@epubjs-react-native/expo-file-system'; // for Expo project
 
 export default function App() {
-  const { width, height } = useWindowDimensions();
+  const { goToLocation } = useReader();
   return (
     <SafeAreaView>
-      <ReaderProvider>
-        <Reader
-          src="https://s3.amazonaws.com/moby-dick/OPS/package.opf"
-          width={width}
-          height={height}
-          fileSystem={useFileSystem}
-        />
-      </ReaderProvider>
+      <Reader
+        src="https://s3.amazonaws.com/moby-dick/OPS/package.opf"
+        fileSystem={useFileSystem}
+      />
     </SafeAreaView>
   );
 }
@@ -118,6 +139,7 @@ export default function App() {
 | `snap`           | `boolean`    |                                                          |
 | `spread`           | `auto` `none` `always`    |                                                                           |
 | `fullsize`           | `boolean`    |                                                                           |
+| `waitForLocationsReady`           |  `boolean`    | only render book after locations generated                                                                           |
 
 ## Hooks
 
@@ -188,7 +210,7 @@ The `meta` object contains:
 
 #### Examples
 
-You can see the examples in these repositories:
+- [You can see the examples demo here](docs/EXAMPLES.md)
 
 - [Examples running on Expo Project](example-expo/App.tsx)
 - [Examples running on Bare React Native Project](example-bare/App.tsx)

@@ -12,4 +12,5 @@ export * from './Spreads';
 export * from './ScrolledDoc';
 export * from './ContinuousSpreads';
 export * from './ContinuousScrolled';
+export { default as WithSlider } from './WithSlider';
 export * from './FullExample';

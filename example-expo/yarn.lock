@@ -1219,10 +1219,10 @@
   dependencies:
     "@types/hammerjs" "^2.0.36"
 
-"@epubjs-react-native/core@1.4.0-beta.49":
-  version "1.4.0-beta.49"
-  resolved "https://registry.yarnpkg.com/@epubjs-react-native/core/-/core-1.4.0-beta.49.tgz#d4249ec2230078485741b0daa9ef94df1a469c72"
-  integrity sha512-fdEq6YUvrUltz57Wh+x72G0tF1UVnxLVav+y6p4yBhN4JFC4HnWdiT2AUA5IvynRFbefbCnboeK14zsqf5lzcA==
+"@epubjs-react-native/core@1.4.0-beta.50":
+  version "1.4.0-beta.50"
+  resolved "https://registry.yarnpkg.com/@epubjs-react-native/core/-/core-1.4.0-beta.50.tgz#01bfd52a0456ff4e661d25318261a429dab63cd5"
+  integrity sha512-3WlqC24Dpmww3xE2Hw3L5dyaVpww2PIbajPntfk1XMT0J32mrbbWtaYyJGAKUWVVpYNz2aY0y6hpzw5Q8q/Pzw==
 
 "@epubjs-react-native/expo-file-system@^1.1.2":
   version "1.1.2"
@@ -6978,6 +6978,13 @@ use-latest-callback@^0.1.5, use-latest-callback@^0.1.9:
   version "0.1.9"
   resolved "https://registry.yarnpkg.com/use-latest-callback/-/use-latest-callback-0.1.9.tgz#10191dc54257e65a8e52322127643a8940271e2a"
   integrity sha512-CL/29uS74AwreI/f2oz2hLTW7ZqVeV5+gxFeGudzQrgkCytrHw33G4KbnQOrRlAEzzAFXi7dDLMC9zhWcVpzmw==
+
+usehooks-ts@^3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/usehooks-ts/-/usehooks-ts-3.1.0.tgz#156119f36efc85f1b1952616c02580f140950eca"
+  integrity sha512-bBIa7yUyPhE1BCc0GmR96VU/15l/9gP1Ch5mYdLcFBaFGQsdmXkvjV0TtOqW1yUd6VjIwDunm+flSciCQXujiw==
+  dependencies:
+    lodash.debounce "^4.0.8"
 
 utf8@^3.0.0:
   version "3.0.0"

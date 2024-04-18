@@ -1,11 +1,24 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import React, { useCallback } from 'react';
+import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { useReader } from '@epubjs-react-native/core';
 import Slider from '@react-native-community/slider';
+import { useDebounceCallback } from 'usehooks-ts';
+import { Text } from 'react-native-paper';
 
 export function Footer() {
-  const { theme, totalLocations } = useReader();
+  const { theme, totalLocations, injectJavascript, currentLocation } =
+    useReader();
+  const debounced = useDebounceCallback((percentage) => {
+    injectJavascript(`
+      try {
+        const cfi = book.locations.cfiFromPercentage(${percentage} / 100);
+        window.ReactNativeWebView.postMessage(JSON.stringify({ type: "onCfiFromPercentage", cfi })); true
+      } catch (error) {
+        alert(error?.message);
+      }
+    `);
+  }, 1000);
 
   return (
     <View
@@ -16,98 +29,42 @@ export function Footer() {
         },
       ]}
     >
-      <Slider
-        style={{ width: '90%', height: 40 }}
-        disabled={totalLocations === 0}
-        minimumValue={0}
-        maximumValue={100}
-        minimumTrackTintColor="#c0c0c0"
-        maximumTrackTintColor="#000000"
-        step={1}
-        tapToSeek
-        onValueChange={(value) => console.log({ value })}
-      />
+      <Text variant="labelMedium" style={styles.currentPercentage}>
+        Current Percentage:{' '}
+        {((currentLocation?.start.percentage || 0) * 100).toFixed(0)}%
+      </Text>
+
+      <View style={styles.row}>
+        <Text variant="labelMedium">0%</Text>
+
+        <Slider
+          style={styles.slider}
+          disabled={totalLocations === 0}
+          minimumValue={0}
+          maximumValue={100}
+          minimumTrackTintColor="#c0c0c0"
+          maximumTrackTintColor="#000000"
+          step={1}
+          tapToSeek
+          onValueChange={(percentage) => debounced(percentage)}
+        />
+
+        <Text variant="labelMedium">100%</Text>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: 'green',
-    paddingHorizontal: 30,
+    paddingHorizontal: 10,
     justifyContent: 'center',
+  },
+  row: {
+    justifyContent: 'space-evenly',
     alignItems: 'center',
+    flexDirection: 'row',
   },
-  section: {
-    letterSpacing: 1,
-    textAlign: 'center',
-  },
-  slider: {
-    width: 300,
-    opacity: 1,
-    marginTop: 10,
-  },
-  text: {
-    fontSize: 14,
-    textAlign: 'center',
-    fontWeight: '500',
-    margin: 0,
-  },
-  outer: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    backgroundColor: '#11FF11',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  outerTrue: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    backgroundColor: '#0F0FFF',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  inner: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: '#111111',
-  },
-  innerTrue: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: '#0F0FFF',
-  },
-  outerSmall: {
-    width: 4,
-    height: 4,
-    top: 6,
-    borderRadius: 2,
-    backgroundColor: '#003366',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  outerTrueSmall: {
-    width: 8,
-    height: 8,
-    borderRadius: 2,
-    backgroundColor: '#ABCDEF',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  innerSmall: {
-    width: 7,
-    height: 7,
-    borderRadius: 1,
-    backgroundColor: '#223366',
-  },
-  innerTrueSmall: {
-    width: 7,
-    height: 7,
-    borderRadius: 1,
-    backgroundColor: '#334488',
-  },
+  slider: { width: '75%', height: 40 },
+  currentPercentage: {},
 });
