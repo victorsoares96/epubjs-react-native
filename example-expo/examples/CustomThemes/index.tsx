@@ -6,7 +6,7 @@ import { useFileSystem } from '@epubjs-react-native/expo-file-system';
 import { Header } from './Header';
 
 export function CustomThemes() {
-  const { width, height } = useWindowDimensions();
+  const { height } = useWindowDimensions();
 
   return (
     <SafeAreaView style={styles.container}>
@@ -15,7 +15,6 @@ export function CustomThemes() {
 
         <Reader
           src="https://s3.amazonaws.com/moby-dick/OPS/package.opf"
-          width={width}
           height={height * 0.8}
           fileSystem={useFileSystem}
           defaultTheme={Themes.DARK}

@@ -86,10 +86,10 @@ export default `
       }
 
       function getCfiFromHref(book, href) {
-          const [_, id] = href.split('#')
-          const section = book.spine.get(href.split('/')[1])
-          const el = (id ? section.document.getElementById(id) : section.document.body)
-          return section.cfiFromElement(el)
+        const [_, id] = href.split('#')
+        const section = book.spine.get(href.split('/')[1])
+        const el = (id ? section.document.getElementById(id) : section.document.body)
+        return section.cfiFromElement(el)
       }
 
       function getChapter(location) {
@@ -168,6 +168,9 @@ export default `
               type: "onLocationsReady",
               epubKey: book.key(),
               locations: book.locations.save(),
+              totalLocations: book.locations.total,
+              currentLocation: rendition.currentLocation(),
+              progress: book.locations.percentageFromCfi(rendition.currentLocation().start.cfi),
             }));
           });
         })

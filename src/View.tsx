@@ -49,7 +49,11 @@ export function View({
   onSwipeDown = () => {},
   defaultTheme = initialTheme,
   renderOpeningBookComponent = () => (
-    <OpeningBook width={width} height={height} />
+    <OpeningBook
+      width={width}
+      height={height}
+      backgroundColor={defaultTheme.body.background}
+    />
   ),
   openingBookComponentContainerStyle = {
     width: Dimensions.get('screen').width,
@@ -69,6 +73,7 @@ export function View({
   injectedJavascript,
   getInjectionJavascriptFn,
   onWebViewMessage,
+  waitForLocationsReady = false,
 }: ViewProps) {
   const {
     registerBook,
@@ -152,10 +157,9 @@ export function View({
 
     if (type === 'onReady') {
       const { totalLocations, currentLocation, progress } = parsedEvent;
-      setIsRendering(false);
-      setTotalLocations(totalLocations);
-      setCurrentLocation(currentLocation);
-      setProgress(progress);
+      if (!waitForLocationsReady) {
+        setIsRendering(false);
+      }
 
       if (initialAnnotations) {
         setInitialAnnotations(initialAnnotations);
@@ -218,9 +222,17 @@ export function View({
     }
 
     if (type === 'onLocationsReady') {
-      const { epubKey } = parsedEvent;
+      const { epubKey, totalLocations, currentLocation, progress } =
+        parsedEvent;
       setLocations(parsedEvent.locations);
       setKey(epubKey);
+      setTotalLocations(totalLocations);
+      setCurrentLocation(currentLocation);
+      setProgress(progress);
+
+      if (waitForLocationsReady) {
+        setIsRendering(false);
+      }
 
       return onLocationsReady(epubKey, parsedEvent.locations);
     }

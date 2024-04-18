@@ -1,8 +1,14 @@
 import * as React from 'react';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { ScrollView, StyleSheet, Text, TouchableOpacity } from 'react-native';
-import { MD3LightTheme, PaperProvider } from 'react-native-paper';
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  useColorScheme,
+} from 'react-native';
+import { MD3DarkTheme, MD3LightTheme, PaperProvider } from 'react-native-paper';
 import {
   SafeAreaProvider,
   useSafeAreaInsets,
@@ -16,12 +22,14 @@ import {
   OpenExternalLink,
   Annotations,
   Bookmarks,
+  FullExample,
   TableOfContents,
   JavascriptInjection,
   Spreads,
   ScrolledDoc,
   ContinuousSpreads,
   ContinuousScrolled,
+  WithSlider,
 } from './examples';
 
 const { Navigator, Screen } = createNativeStackNavigator();
@@ -129,6 +137,18 @@ export const examples = [
     route: 'ContinuousScrolled',
     component: ContinuousScrolled,
   },
+  {
+    title: 'With Slider',
+    description: 'Navigate between locations with slider',
+    route: 'WithSlider',
+    component: WithSlider,
+  },
+  {
+    title: 'Full Example',
+    description: 'A complete reader using library resources',
+    route: 'FullExample',
+    component: FullExample,
+  },
 ];
 
 function Examples() {
@@ -159,8 +179,11 @@ function Examples() {
 }
 
 export default function App() {
+  const colorScheme = useColorScheme();
   return (
-    <PaperProvider theme={MD3LightTheme}>
+    <PaperProvider
+      theme={colorScheme === 'dark' ? MD3DarkTheme : MD3LightTheme}
+    >
       <SafeAreaProvider>
         <NavigationContainer>
           <Navigator initialRouteName="Examples">
@@ -182,6 +205,7 @@ export default function App() {
                     'JavascriptInjection',
                     'Search',
                     'CustomThemes',
+                    'FullExample',
                   ].includes(route),
                 }}
                 component={Example}

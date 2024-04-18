@@ -20,12 +20,12 @@ export function Reader({
   defaultTheme = initialTheme,
   initialLocations,
   allowScriptedContent = Platform.OS === 'ios',
-  enableSelection = false,
   onPressExternalLink,
   renderLoadingFileComponent = (props) => (
     <LoadingFile {...props} width={width} height={height} />
   ),
   fileSystem: useFileSystem,
+  menuItems,
   manager = 'default',
   flow = 'auto',
   snap,
@@ -42,6 +42,7 @@ export function Reader({
     documentDirectory,
     writeAsStringAsync,
   } = useFileSystem();
+  const enableSelection = menuItems ? true : rest.enableSelection || false;
   const allowPopups = onPressExternalLink ? true : rest.allowPopups || false;
 
   const { setIsLoading, isLoading } = useContext(ReaderContext);
@@ -248,6 +249,8 @@ export function Reader({
       height={height}
       defaultTheme={defaultTheme || initialTheme}
       onPressExternalLink={onPressExternalLink}
+      enableSelection={enableSelection}
+      menuItems={menuItems}
       manager={manager}
       flow={flow}
       snap={snap}

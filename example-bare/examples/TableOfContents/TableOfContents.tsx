@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unused-prop-types */
 /* eslint-disable react-native/no-inline-styles */
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import React, { forwardRef, useState } from 'react';
@@ -12,8 +13,9 @@ import BottomSheet, {
   BottomSheetTextInput,
 } from '@gorhom/bottom-sheet';
 import { BottomSheetMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
-import { Button, MD3Colors, Text } from 'react-native-paper';
+import { Button, Text } from 'react-native-paper';
 import Section from './Section';
+import { contrast } from '../FullExample/utils';
 
 interface Props {
   onPressSection: (section: SectionType) => void;
@@ -23,7 +25,7 @@ export type Ref = BottomSheetMethods;
 
 export const TableOfContents = forwardRef<Ref, Props>(
   ({ onPressSection, onClose }, ref) => {
-    const { toc, section } = useReader();
+    const { toc, section, theme } = useReader();
 
     const [searchTerm, setSearchTerm] = useState('');
     const [data, setData] = useState<Toc>(toc);
@@ -31,7 +33,6 @@ export const TableOfContents = forwardRef<Ref, Props>(
     const snapPoints = React.useMemo(() => ['50%', '90%'], []);
 
     const renderItem = React.useCallback(
-      // eslint-disable-next-line react/no-unused-prop-types
       ({ item }: { item: SectionType }) => (
         <Section
           searchTerm={searchTerm}
@@ -47,11 +48,20 @@ export const TableOfContents = forwardRef<Ref, Props>(
 
     const header = React.useCallback(
       () => (
-        <View>
+        <View style={{ backgroundColor: theme.body.background }}>
           <View style={styles.title}>
-            <Text variant="titleMedium">Table of Contents</Text>
+            <Text
+              variant="titleMedium"
+              style={{ color: contrast[theme.body.background] }}
+            >
+              Table of Contents
+            </Text>
 
-            <Button mode="text" onPress={onClose}>
+            <Button
+              mode="text"
+              textColor={contrast[theme.body.background]}
+              onPress={onClose}
+            >
               Close
             </Button>
           </View>
@@ -66,14 +76,14 @@ export const TableOfContents = forwardRef<Ref, Props>(
               defaultValue={searchTerm}
               style={styles.input}
               placeholder="Type an term here..."
-              placeholderTextColor={MD3Colors.primary30}
+              placeholderTextColor={contrast[theme.body.background]}
               onSubmitEditing={(event) => {
                 event.persist();
 
                 setSearchTerm(event.nativeEvent?.text);
                 setData(
                   toc.filter((elem) =>
-                    new RegExp(event.nativeEvent?.text, 'gi').test(elem.label)
+                    new RegExp(event.nativeEvent?.text, 'gi').test(elem?.label)
                   )
                 );
               }}
@@ -81,7 +91,7 @@ export const TableOfContents = forwardRef<Ref, Props>(
           </View>
         </View>
       ),
-      [onClose, searchTerm, toc]
+      [onClose, searchTerm, theme.body.background, toc]
     );
 
     React.useEffect(() => {
@@ -93,7 +103,9 @@ export const TableOfContents = forwardRef<Ref, Props>(
         index={-1}
         snapPoints={snapPoints}
         enablePanDownToClose
-        style={styles.container}
+        style={{ ...styles.container, backgroundColor: theme.body.background }}
+        handleStyle={{ backgroundColor: theme.body.background }}
+        backgroundStyle={{ backgroundColor: theme.body.background }}
         onClose={() => setSearchTerm('')}
       >
         <BottomSheetFlatList

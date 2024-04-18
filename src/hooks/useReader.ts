@@ -42,6 +42,7 @@ export function useReader() {
     isBookmarked,
     injectJavascript,
     changeFlow,
+    isRendering,
   } = useContext(ReaderContext);
 
   return {
@@ -84,6 +85,7 @@ export function useReader() {
     isBookmarked,
     injectJavascript,
     changeFlow,
+    isRendering,
   } as Pick<
     ReaderContextProps,
     | 'changeFontSize'
@@ -125,5 +127,6 @@ export function useReader() {
     | 'clearSearchResults'
     | 'isSearching'
     | 'changeFlow'
+    | 'isRendering'
   >;
 }

@@ -356,7 +356,8 @@ export interface ReaderProps {
   openingBookComponentContainerStyle?: ViewStyle;
   /**
    * Enable text selection feature on the book.
-   * Default is `false`
+   *
+   * Default is false, except when `menuItems` is passed.
    */
   enableSelection?: boolean;
 
@@ -451,4 +452,6 @@ export interface ReaderProps {
   spread?: Spread;
 
   fullsize?: boolean;
+
+  waitForLocationsReady?: boolean;
 }
