@@ -29,6 +29,7 @@ import {
   ScrolledDoc,
   ContinuousSpreads,
   ContinuousScrolled,
+  WithSlider,
 } from './examples';
 
 const { Navigator, Screen } = createNativeStackNavigator();
@@ -135,6 +136,12 @@ export const examples = [
       'The example is the same as Scrolled Doc except the entire ebook is rendered in the browser at once so there are no navigation links above and below each chapter. This version may take longer to render and uses more memory since the whole ebook is loaded into memory. This version has no links to navigate or jump between chapters.',
     route: 'ContinuousScrolled',
     component: ContinuousScrolled,
+  },
+  {
+    title: 'With Slider',
+    description: 'Navigate between locations with slider',
+    route: 'WithSlider',
+    component: WithSlider,
   },
   {
     title: 'Full Example',

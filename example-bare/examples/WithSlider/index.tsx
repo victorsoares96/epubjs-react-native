@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Dimensions, SafeAreaView } from 'react-native';
 import { Reader, ReaderProvider, useReader } from '@epubjs-react-native/core';
-import { useFileSystem } from '@epubjs-react-native/expo-file-system';
+import { useFileSystem } from '@epubjs-react-native/file-system';
 import { Footer } from './Footer';
 
 export function Book() {

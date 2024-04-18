@@ -49,7 +49,11 @@ export function View({
   onSwipeDown = () => {},
   defaultTheme = initialTheme,
   renderOpeningBookComponent = () => (
-    <OpeningBook width={width} height={height} />
+    <OpeningBook
+      width={width}
+      height={height}
+      backgroundColor={defaultTheme.body.background}
+    />
   ),
   openingBookComponentContainerStyle = {
     width: Dimensions.get('screen').width,
@@ -131,8 +135,6 @@ export function View({
     const parsedEvent = JSON.parse(event.nativeEvent.data);
 
     const { type } = parsedEvent;
-
-    console.log({ type });
 
     if (!INTERNAL_EVENTS.includes(type) && onWebViewMessage) {
       return onWebViewMessage(parsedEvent);
