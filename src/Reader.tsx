@@ -55,9 +55,8 @@ export function Reader({
     (async () => {
       setIsLoading(true);
 
-      const jszipFileUri = `${documentDirectory}jszip.min.js`;
-      const epubjsFileUri = `${documentDirectory}epub.min.js`;
-
+      const jszipFileUri = `${documentDirectory}/jszip.min.js`;
+      const epubjsFileUri = `${documentDirectory}/epub.min.js`;      
       try {
         await writeAsStringAsync(jszipFileUri, jszip);
       } catch (e) {
@@ -211,7 +210,7 @@ export function Reader({
         if (template) {
           const content = template;
 
-          const fileUri = `${documentDirectory}index.html`;
+          const fileUri = `${documentDirectory}/index.html`;
           await writeAsStringAsync(fileUri, content);
           setTemplateUrl(fileUri);
         }

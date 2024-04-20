@@ -38,6 +38,16 @@ In your ios project folder run:
 npx pod install
 ```
 
+For bare react-native projects, add the following permissions to `Info.plist`:
+```
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<true/>
+```
+
+
+
+```
+
 ## Usage
 
 Wrap your root component in ReaderProvider. If you have a vanilla React Native project, it's a good idea to add it in the component which is passed to AppRegistry.registerComponent. This will usually be in the index.js file. If you have an Expo project, you can do this inside the exported component in the App.js file.
