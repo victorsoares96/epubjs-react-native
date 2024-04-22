@@ -39,13 +39,10 @@ npx pod install
 ```
 
 For bare react-native projects, add the following permissions to `Info.plist`:
-```
-	<key>LSSupportsOpeningDocumentsInPlace</key>
-	<true/>
-```
 
-
-
+```sh
+<key>LSSupportsOpeningDocumentsInPlace</key>
+<true/>
 ```
 
 ## Usage
