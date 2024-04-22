@@ -86,7 +86,7 @@ import { Reader, useReader } from '@epubjs-react-native/core';
 export default function App() {
   const { goToLocation } = useReader();
   return (
-    <SafeAreaView>
+    <SafeAreaView style={{ flex: 1 }}>
       <Reader
         src="https://s3.amazonaws.com/moby-dick/OPS/package.opf"
         fileSystem={useFileSystem}
