@@ -44,7 +44,6 @@ export function Footer() {
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 30,
-    flex: 0,
     paddingBottom: 10,
     flexDirection: 'row',
     justifyContent: 'space-between',

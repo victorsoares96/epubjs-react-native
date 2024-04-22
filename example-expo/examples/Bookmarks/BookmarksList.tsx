@@ -1,4 +1,3 @@
-/* eslint-disable react-native/no-inline-styles */
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import React, { forwardRef, useEffect, useState } from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
@@ -56,143 +55,140 @@ export const BookmarksList = forwardRef<Ref, Props>(({ onClose }, ref) => {
 
   return (
     <BottomSheetModalProvider>
-      <View
-        style={{ ...styles.container, backgroundColor: theme.body.background }}
+      <BottomSheetModal
+        ref={ref}
+        index={1}
+        enablePanDownToClose
+        snapPoints={snapPoints}
+        handleStyle={{ backgroundColor: theme.body.background }}
       >
-        <BottomSheetModal
-          ref={ref}
-          index={1}
-          snapPoints={snapPoints}
-          handleStyle={{ backgroundColor: theme.body.background }}
+        <BottomSheetView
+          style={{
+            ...styles.contentContainer,
+            backgroundColor: theme.body.background,
+          }}
         >
-          <BottomSheetView
-            style={{
-              ...styles.contentContainer,
-              backgroundColor: theme.body.background,
-            }}
-          >
+          <View style={styles.title}>
+            <Text
+              variant="titleMedium"
+              style={{ color: contrast[theme.body.background] }}
+            >
+              Bookmarks
+            </Text>
+
+            {bookmarks.length > 0 && (
+              <Button
+                mode="text"
+                onPress={() => {
+                  removeBookmarks();
+                  onClose();
+                }}
+                textColor={contrast[theme.body.background]}
+              >
+                Clear All
+              </Button>
+            )}
+          </View>
+
+          {bookmarks.length === 0 && (
             <View style={styles.title}>
               <Text
-                variant="titleMedium"
-                style={{ color: contrast[theme.body.background] }}
+                variant="bodyMedium"
+                style={{
+                  fontStyle: 'italic',
+                  color: contrast[theme.body.background],
+                }}
               >
-                Bookmarks
+                No bookmarks...
               </Text>
-
-              {bookmarks.length > 0 && (
-                <Button
-                  mode="text"
-                  onPress={() => {
-                    removeBookmarks();
-                    onClose();
-                  }}
-                  textColor={contrast[theme.body.background]}
-                >
-                  Clear All
-                </Button>
-              )}
             </View>
+          )}
 
-            {bookmarks.length === 0 && (
-              <View style={styles.title}>
-                <Text
-                  variant="bodyMedium"
-                  style={{
-                    fontStyle: 'italic',
-                    color: contrast[theme.body.background],
-                  }}
-                >
-                  No bookmarks...
-                </Text>
-              </View>
-            )}
+          {isBookmarked && (
+            <View style={{ width: '100%' }}>
+              <BottomSheetTextInput
+                defaultValue={note}
+                style={styles.input}
+                multiline
+                placeholder="Type an annotation here..."
+                placeholderTextColor={contrast[theme.body.background]}
+                onChangeText={(text) => setNote(text)}
+              />
 
-            {isBookmarked && (
-              <View style={{ width: '100%' }}>
-                <BottomSheetTextInput
-                  defaultValue={note}
-                  style={styles.input}
-                  multiline
-                  placeholder="Type an annotation here..."
-                  placeholderTextColor={contrast[theme.body.background]}
-                  onChangeText={(text) => setNote(text)}
-                />
+              <Button
+                mode="text"
+                style={{ alignSelf: 'flex-end' }}
+                onPress={() => updateBookmark(currentBookmark!.id, { note })}
+                textColor={contrast[theme.body.background]}
+              >
+                Update Annotation
+              </Button>
+            </View>
+          )}
 
-                <Button
-                  mode="text"
-                  style={{ alignSelf: 'flex-end' }}
-                  onPress={() => updateBookmark(currentBookmark!.id, { note })}
-                  textColor={contrast[theme.body.background]}
-                >
-                  Update Annotation
-                </Button>
-              </View>
-            )}
+          {bookmarks.map((bookmark) => (
+            <View key={bookmark.id} style={styles.bookmarkContainer}>
+              <TouchableOpacity
+                style={styles.bookmarkInfo}
+                onPress={() => {
+                  goToLocation(bookmark.location.start.cfi);
+                  onClose();
+                }}
+              >
+                <View style={styles.bookmarkIcon}>
+                  <IconButton
+                    icon="bookmark"
+                    size={20}
+                    iconColor={MD3Colors.neutral50}
+                  />
 
-            {bookmarks.map((bookmark) => (
-              <View key={bookmark.id} style={styles.bookmarkContainer}>
-                <TouchableOpacity
-                  style={styles.bookmarkInfo}
-                  onPress={() => {
-                    goToLocation(bookmark.location.start.cfi);
-                    onClose();
-                  }}
-                >
-                  <View style={styles.bookmarkIcon}>
-                    <IconButton
-                      icon="bookmark"
-                      size={20}
-                      iconColor={MD3Colors.neutral50}
-                    />
+                  <Text
+                    style={{
+                      ...styles.bookmarkLocationNumber,
+                      color: contrast[theme.body.background],
+                    }}
+                    variant="labelSmall"
+                  >
+                    {bookmark.location.start.location}
+                  </Text>
+                </View>
 
-                    <Text
-                      style={{
-                        ...styles.bookmarkLocationNumber,
-                        color: contrast[theme.body.background],
-                      }}
-                      variant="labelSmall"
-                    >
-                      {bookmark.location.start.location}
-                    </Text>
-                  </View>
+                <View style={styles.bookmarkInfoText}>
+                  <Text
+                    numberOfLines={1}
+                    style={{
+                      marginBottom: 2,
+                      color: contrast[theme.body.background],
+                    }}
+                  >
+                    Chapter: {bookmark.section?.label}
+                  </Text>
 
-                  <View style={styles.bookmarkInfoText}>
-                    <Text
-                      numberOfLines={1}
-                      style={{
-                        marginBottom: 2,
-                        color: contrast[theme.body.background],
-                      }}
-                    >
-                      Chapter: {bookmark.section?.label}
-                    </Text>
+                  <Text
+                    numberOfLines={2}
+                    style={{
+                      fontStyle: 'italic',
+                      color: contrast[theme.body.background],
+                    }}
+                  >
+                    &quot;{bookmark.text}&quot;
+                  </Text>
+                </View>
+              </TouchableOpacity>
 
-                    <Text
-                      numberOfLines={2}
-                      style={{
-                        fontStyle: 'italic',
-                        color: contrast[theme.body.background],
-                      }}
-                    >
-                      &quot;{bookmark.text}&quot;
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-
-                <IconButton
-                  icon="trash-can-outline"
-                  size={20}
-                  iconColor={MD3Colors.error50}
-                  onPress={() => {
-                    removeBookmark(bookmark);
-                    onClose();
-                  }}
-                />
-              </View>
-            ))}
-          </BottomSheetView>
-        </BottomSheetModal>
-      </View>
+              <IconButton
+                icon="trash-can-outline"
+                size={20}
+                iconColor={MD3Colors.error50}
+                onPress={() => {
+                  removeBookmark(bookmark);
+                  onClose();
+                }}
+              />
+            </View>
+          ))}
+        </BottomSheetView>
+      </BottomSheetModal>
     </BottomSheetModalProvider>
   );
 });

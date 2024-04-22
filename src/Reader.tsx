@@ -56,7 +56,7 @@ export function Reader({
       setIsLoading(true);
 
       const jszipFileUri = `${documentDirectory}/jszip.min.js`;
-      const epubjsFileUri = `${documentDirectory}/epub.min.js`;      
+      const epubjsFileUri = `${documentDirectory}/epub.min.js`;
       try {
         await writeAsStringAsync(jszipFileUri, jszip);
       } catch (e) {

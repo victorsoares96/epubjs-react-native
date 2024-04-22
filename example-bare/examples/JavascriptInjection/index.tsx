@@ -2,12 +2,22 @@ import * as React from 'react';
 import { SafeAreaView, useWindowDimensions } from 'react-native';
 import { Reader, ReaderProvider } from '@epubjs-react-native/core';
 import { useFileSystem } from '@epubjs-react-native/file-system';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Header } from './Header';
 
 export function JavascriptInjection() {
   const { width, height } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
   return (
-    <SafeAreaView>
+    <SafeAreaView
+      style={{
+        flex: 1,
+        paddingTop: insets.top,
+        paddingBottom: insets.bottom,
+        paddingLeft: insets.left,
+        paddingRight: insets.right,
+      }}
+    >
       <ReaderProvider>
         <Header />
 

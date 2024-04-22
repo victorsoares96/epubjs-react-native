@@ -7,7 +7,7 @@ import {
   useReader,
 } from '@epubjs-react-native/core';
 import { useFileSystem } from '@epubjs-react-native/file-system';
-import BottomSheet from '@gorhom/bottom-sheet';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { COLORS } from './AnnotationForm';
 import { AnnotationsList } from './AnnotationsList';
@@ -15,6 +15,7 @@ import { Selection } from './utils';
 
 function Book() {
   const { width, height } = useWindowDimensions();
+
   const { addAnnotation, removeAnnotation, annotations } = useReader();
   const [selection, setSelection] = React.useState<Selection | null>(null);
   const [selectedAnnotation, setSelectedAnnotation] = React.useState<
@@ -22,9 +23,9 @@ function Book() {
   >(undefined);
   const [tempMark, setTempMark] = React.useState<Annotation | null>(null);
 
-  const annotationsListRef = React.useRef<BottomSheet>(null);
+  const annotationsListRef = React.useRef<BottomSheetModal>(null);
   return (
-    <GestureHandlerRootView>
+    <GestureHandlerRootView style={{ flex: 1 }}>
       <Reader
         src="https://s3.amazonaws.com/moby-dick/OPS/package.opf"
         width={width}
@@ -59,7 +60,7 @@ function Book() {
         }}
         onPressAnnotation={(annotation) => {
           setSelectedAnnotation(annotation);
-          annotationsListRef.current?.snapToIndex(0);
+          annotationsListRef.current?.present();
         }}
         onChangeAnnotations={(annotation) => {
           console.log('onChangeAnnotations', annotation);
@@ -97,7 +98,7 @@ function Book() {
             action: (cfiRange, text) => {
               setSelection({ cfiRange, text });
               addAnnotation('highlight', cfiRange, { isTemp: true });
-              annotationsListRef.current?.snapToIndex(0);
+              annotationsListRef.current?.present();
               return true;
             },
           },
@@ -114,7 +115,7 @@ function Book() {
           setSelection(null);
           setSelectedAnnotation(undefined);
           if (tempMark) removeAnnotation(tempMark);
-          annotationsListRef.current?.close();
+          annotationsListRef.current?.dismiss();
         }}
       />
     </GestureHandlerRootView>

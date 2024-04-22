@@ -1,244 +1,215 @@
 /* eslint-disable react/no-unused-prop-types */
-/* eslint-disable react-native/no-inline-styles */
+
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import React, { forwardRef, useState } from 'react';
 import { ActivityIndicator, View, StyleSheet } from 'react-native';
 import {
-  Section,
   SearchResult as SearchResultType,
   useReader,
 } from '@epubjs-react-native/core';
-import BottomSheet, {
+import {
+  BottomSheetModal,
+  BottomSheetModalProvider,
   BottomSheetFlatList,
   BottomSheetTextInput,
 } from '@gorhom/bottom-sheet';
-import { BottomSheetMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
-import { Text, Button } from 'react-native-paper';
+import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
+import { Text } from 'react-native-paper';
 import SearchResult from './SearchResult';
 import { contrast } from '../FullExample/utils';
 
 interface Props {
-  section: Section | null;
-  onOpenTableOfContents: () => void;
-  onClearFilter: () => void;
   onClose: () => void;
 }
-export type Ref = BottomSheetMethods;
+export type Ref = BottomSheetModalMethods;
 
-export const SearchList = forwardRef<Ref, Props>(
-  ({ section, onOpenTableOfContents, onClearFilter, onClose }, ref) => {
-    const {
-      searchResults,
-      goToLocation,
-      search,
-      clearSearchResults,
-      isSearching,
+export const SearchList = forwardRef<Ref, Props>(({ onClose }, ref) => {
+  const {
+    searchResults,
+    goToLocation,
+    search,
+    clearSearchResults,
+    isSearching,
+    addAnnotation,
+    removeAnnotationByCfi,
+    theme,
+  } = useReader();
+
+  const [searchTerm, setSearchTerm] = useState('');
+  const [data, setData] = useState<SearchResultType[]>(searchResults.results);
+  const [page, setPage] = useState(1);
+
+  const snapPoints = React.useMemo(() => ['50%', '90%'], []);
+
+  const renderItem = React.useCallback(
+    ({ item }: { item: SearchResultType }) => (
+      <SearchResult
+        searchTerm={searchTerm}
+        searchResult={item}
+        onPress={(searchResult) => {
+          goToLocation(searchResult.cfi);
+          addAnnotation('highlight', searchResult.cfi);
+          setTimeout(() => {
+            removeAnnotationByCfi(searchResult.cfi);
+          }, 3000);
+          clearSearchResults();
+          setPage(1);
+          setData([]);
+
+          onClose();
+        }}
+      />
+    ),
+    [
       addAnnotation,
+      clearSearchResults,
+      goToLocation,
+      onClose,
       removeAnnotationByCfi,
-      theme,
-    } = useReader();
+      searchTerm,
+    ]
+  );
 
-    const [searchTerm, setSearchTerm] = useState('');
-    const [data, setData] = useState<SearchResultType[]>(searchResults.results);
-    const [page, setPage] = useState(1);
-
-    const snapPoints = React.useMemo(() => ['50%', '90%'], []);
-
-    const renderItem = React.useCallback(
-      ({ item }: { item: SearchResultType }) => (
-        <SearchResult
-          searchTerm={searchTerm}
-          searchResult={item}
-          onPress={(searchResult) => {
-            goToLocation(searchResult.cfi);
-            addAnnotation('highlight', searchResult.cfi);
-            setTimeout(() => {
-              removeAnnotationByCfi(searchResult.cfi);
-            }, 3000);
-            clearSearchResults();
-            setPage(1);
-            setData([]);
-
-            onClose();
-          }}
-        />
-      ),
-      [
-        addAnnotation,
-        clearSearchResults,
-        goToLocation,
-        onClose,
-        removeAnnotationByCfi,
-        searchTerm,
-      ]
-    );
-
-    const header = React.useCallback(
-      () => (
-        <View>
-          <View style={styles.title}>
-            <Text
-              variant="titleMedium"
-              style={{ color: contrast[theme.body.background] }}
-            >
-              Search Results
-            </Text>
-
-            <Button
-              mode="text"
-              onPress={() =>
-                !section ? onOpenTableOfContents() : onClearFilter()
-              }
-            >
-              Filter: {section?.label || 'Press Here'}
-            </Button>
-          </View>
-
-          <View style={{ width: '100%' }}>
-            <BottomSheetTextInput
-              inputMode="search"
-              returnKeyType="search"
-              returnKeyLabel="Search"
-              autoCorrect={false}
-              autoCapitalize="none"
-              defaultValue={searchTerm}
-              style={styles.input}
-              placeholder="Type an term here..."
-              placeholderTextColor={contrast[theme.body.background]}
-              onSubmitEditing={(event) => {
-                setSearchTerm(event.nativeEvent.text);
-                clearSearchResults();
-                setData([]);
-                setPage(1);
-                search(event.nativeEvent.text, 1, 20, {
-                  sectionId: section?.id,
-                });
-              }}
-            />
-          </View>
-
-          {isSearching && (
-            <View style={styles.title}>
-              <Text
-                variant="bodyMedium"
-                style={{
-                  fontStyle: 'italic',
-                  color: contrast[theme.body.background],
-                }}
-              >
-                Searching results...
-              </Text>
-            </View>
-          )}
-        </View>
-      ),
-      [
-        clearSearchResults,
-        isSearching,
-        onClearFilter,
-        onOpenTableOfContents,
-        search,
-        searchTerm,
-        section,
-        theme.body.background,
-      ]
-    );
-
-    const footer = React.useCallback(
-      () => (
-        <View style={styles.title}>
-          {isSearching && (
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <ActivityIndicator animating />
-
-              <Text
-                variant="bodyMedium"
-                style={{
-                  fontStyle: 'italic',
-                  marginLeft: 5,
-                  color: contrast[theme.body.background],
-                }}
-              >
-                fetching results...
-              </Text>
-            </View>
-          )}
-
-          {data.length > 0 &&
-            data.length === searchResults.totalResults &&
-            !isSearching && (
-              <Text
-                variant="bodyMedium"
-                style={{
-                  fontStyle: 'italic',
-                  color: contrast[theme.body.background],
-                }}
-              >
-                No more results at the moment...
-              </Text>
-            )}
-        </View>
-      ),
-      [
-        data.length,
-        isSearching,
-        searchResults.totalResults,
-        theme.body.background,
-      ]
-    );
-
-    const empty = React.useCallback(
-      () => (
+  const header = React.useCallback(
+    () => (
+      <View>
         <View style={styles.title}>
           <Text
-            variant="bodyMedium"
-            style={{
-              fontStyle: 'italic',
-              color: contrast[theme.body.background],
-            }}
+            variant="titleMedium"
+            style={{ color: contrast[theme.body.background] }}
           >
-            No results...
+            Search Results
           </Text>
         </View>
-      ),
-      [theme.body.background]
-    );
 
-    const handleClose = React.useCallback(() => {
-      clearSearchResults();
-      setPage(1);
-      setData([]);
-    }, [clearSearchResults]);
+        <View style={{ width: '100%' }}>
+          <BottomSheetTextInput
+            inputMode="search"
+            returnKeyType="search"
+            returnKeyLabel="Search"
+            autoCorrect={false}
+            autoCapitalize="none"
+            defaultValue={searchTerm}
+            style={styles.input}
+            placeholder="Type an term here..."
+            placeholderTextColor={contrast[theme.body.background]}
+            onSubmitEditing={(event) => {
+              setSearchTerm(event.nativeEvent.text);
+              clearSearchResults();
+              setData([]);
+              setPage(1);
+              search(event.nativeEvent.text, 1, 20);
+            }}
+          />
+        </View>
 
-    const fetchMoreData = React.useCallback(() => {
-      if (searchResults.results.length > 0 && !isSearching) {
-        search(searchTerm, page + 1, 20, { sectionId: section?.id });
-        setPage(page + 1);
-      }
-    }, [
+        {isSearching && (
+          <View style={styles.title}>
+            <Text
+              variant="bodyMedium"
+              style={{
+                fontStyle: 'italic',
+                color: contrast[theme.body.background],
+              }}
+            >
+              Searching results...
+            </Text>
+          </View>
+        )}
+      </View>
+    ),
+    [clearSearchResults, isSearching, search, searchTerm, theme.body.background]
+  );
+
+  const footer = React.useCallback(
+    () => (
+      <View style={styles.title}>
+        {isSearching && (
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <ActivityIndicator animating />
+
+            <Text
+              variant="bodyMedium"
+              style={{
+                fontStyle: 'italic',
+                marginLeft: 5,
+                color: contrast[theme.body.background],
+              }}
+            >
+              fetching results...
+            </Text>
+          </View>
+        )}
+
+        {data.length > 0 &&
+          data.length === searchResults.totalResults &&
+          !isSearching && (
+            <Text
+              variant="bodyMedium"
+              style={{
+                fontStyle: 'italic',
+                color: contrast[theme.body.background],
+              }}
+            >
+              No more results at the moment...
+            </Text>
+          )}
+      </View>
+    ),
+    [
+      data.length,
       isSearching,
-      page,
-      search,
-      searchResults.results.length,
-      searchTerm,
-      section?.id,
-    ]);
+      searchResults.totalResults,
+      theme.body.background,
+    ]
+  );
 
-    React.useEffect(() => {
-      if (searchResults.results.length > 0) {
-        setData((oldState) => [...oldState, ...searchResults.results]);
-      }
-    }, [searchResults]);
+  const empty = React.useCallback(
+    () => (
+      <View style={styles.title}>
+        <Text
+          variant="bodyMedium"
+          style={{
+            fontStyle: 'italic',
+            color: contrast[theme.body.background],
+          }}
+        >
+          No results...
+        </Text>
+      </View>
+    ),
+    [theme.body.background]
+  );
 
-    return (
-      <BottomSheet
+  const handleClose = React.useCallback(() => {
+    clearSearchResults();
+    setPage(1);
+    setData([]);
+  }, [clearSearchResults]);
+
+  const fetchMoreData = React.useCallback(() => {
+    if (searchResults.results.length > 0 && !isSearching) {
+      search(searchTerm, page + 1, 20);
+      setPage(page + 1);
+    }
+  }, [isSearching, page, search, searchResults.results.length, searchTerm]);
+
+  React.useEffect(() => {
+    if (searchResults.results.length > 0) {
+      setData((oldState) => [...oldState, ...searchResults.results]);
+    }
+  }, [searchResults]);
+
+  return (
+    <BottomSheetModalProvider>
+      <BottomSheetModal
         ref={ref}
-        index={-1}
+        index={0}
         snapPoints={snapPoints}
         enablePanDownToClose
         style={styles.container}
         backgroundStyle={{ backgroundColor: theme.body.background }}
-        onClose={handleClose}
+        onDismiss={handleClose}
       >
         <BottomSheetFlatList<SearchResultType>
           data={data}
@@ -253,10 +224,10 @@ export const SearchList = forwardRef<Ref, Props>(
           onEndReachedThreshold={0.2}
           onEndReached={fetchMoreData}
         />
-      </BottomSheet>
-    );
-  }
-);
+      </BottomSheetModal>
+    </BottomSheetModalProvider>
+  );
+});
 
 const styles = StyleSheet.create({
   container: {

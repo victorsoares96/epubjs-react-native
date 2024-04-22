@@ -1,5 +1,5 @@
 /* eslint-disable react/no-unused-prop-types */
-/* eslint-disable react-native/no-inline-styles */
+
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import React, { forwardRef, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
@@ -8,11 +8,13 @@ import {
   Section as SectionType,
   useReader,
 } from '@epubjs-react-native/core';
-import BottomSheet, {
+import {
+  BottomSheetModal,
+  BottomSheetModalProvider,
   BottomSheetFlatList,
   BottomSheetTextInput,
 } from '@gorhom/bottom-sheet';
-import { BottomSheetMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
+import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
 import { Button, Text } from 'react-native-paper';
 import Section from './Section';
 import { contrast } from '../FullExample/utils';
@@ -21,7 +23,7 @@ interface Props {
   onPressSection: (section: SectionType) => void;
   onClose: () => void;
 }
-export type Ref = BottomSheetMethods;
+export type Ref = BottomSheetModalMethods;
 
 export const TableOfContents = forwardRef<Ref, Props>(
   ({ onPressSection, onClose }, ref) => {
@@ -98,26 +100,31 @@ export const TableOfContents = forwardRef<Ref, Props>(
       setData(toc);
     }, [toc]);
     return (
-      <BottomSheet
-        ref={ref}
-        index={-1}
-        snapPoints={snapPoints}
-        enablePanDownToClose
-        style={{ ...styles.container, backgroundColor: theme.body.background }}
-        handleStyle={{ backgroundColor: theme.body.background }}
-        backgroundStyle={{ backgroundColor: theme.body.background }}
-        onClose={() => setSearchTerm('')}
-      >
-        <BottomSheetFlatList
-          data={data}
-          showsVerticalScrollIndicator={false}
-          keyExtractor={(item) => item.id}
-          renderItem={renderItem}
-          ListHeaderComponent={header}
-          style={{ width: '100%' }}
-          maxToRenderPerBatch={20}
-        />
-      </BottomSheet>
+      <BottomSheetModalProvider>
+        <BottomSheetModal
+          ref={ref}
+          index={0}
+          snapPoints={snapPoints}
+          enablePanDownToClose
+          style={{
+            ...styles.container,
+            backgroundColor: theme.body.background,
+          }}
+          handleStyle={{ backgroundColor: theme.body.background }}
+          backgroundStyle={{ backgroundColor: theme.body.background }}
+          onDismiss={() => setSearchTerm('')}
+        >
+          <BottomSheetFlatList
+            data={data}
+            showsVerticalScrollIndicator={false}
+            keyExtractor={(item) => item.id}
+            renderItem={renderItem}
+            ListHeaderComponent={header}
+            style={{ width: '100%' }}
+            maxToRenderPerBatch={20}
+          />
+        </BottomSheetModal>
+      </BottomSheetModalProvider>
     );
   }
 );

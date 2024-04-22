@@ -1,16 +1,11 @@
 import React from 'react';
-import {
-  DimensionValue,
-  I18nManager,
-  Platform,
-  TouchableWithoutFeedback,
-  View,
-} from 'react-native';
+import { DimensionValue, I18nManager, Platform, View } from 'react-native';
 import {
   GestureHandlerRootView,
   GestureDetector,
   Gesture,
   Directions,
+  TouchableWithoutFeedback,
 } from 'react-native-gesture-handler';
 
 interface Props {
@@ -78,26 +73,36 @@ export function GestureHandler({
       }, 500);
     }
   };
-  return (
-    <GestureHandlerRootView style={{ width, height }}>
-      <GestureDetector
-        gesture={Gesture.Exclusive(
-          swipeLeft,
-          swipeRight,
-          swipeUp,
-          swipeDown,
-          longPress,
-          doubleTap,
-          singleTap
-        )}
-      >
-        <TouchableWithoutFeedback
-          style={{ width, height }}
-          onPress={() => Platform.OS === 'ios' && handleDoubleTap()}
-          onLongPress={() => Platform.OS === 'ios' && onLongPress()}
+
+  if (Platform.OS === 'ios') {
+    return (
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <GestureDetector
+          gesture={Gesture.Exclusive(
+            swipeLeft,
+            swipeRight,
+            swipeUp,
+            swipeDown,
+            longPress,
+            doubleTap,
+            singleTap
+          )}
         >
-          <View style={{ width, height }}>{children}</View>
-        </TouchableWithoutFeedback>
+          <TouchableWithoutFeedback
+            style={{ width, height }}
+            onPress={() => Platform.OS === 'ios' && handleDoubleTap()}
+            onLongPress={() => Platform.OS === 'ios' && onLongPress()}
+          >
+            {children}
+          </TouchableWithoutFeedback>
+        </GestureDetector>
+      </GestureHandlerRootView>
+    );
+  }
+  return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <GestureDetector gesture={Gesture.Exclusive(swipeLeft, swipeRight)}>
+        <View style={{ width, height }}>{children}</View>
       </GestureDetector>
     </GestureHandlerRootView>
   );

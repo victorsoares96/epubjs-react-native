@@ -12,7 +12,7 @@ export function InitialLocation() {
         <Reader
           src="https://s3.amazonaws.com/moby-dick/OPS/package.opf"
           width={width}
-          height={height * 0.7}
+          height={height * 0.9}
           fileSystem={useFileSystem}
           initialLocation="introduction_001.xhtml"
         />

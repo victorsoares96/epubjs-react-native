@@ -7,7 +7,7 @@ export function OpenExternalLink() {
   const { width, height } = useWindowDimensions();
 
   return (
-    <SafeAreaView>
+    <SafeAreaView style={{ flex: 1 }}>
       <ReaderProvider>
         <Reader
           src="https://github.com/IDPF/epub3-samples/releases/download/20230704/accessible_epub_3.epub"

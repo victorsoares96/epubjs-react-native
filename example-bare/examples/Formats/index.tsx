@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { Reader, ReaderProvider } from '@epubjs-react-native/core';
 import { useFileSystem } from '@epubjs-react-native/file-system';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import base64 from './base64';
 import { styles } from './styles';
 
@@ -19,9 +20,19 @@ const opf = 'https://s3.amazonaws.com/moby-dick/OPS/package.opf';
 
 export function Formats() {
   const { width, height } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
+
   const [src, setSrc] = React.useState(opf);
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView
+      style={{
+        ...styles.container,
+        paddingTop: insets.top,
+        paddingBottom: insets.bottom,
+        paddingLeft: insets.left,
+        paddingRight: insets.right,
+      }}
+    >
       <View style={styles.options}>
         <TouchableOpacity onPress={() => setSrc(opf)}>
           <Text>Book (.opf)</Text>
@@ -45,8 +56,11 @@ export function Formats() {
                   text: 'Ok',
                   onPress: async () => {
                     const { assets } = await DocumentPicker.getDocumentAsync();
+                    if (!assets) return;
 
-                    if (assets && assets[0].uri) setSrc(assets[0].uri);
+                    const { uri } = assets[0];
+
+                    if (uri) setSrc(uri);
                   },
                 },
               ]
