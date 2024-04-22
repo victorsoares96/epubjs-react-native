@@ -33,14 +33,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginHorizontal: 10,
   },
-  themeIcon: {
-    width: 24,
-    height: 24,
-    borderRadius: 32,
-    borderColor: '#000',
-    borderWidth: 2,
-    marginRight: 10,
-  },
   actions: {
     flexDirection: 'row',
     alignItems: 'center',

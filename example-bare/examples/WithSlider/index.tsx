@@ -7,7 +7,7 @@ import { Footer } from './Footer';
 export function Book() {
   const { goToLocation } = useReader();
   return (
-    <SafeAreaView>
+    <SafeAreaView style={{ flex: 1 }}>
       <Reader
         src="https://s3.amazonaws.com/moby-dick/OPS/package.opf"
         fileSystem={useFileSystem}

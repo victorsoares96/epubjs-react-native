@@ -1,62 +1,48 @@
 import * as React from 'react';
-import { SafeAreaView, useWindowDimensions } from 'react-native';
-import { Section, Reader, ReaderProvider } from '@epubjs-react-native/core';
+import { useWindowDimensions } from 'react-native';
+import { Reader, ReaderProvider } from '@epubjs-react-native/core';
 import { useFileSystem } from '@epubjs-react-native/expo-file-system';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import BottomSheet, { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
-import { styles } from './styles';
 import { Header } from './Header';
 import { SearchList } from './SearchList';
-import { TableOfContents } from '../TableOfContents/TableOfContents';
 
 function Inner() {
-  const { width, height } = useWindowDimensions();
+  const { height } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
 
-  const searchListRef = React.useRef<BottomSheet>(null);
-  const tableOfContentsRef = React.useRef<BottomSheet>(null);
-
-  const [section, setSection] = React.useState<Section | null>(null);
+  const searchListRef = React.useRef<BottomSheetModal>(null);
   return (
-    <SafeAreaView style={styles.container}>
-      <GestureHandlerRootView>
-        <Header onPressSearch={() => searchListRef.current?.snapToIndex(0)} />
+    <GestureHandlerRootView
+      style={{
+        flex: 1,
+        paddingTop: insets.top,
+        paddingBottom: insets.bottom,
+        paddingLeft: insets.left,
+        paddingRight: insets.right,
+      }}
+    >
+      <Header onPressSearch={() => searchListRef.current?.present()} />
 
-        <Reader
-          src="https://s3.amazonaws.com/moby-dick/OPS/package.opf"
-          width={width}
-          height={height * 0.8}
-          fileSystem={useFileSystem}
-        />
+      <Reader
+        src="https://s3.amazonaws.com/moby-dick/OPS/package.opf"
+        height={height * 0.8}
+        fileSystem={useFileSystem}
+      />
 
-        <SearchList
-          ref={searchListRef}
-          section={section}
-          onOpenTableOfContents={() =>
-            tableOfContentsRef.current?.snapToIndex(0)
-          }
-          onClearFilter={() => setSection(null)}
-          onClose={() => searchListRef.current?.close()}
-        />
-
-        <TableOfContents
-          ref={tableOfContentsRef}
-          onClose={() => tableOfContentsRef.current?.close()}
-          onPressSection={(selectedSection) => {
-            setSection(selectedSection);
-            tableOfContentsRef.current?.close();
-          }}
-        />
-      </GestureHandlerRootView>
-    </SafeAreaView>
+      <SearchList
+        ref={searchListRef}
+        onClose={() => searchListRef.current?.dismiss()}
+      />
+    </GestureHandlerRootView>
   );
 }
 
 export function Search() {
   return (
     <ReaderProvider>
-      <BottomSheetModalProvider>
-        <Inner />
-      </BottomSheetModalProvider>
+      <Inner />
     </ReaderProvider>
   );
 }

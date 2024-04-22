@@ -1,11 +1,13 @@
-/* eslint-disable react/require-default-props */
-/* eslint-disable react-native/no-inline-styles */
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import React, { forwardRef } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { useReader, Annotation } from '@epubjs-react-native/core';
-import BottomSheet, { BottomSheetFlatList } from '@gorhom/bottom-sheet';
-import { BottomSheetMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
+import {
+  BottomSheetFlatList,
+  BottomSheetModal,
+  BottomSheetModalProvider,
+} from '@gorhom/bottom-sheet';
+import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
 import { Button, Text } from 'react-native-paper';
 import { contrast } from '../FullExample/utils';
 import AnnotationForm from './AnnotationForm';
@@ -18,7 +20,7 @@ interface Props {
   annotations: Annotation[];
   onClose: () => void;
 }
-export type Ref = BottomSheetMethods;
+export type Ref = BottomSheetModalMethods;
 
 export const AnnotationsList = forwardRef<Ref, Props>(
   ({ selection, selectedAnnotation, annotations, onClose }, ref) => {
@@ -90,29 +92,34 @@ export const AnnotationsList = forwardRef<Ref, Props>(
     );
 
     return (
-      <BottomSheet
-        ref={ref}
-        index={-1}
-        snapPoints={snapPoints}
-        enablePanDownToClose
-        style={{ ...styles.container, backgroundColor: theme.body.background }}
-        handleStyle={{ backgroundColor: theme.body.background }}
-        backgroundStyle={{ backgroundColor: theme.body.background }}
-        onClose={onClose}
-      >
-        <BottomSheetFlatList<Annotation>
-          data={annotations.filter(
-            (annotation) =>
-              !annotation?.data?.isTemp && annotation.type !== 'mark'
-          )}
-          showsVerticalScrollIndicator={false}
-          keyExtractor={(item) => item.cfiRange}
-          renderItem={renderItem}
-          ListHeaderComponent={header}
-          style={{ width: '100%' }}
-          maxToRenderPerBatch={20}
-        />
-      </BottomSheet>
+      <BottomSheetModalProvider>
+        <BottomSheetModal
+          ref={ref}
+          index={0}
+          snapPoints={snapPoints}
+          enablePanDownToClose
+          style={{
+            ...styles.container,
+            backgroundColor: theme.body.background,
+          }}
+          handleStyle={{ backgroundColor: theme.body.background }}
+          backgroundStyle={{ backgroundColor: theme.body.background }}
+          onDismiss={onClose}
+        >
+          <BottomSheetFlatList<Annotation>
+            data={annotations.filter(
+              (annotation) =>
+                !annotation?.data?.isTemp && annotation.type !== 'mark'
+            )}
+            showsVerticalScrollIndicator={false}
+            keyExtractor={(item) => item.cfiRange}
+            renderItem={renderItem}
+            ListHeaderComponent={header}
+            style={{ width: '100%' }}
+            maxToRenderPerBatch={20}
+          />
+        </BottomSheetModal>
+      </BottomSheetModalProvider>
     );
   }
 );

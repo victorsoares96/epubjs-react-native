@@ -5,7 +5,7 @@ import { useFileSystem } from '@epubjs-react-native/file-system';
 
 export function Spreads() {
   return (
-    <SafeAreaView>
+    <SafeAreaView style={{ flex: 1 }}>
       <ReaderProvider>
         <Reader
           src="https://s3.amazonaws.com/moby-dick/OPS/package.opf"

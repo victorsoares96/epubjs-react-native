@@ -56,8 +56,8 @@ export function View({
     />
   ),
   openingBookComponentContainerStyle = {
-    width: Dimensions.get('screen').width,
-    height: Dimensions.get('screen').height,
+    width: width || Dimensions.get('screen').width,
+    height: height || Dimensions.get('screen').height,
   },
   onPressExternalLink,
   menuItems,
