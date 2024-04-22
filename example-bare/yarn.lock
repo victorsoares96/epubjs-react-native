@@ -1219,15 +1219,15 @@
   dependencies:
     "@types/hammerjs" "^2.0.36"
 
-"@epubjs-react-native/core@1.4.0":
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/@epubjs-react-native/core/-/core-1.4.0.tgz#e2c4183bd07bbc896129059280b3ac0d47825d01"
-  integrity sha512-QB1qH9nCjcjL/IxqGZhDJozIq8EZbZ1d9m5Yt5clZlff37oPbgmTT7Kax0d32/ArCcWmi+JTz3ANZ3CTKjWrFQ==
+"@epubjs-react-native/core@1.4.1":
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/@epubjs-react-native/core/-/core-1.4.1.tgz#b3551f88e36e5d0841dd9402bb6057d296325176"
+  integrity sha512-JkQufJm7G4tVljhi+sknbww3bUTRJqLime5w0KbB5sc5gdpKVB2VgQcVIIpgiMh6P7rvQ2dwp662YhOezHBQgw==
 
-"@epubjs-react-native/file-system@^1.1.2":
-  version "1.1.2"
-  resolved "https://registry.yarnpkg.com/@epubjs-react-native/file-system/-/file-system-1.1.2.tgz#99bdd7f060f912cb4c8296c86604167508eeb5c2"
-  integrity sha512-3hd2594Ls+s4y9trft5IvYt8QJZrk6DmXb9kZkxJ1H1roWIubCbHT6vRvTbx4e+CGT1SePsBWct6XwCqEcSuRA==
+"@epubjs-react-native/file-system@1.1.3":
+  version "1.1.3"
+  resolved "https://registry.yarnpkg.com/@epubjs-react-native/file-system/-/file-system-1.1.3.tgz#9e3429b5e306919a81f0eff0c34c9cb9466b3148"
+  integrity sha512-0rmrw/OV8DYoMvUmPOVYxpiC/lE92W9nn78LqY95tYduUTFRFjDvQs6a3OGpOVip+6dO7lT2OHB0mqnWr/g9dw==
 
 "@expo/bunyan@^4.0.0":
   version "4.0.0"
