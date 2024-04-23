@@ -31,6 +31,7 @@ export function Reader({
   snap,
   spread,
   fullsize,
+  cacheLocations,
   ...rest
 }: ReaderProps) {
   const {
@@ -67,6 +68,10 @@ export function Reader({
         await writeAsStringAsync(epubjsFileUri, epubjs);
       } catch (e) {
         throw new Error('failed to write epubjs js file');
+      }
+
+      if (initialLocations) {
+        
       }
 
       setAllowedUris(`${jszipFileUri},${epubjsFileUri}`);
@@ -253,6 +258,7 @@ export function Reader({
       manager={manager}
       flow={flow}
       snap={snap}
+      cacheLocations={cacheLocations}
       {...rest}
     />
   );

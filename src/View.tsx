@@ -10,6 +10,7 @@ import type { Bookmark, ReaderProps } from './types';
 import { OpeningBook } from './utils/OpeningBook';
 import INTERNAL_EVENTS from './utils/internalEvents.util';
 import { GestureHandler } from './utils/GestureHandler';
+import { storage } from './utils/Storage';
 
 export type ViewProps = Omit<ReaderProps, 'src' | 'fileSystem'> & {
   templateUri: string;
@@ -74,6 +75,7 @@ export function View({
   getInjectionJavascriptFn,
   onWebViewMessage,
   waitForLocationsReady = false,
+  cacheLocations,
 }: ViewProps) {
   const {
     registerBook,
@@ -229,6 +231,14 @@ export function View({
       setTotalLocations(totalLocations);
       setCurrentLocation(currentLocation);
       setProgress(progress);
+
+      if (cacheLocations) {
+        const hasCache = storage.contains(epubKey);
+
+        if (!hasCache) {
+          storage.set(epubKey, JSON.stringify(parsedEvent.locations));
+        }
+      }
 
       if (waitForLocationsReady) {
         setIsRendering(false);
