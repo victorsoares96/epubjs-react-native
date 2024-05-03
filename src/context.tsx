@@ -21,6 +21,7 @@ import type {
   Toc,
   Landmark,
   Flow,
+  PaginateOptions,
 } from './types';
 import * as webViewInjectFunctions from './utils/webViewInjectFunctions';
 
@@ -57,6 +58,7 @@ enum Types {
   SET_LANDMARKS = 'SET_LANDMARKS',
   SET_BOOKMARKS = 'SET_BOOKMARKS',
   SET_IS_BOOKMARKED = 'SET_IS_BOOKMARKED',
+  SET_FLOW = 'SET_FLOW',
 }
 
 type BookPayload = {
@@ -89,6 +91,7 @@ type BookPayload = {
   [Types.SET_LANDMARKS]: Landmark[];
   [Types.SET_BOOKMARKS]: Bookmark[];
   [Types.SET_IS_BOOKMARKED]: boolean;
+  [Types.SET_FLOW]: Flow;
 };
 
 type BookActions = ActionMap<BookPayload>[keyof ActionMap<BookPayload>];
@@ -123,6 +126,7 @@ type InitialState = {
   landmarks: Landmark[];
   bookmarks: Bookmark[];
   isBookmarked: boolean;
+  flow: Flow;
 };
 
 export const defaultTheme: Theme = {
@@ -181,6 +185,7 @@ const initialState: InitialState = {
   landmarks: [],
   bookmarks: [],
   isBookmarked: false,
+  flow: 'auto',
 };
 
 function bookReducer(state: InitialState, action: BookActions): InitialState {
@@ -290,6 +295,11 @@ function bookReducer(state: InitialState, action: BookActions): InitialState {
         ...state,
         isBookmarked: action.payload,
       };
+    case Types.SET_FLOW:
+      return {
+        ...state,
+        flow: action.payload,
+      };
     default:
       return state;
   }
@@ -323,13 +333,17 @@ export interface ReaderContextProps {
 
   /**
    * Go to previous page in the book
+   *
+   * keepScrollOffset - default is false
    */
-  goPrevious: () => void;
+  goPrevious: (options?: PaginateOptions) => void;
 
   /**
    * Go to next page in the book
+   *
+   * keepScrollOffset - default is false
    */
-  goNext: () => void;
+  goNext: (options?: PaginateOptions) => void;
 
   /**
    * Get the total locations of the book
@@ -561,6 +575,13 @@ export interface ReaderContextProps {
   injectJavascript: (script: string) => void;
 
   changeFlow: (flow: Flow) => void;
+
+  flow: Flow;
+
+  /**
+   * Private
+   */
+  setFlow: (flow: Flow) => void;
 }
 
 const ReaderContext = createContext<ReaderContextProps>({
@@ -654,6 +675,8 @@ const ReaderContext = createContext<ReaderContextProps>({
 
   injectJavascript: () => {},
   changeFlow: () => {},
+  setFlow: () => {},
+  flow: 'auto',
 });
 
 function ReaderProvider({ children }: { children: React.ReactNode }) {
@@ -740,13 +763,39 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
     book.current?.injectJavaScript(`rendition.display('${targetCfi}'); true`);
   }, []);
 
-  const goPrevious = useCallback(() => {
-    book.current?.injectJavaScript(`rendition.prev(); true`);
-  }, []);
+  const goPrevious = useCallback(
+    (options?: PaginateOptions) => {
+      webViewInjectFunctions.injectJavaScript(
+        book,
+        `
+      ${
+        !options?.keepScrollOffset && state.flow === 'scrolled-doc'
+          ? `rendition.once('relocated', () => rendition.moveTo(0));`
+          : ''
+      }
+      rendition.prev();
+    `
+      );
+    },
+    [state.flow]
+  );
 
-  const goNext = useCallback(() => {
-    book.current?.injectJavaScript(`rendition.next(); true`);
-  }, []);
+  const goNext = useCallback(
+    (options?: PaginateOptions) => {
+      webViewInjectFunctions.injectJavaScript(
+        book,
+        `
+      ${
+        !options?.keepScrollOffset && state.flow === 'scrolled-doc'
+          ? `rendition.once('relocated', () => rendition.moveTo(0));`
+          : ''
+      }
+      rendition.next();
+    `
+      );
+    },
+    [state.flow]
+  );
 
   const getLocations = useCallback(() => state.locations, [state.locations]);
 
@@ -1093,6 +1142,11 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       book,
       `rendition.flow(${JSON.stringify(flow)}); true`
     );
+    dispatch({ type: Types.SET_FLOW, payload: flow });
+  }, []);
+
+  const setFlow = useCallback((flow: Flow) => {
+    dispatch({ type: Types.SET_FLOW, payload: flow });
   }, []);
 
   const contextValue = useMemo(
@@ -1169,6 +1223,8 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       isBookmarked: state.isBookmarked,
       injectJavascript,
       changeFlow,
+      setFlow,
+      flow: state.flow,
     }),
     [
       changeFontFamily,
@@ -1233,6 +1289,8 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       setIsBookmarked,
       injectJavascript,
       changeFlow,
+      setFlow,
+      state.flow,
     ]
   );
   return (

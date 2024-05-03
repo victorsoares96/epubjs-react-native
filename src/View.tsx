@@ -74,6 +74,8 @@ export function View({
   getInjectionJavascriptFn,
   onWebViewMessage,
   waitForLocationsReady = false,
+  keepScrollOffsetOnLocationChange,
+  flow,
 }: ViewProps) {
   const {
     registerBook,
@@ -104,12 +106,17 @@ export function View({
     setIsBookmarked,
     currentLocation: currLoc,
     setIsSearching,
+    setFlow,
   } = useContext(ReaderContext);
   const book = useRef<WebView>(null);
   const [selectedText, setSelectedText] = useState<{
     cfiRange: string;
     cfiRangeText: string;
   }>({ cfiRange: '', cfiRangeText: '' });
+
+  useEffect(() => {
+    setFlow(flow || 'auto');
+  }, [flow, setFlow]);
 
   useEffect(() => {
     if (getInjectionJavascriptFn && book.current) {
@@ -415,13 +422,17 @@ export function View({
       onLongPress={onLongPress}
       onSwipeLeft={() => {
         if (enableSwipe) {
-          goNext();
+          goNext({
+            keepScrollOffset: keepScrollOffsetOnLocationChange,
+          });
           onSwipeLeft();
         }
       }}
       onSwipeRight={() => {
         if (enableSwipe) {
-          goPrevious();
+          goPrevious({
+            keepScrollOffset: keepScrollOffsetOnLocationChange,
+          });
           onSwipeRight();
         }
       }}

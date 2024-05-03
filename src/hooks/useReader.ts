@@ -43,6 +43,7 @@ export function useReader() {
     injectJavascript,
     changeFlow,
     isRendering,
+    flow,
   } = useContext(ReaderContext);
 
   return {
@@ -86,6 +87,7 @@ export function useReader() {
     injectJavascript,
     changeFlow,
     isRendering,
+    flow,
   } as Pick<
     ReaderContextProps,
     | 'changeFontSize'
@@ -128,5 +130,6 @@ export function useReader() {
     | 'isSearching'
     | 'changeFlow'
     | 'isRendering'
+    | 'flow'
   >;
 }
