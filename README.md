@@ -35,7 +35,7 @@ npx expo install @epubjs-react-native/expo-file-system react-native-fs react-nat
 In your ios project folder run:
 
 ```sh
-npx pod install
+npx pod-install
 ```
 
 For bare react-native projects, add the following permissions to `Info.plist`:
@@ -147,6 +147,7 @@ export default function App() {
 | `spread`           | `auto` `none` `always`    |                                                                           |
 | `fullsize`           | `boolean`    |                                                                           |
 | `waitForLocationsReady`           |  `boolean`    | only render book after locations generated                                                                           |
+| `keepScrollOffsetOnLocationChange` | `boolean` | Prevents scroll top when change location. Works with `scrolled-doc` flow.
 
 ## Hooks
 
@@ -166,8 +167,8 @@ const { changeFontSize, goToLocation, ... } = useReader();
 | `changeFontFamily`   | `font`   | Change font family of all elements in the book                            |
 | `goToLocation`       | `cfi`    | Go to specific location in the book                                       |
 | `getLocations`       |          | Get the total locations of the book                                       |
-| `goPrevious`         |          | Go to previous page in the book                                           |
-| `goNext`             |          | Go to next page in the book                                               |
+| `goPrevious`         | `PaginateOptions`        | Go to previous page in the book                                           |
+| `goNext`             | `PaginateOptions`         | Go to next page in the book                                               |
 | `search`             | `query`  | Search for a specific text in the book                                    |
 | `clearSearchResults` | `void`   | Clear search results                                                      |
 | `changeTheme`        | `theme`  | Change active theme                                                       |

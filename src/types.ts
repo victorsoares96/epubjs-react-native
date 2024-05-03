@@ -1,5 +1,9 @@
 import { DimensionValue, ViewStyle } from 'react-native';
 
+export type PaginateOptions = {
+  keepScrollOffset?: boolean;
+};
+
 export type Location = {
   atStart?: boolean;
   atEnd?: boolean;
@@ -454,4 +458,13 @@ export interface ReaderProps {
   fullsize?: boolean;
 
   waitForLocationsReady?: boolean;
+
+  /**
+   * Prevents scroll top when change location
+   *
+   * Works with `scrolled-doc` flow.
+   *
+   * Default is false
+   */
+  keepScrollOffsetOnLocationChange?: boolean;
 }
