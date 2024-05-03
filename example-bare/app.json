@@ -7,5 +7,12 @@
       "**/*"
     ]
   },
+  "ios": {
+    "infoPlist": {
+      "UISupportsDocumentBrowser": true,
+      "UIFileSharingEnabled": true,
+      "LSSupportsOpeningDocumentsInPlace": true
+    }
+  },
   "name": "example-bare"
 }
