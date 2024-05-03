@@ -55,7 +55,9 @@ export function Formats() {
                 {
                   text: 'Ok',
                   onPress: async () => {
-                    const { assets } = await DocumentPicker.getDocumentAsync();
+                    const { assets } = await DocumentPicker.getDocumentAsync({
+                      copyToCacheDirectory: false,
+                    });
                     if (!assets) return;
 
                     const { uri } = assets[0];
