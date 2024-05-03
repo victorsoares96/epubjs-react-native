@@ -70,7 +70,7 @@
     "@typescript-eslint/parser": "7.7.0",
     "commitizen": "4.3.0",
     "commitizen-emoji": "1.0.5",
-    "eslint": "8.57.0",
+    "eslint": "9.2.0",
     "eslint-config-airbnb": "19.0.4",
     "eslint-config-airbnb-typescript": "18.0.0",
     "eslint-config-prettier": "9.1.0",
