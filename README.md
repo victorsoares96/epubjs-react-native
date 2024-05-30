@@ -175,8 +175,11 @@ const { changeFontSize, goToLocation, ... } = useReader();
 | `getCurrentLocation` |          | Returns the current location of the book                                  |
 | `getMeta`            |          | Returns an object containing the book's metadata.                         |
 | `addAnnotation`      |    `annotation`      | Attach annotation in the book.                                            |
+| `addAnnotationByTagId`      |    `annotation`      | Attach annotation in the book by dom element tag id.                                            |
 | `updateAnnotation`   |     `annotation, data, styles`     | Update annotation data and style                                          |
+| `updateAnnotationByTagId`   |     `annotation, data, styles`     | Update annotation data and style by dom element tag id                                          |
 | `removeAnnotation`   |  `annotation`        | Detach annotation in the book.                                            |
+| `removeAnnotationByTagId`   |  `annotation`        | Detach annotation in the book by dom element tag id.                                            |
 | `removeAnnotationByCfi`  `cfi`          |          | Detach annotations in the book by provided cfi.                         |
 | `removeAnnotations`  |    `type?: optional`      | Detach all annotations in the book. Can be detach by type                 |
 | `removeSelection`    |          | Remove selection                 |

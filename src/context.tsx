@@ -438,8 +438,45 @@ export interface ReaderContextProps {
     iconClass?: string
   ) => void;
 
+  addAnnotationByTagId: (
+    type: AnnotationType,
+    tagId: string,
+    data?: object,
+    styles?: AnnotationStyles,
+    /**
+     * The name of the css class defined in the applied theme that will be used as the icon for the markup.
+     * Example of how the class should be defined in the theme file:
+     * ```html
+     * <style type="text/css">
+     *  [ref="epubjs-mk-heart"] {
+     *    background: url("data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPScxLj4...") no-repeat;
+     *    width: 20px;
+     *    height: 20px;
+     *    cursor: pointer;
+     *    margin-left: 0;
+     *  }
+     * </style>
+     * ```
+     *
+     *
+     * And how it should be defined:
+     *
+     *
+     * ```js
+     * addAnnotation('mark', 'epubCfi(20/14...)', {}, undefined, 'epubjs-mk-heart');
+     * ```
+     */
+    iconClass?: string
+  ) => void;
+
   updateAnnotation: (
     annotation: Annotation,
+    data?: object,
+    styles?: AnnotationStyles
+  ) => void;
+
+  updateAnnotationByTagId: (
+    tagId: string,
     data?: object,
     styles?: AnnotationStyles
   ) => void;
@@ -450,6 +487,8 @@ export interface ReaderContextProps {
    * Remove all annotations matching with provided cfi
    */
   removeAnnotationByCfi: (cfiRange: ePubCfi) => void;
+
+  removeAnnotationByTagId: (tagId: string) => void;
 
   removeAnnotations: (type?: AnnotationType) => void;
 
@@ -660,8 +699,11 @@ const ReaderContext = createContext<ReaderContextProps>({
   removeSelection: () => {},
 
   addAnnotation: () => {},
+  addAnnotationByTagId: () => {},
   updateAnnotation: () => {},
+  updateAnnotationByTagId: () => {},
   removeAnnotation: () => {},
+  removeAnnotationByTagId: () => {},
   removeAnnotationByCfi: () => {},
   removeAnnotations: () => {},
   setAnnotations: () => {},
@@ -921,11 +963,47 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
     []
   );
 
+  const addAnnotationByTagId = useCallback(
+    (
+      type: AnnotationType,
+      tagId: string,
+      data?: object,
+      styles?: {
+        color?: string;
+        opacity?: number;
+        thickness?: number;
+      },
+      iconClass = ''
+    ) => {
+      webViewInjectFunctions.injectJavaScript(
+        book,
+        webViewInjectFunctions.addAnnotationByTagId(
+          type,
+          tagId,
+          data,
+          iconClass,
+          styles
+        )
+      );
+    },
+    []
+  );
+
   const updateAnnotation = useCallback(
     (annotation: Annotation, data = {}, styles?: AnnotationStyles) => {
       webViewInjectFunctions.injectJavaScript(
         book,
         webViewInjectFunctions.updateAnnotation(annotation, data, styles)
+      );
+    },
+    []
+  );
+
+  const updateAnnotationByTagId = useCallback(
+    (tagId: string, data = {}, styles?: AnnotationStyles) => {
+      webViewInjectFunctions.injectJavaScript(
+        book,
+        webViewInjectFunctions.updateAnnotationByTagId(tagId, data, styles)
       );
     },
     []
@@ -939,6 +1017,13 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
 
         ${webViewInjectFunctions.onChangeAnnotations()}
     `
+    );
+  }, []);
+
+  const removeAnnotationByTagId = useCallback((tagId: string) => {
+    webViewInjectFunctions.injectJavaScript(
+      book,
+      webViewInjectFunctions.removeAnnotationByTagId(tagId)
     );
   }, []);
 
@@ -1198,8 +1283,11 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       removeSelection,
 
       addAnnotation,
+      addAnnotationByTagId,
       updateAnnotation,
+      updateAnnotationByTagId,
       removeAnnotation,
+      removeAnnotationByTagId,
       removeAnnotationByCfi,
       removeAnnotations,
       setAnnotations,
@@ -1253,8 +1341,11 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
       setTotalLocations,
       removeSelection,
       addAnnotation,
+      addAnnotationByTagId,
       updateAnnotation,
+      updateAnnotationByTagId,
       removeAnnotation,
+      removeAnnotationByTagId,
       removeAnnotationByCfi,
       removeAnnotations,
       setAnnotations,

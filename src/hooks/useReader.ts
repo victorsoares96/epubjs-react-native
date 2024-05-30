@@ -26,8 +26,11 @@ export function useReader() {
     key,
     searchResults,
     addAnnotation,
+    addAnnotationByTagId,
     updateAnnotation,
+    updateAnnotationByTagId,
     removeAnnotation,
+    removeAnnotationByTagId,
     removeAnnotationByCfi,
     removeSelection,
     annotations,
@@ -59,8 +62,11 @@ export function useReader() {
     search,
     clearSearchResults,
     addAnnotation,
+    addAnnotationByTagId,
     updateAnnotation,
+    updateAnnotationByTagId,
     removeAnnotation,
+    removeAnnotationByTagId,
     removeAnnotationByCfi,
     removeSelection,
     theme,
@@ -111,8 +117,11 @@ export function useReader() {
     | 'key'
     | 'searchResults'
     | 'addAnnotation'
+    | 'addAnnotationByTagId'
     | 'updateAnnotation'
+    | 'updateAnnotationByTagId'
     | 'removeAnnotation'
+    | 'removeAnnotationByTagId'
     | 'removeAnnotationByCfi'
     | 'removeSelection'
     | 'annotations'
