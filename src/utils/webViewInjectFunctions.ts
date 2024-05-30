@@ -16,6 +16,8 @@ export function injectJavaScript(
     } catch (error) {
       alert(error?.message);
     }
+
+    true;
   `);
 }
 
