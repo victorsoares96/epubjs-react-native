@@ -28,8 +28,15 @@ body:
       required: false
   - type: textarea
     attributes:
-      label: Environment
+      label: Environment (or package.json)
       description: Run the `npx expo-env-info` command and paste its output in the field below.
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Your .epub file
+      description: |
+        To help fix the problem it is very helpful if you provide a link to the book you are using in the bug scenario. This is just for debugging purposes...
     validations:
       required: true
   - type: textarea
