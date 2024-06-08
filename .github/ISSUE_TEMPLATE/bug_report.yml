@@ -25,7 +25,16 @@ body:
         - Android
         - iOS
     validations:
-      required: false
+      required: true
+  - type: dropdown
+    attributes:
+      label: What workflow(s) does this occur on?
+      multiple: true
+      options:
+        - Expo Workflow
+        - Bare Workflow
+    validations:
+      required: true
   - type: textarea
     attributes:
       label: Environment (or package.json)
@@ -38,7 +47,7 @@ body:
       description: |
         To help fix the problem it is very helpful if you provide a link to the book you are using in the bug scenario. This is just for debugging purposes...
     validations:
-      required: true
+      required: false
   - type: textarea
     attributes:
       label: Minimal reproducible example
@@ -47,7 +56,7 @@ body:
         List the steps you took to generate the reproducible example within that repository in the README or the summary field below along with any instructions needed to run the project.
         [Learn more about creating a minimal reproducible example](https://stackoverflow.com/help/mcve).
     validations:
-      required: true
+      required: false
   - type: markdown
     attributes:
       value: Please make sure contributors can run your code and follow the steps your provided in order to reproduce the bug.
@@ -56,3 +65,19 @@ body:
       value: |
         **Realize that it is up to you to debug your code and be as certain as possible that the bug is with lib, not with your own app.**
         [Here's an excellent guide to debugging you can follow](https://gist.github.com/brentvatne/5ac00cba0c70b7a06b89a56787d6bc4a).
+  - type: checkboxes
+  id: observations
+  attributes:
+    label: I confirm that i have:
+    description: Before creating a new issue, please check if you have already completed these steps.
+    options:
+      - label: I looked for a solution to my problem in other open and resolved issues
+        required: true
+      - label: I checked the [examples](https://github.com/victorsoares96/epubjs-react-native/blob/master/docs/EXAMPLES.md) provided solve my problem
+        required: true
+      - label: I have verified that my problem is not caused by a third-party library
+        required: true
+      - label: I cloned the project environment [examples](https://github.com/victorsoares96/epubjs-react-native/tree/master/example-bare) and still the problem persists
+        required: true
+      - label: I'm using the latest available version of the library and its [complements](https://www.npmjs.com/package/@epubjs-react-native/file-system)
+        required: true
