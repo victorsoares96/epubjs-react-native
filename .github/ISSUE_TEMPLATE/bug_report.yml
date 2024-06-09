@@ -79,5 +79,5 @@ body:
           required: true
         - label: I cloned the project environment [examples](https://github.com/victorsoares96/epubjs-react-native/tree/master/example-bare) and still the problem persists
           required: true
-        - label: Im using the latest available version of the library and its [complements](https://www.npmjs.com/package/@epubjs-react-native/file-system)
+        - label: I'm using the latest available version of the library and its [complements](https://www.npmjs.com/package/@epubjs-react-native/file-system)
           required: true
