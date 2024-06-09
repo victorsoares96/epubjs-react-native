@@ -66,18 +66,11 @@ body:
         **Realize that it is up to you to debug your code and be as certain as possible that the bug is with lib, not with your own app.**
         [Here's an excellent guide to debugging you can follow](https://gist.github.com/brentvatne/5ac00cba0c70b7a06b89a56787d6bc4a).
   - type: checkboxes
+    id: cat-preferences
     attributes:
-      label: I confirm that i have:
-      description: | 
-        **Before creating a new issue, please check if you have already completed these steps.**
+      label: What kinds of cats do you like?
+      description: You may select more than one.
       options:
-        - label: I looked for a solution to my problem in other open and resolved issues
+        - label: Orange cat (required. Everyone likes orange cats.)
           required: true
-        - label: I checked the [examples](https://github.com/victorsoares96/epubjs-react-native/blob/master/docs/EXAMPLES.md) provided solve my problem
-          required: true
-        - label: I have verified that my problem is not caused by a third-party library
-          required: true
-        - label: I cloned the project environment [examples](https://github.com/victorsoares96/epubjs-react-native/tree/master/example-bare) and still the problem persists
-          required: true
-        - label: Im using the latest available version of the library and its [complements](https://www.npmjs.com/package/@epubjs-react-native/file-system)
-          required: true
+        - label: **Black cat**
