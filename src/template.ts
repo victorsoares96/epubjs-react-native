@@ -87,11 +87,7 @@ export default `
 
       function getCfiFromHref(book, href) {
         const [_, id] = href.split('#')
-        let section = book.spine.get(href.split('/')[1])
-
-        if (!section) {
-          section = book.spine.get(href);
-        }
+        let section = book.spine.get(href.split('/')[1]) || book.spine.get(href) || book.spine.get(href.split('/').slice(1).join('/'))
 
         const el = (id ? section.document.getElementById(id) : section.document.body)
         return section.cfiFromElement(el)
