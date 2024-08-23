@@ -112,6 +112,7 @@ export default function App() {
 | `onReady`                    | `function`    | Called once book has been displayed. Optional.               |
 | `onDisplayError`             | `function`    | Called once book has not been displayed. Optional.           |
 | `onRendered`                 | `function`    | Emit that a section has been rendered. Optional.             |
+| `onChangeSection`            | `function`    | Called when section has been change. Optional.               |
 | `onResized`                  | `function`    | Called when occurred a page change. Optional.                |
 | `onLocationChange`           | `function`    | Called when occurred a page change. Optional.                |
 | `onSearch`                   | `function`    | Called once when the book has been searched. Optional.       |
