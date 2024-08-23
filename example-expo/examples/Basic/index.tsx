@@ -10,6 +10,7 @@ export function Basic() {
         <Reader
           src="https://s3.amazonaws.com/moby-dick/OPS/package.opf"
           fileSystem={useFileSystem}
+          charactersPerLocation={2000}
         />
       </ReaderProvider>
     </SafeAreaView>

@@ -3,8 +3,8 @@ import type { Flow, Manager, Spread, Theme, ePubCfi } from '../types';
 import template from '../template';
 import type { SourceType } from '../utils/enums/source-type.enum';
 
-export function useInjectWebVieWVariables() {
-  const injectWebVieWVariables = useCallback(
+export function useInjectWebViewVariables() {
+  const injectWebViewVariables = useCallback(
     ({
       jszip,
       epubjs,
@@ -20,6 +20,7 @@ export function useInjectWebVieWVariables() {
       snap,
       spread,
       fullsize,
+      charactersPerLocation = 1600,
     }: {
       jszip: string;
       epubjs: string;
@@ -35,6 +36,7 @@ export function useInjectWebVieWVariables() {
       snap?: boolean;
       spread?: Spread;
       fullsize?: boolean;
+      charactersPerLocation?: number;
     }) => {
       return template
         .replace(
@@ -71,9 +73,13 @@ export function useInjectWebVieWVariables() {
           /spread: undefined/,
           `spread: ${spread ? JSON.stringify(spread) : undefined}`
         )
-        .replace(/fullsize: undefined/, `fullsize: ${fullsize ?? undefined}`);
+        .replace(/fullsize: undefined/, `fullsize: ${fullsize ?? undefined}`)
+        .replace(
+          /book\.locations\.generate\(1600\)/,
+          `book.locations.generate(${charactersPerLocation})`
+        );
     },
     []
   );
-  return { injectWebVieWVariables };
+  return { injectWebViewVariables };
 }

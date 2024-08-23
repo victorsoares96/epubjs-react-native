@@ -148,6 +148,7 @@ export default function App() {
 | `fullsize`           | `boolean`    |                                                                           |
 | `waitForLocationsReady`           |  `boolean`    | only render book after locations generated                                                                           |
 | `keepScrollOffsetOnLocationChange` | `boolean` | Prevents scroll top when change location. Works with `scrolled-doc` flow.
+| `charactersPerLocation`           | `number`    | Default is 1600                                                                          |
 
 ## Hooks
 
