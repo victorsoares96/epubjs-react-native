@@ -20,7 +20,7 @@
     "react-native-screens": "~3.29.0",
     "react-native-vector-icons": "^10.0.3",
     "react-native-web": "~0.19.6",
-    "react-native-webview": "13.6.4",
+    "react-native-webview": "13.11.1",
     "usehooks-ts": "^3.1.0"
   },
   "devDependencies": {
