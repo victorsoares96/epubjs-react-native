@@ -74,19 +74,21 @@ export function GestureHandler({
     }
   };
 
+  const combinedGestures = Gesture.Exclusive(
+    swipeLeft,
+    swipeRight,
+    swipeUp,
+    swipeDown,
+    longPress,
+    doubleTap,
+    singleTap
+  );
+  
   if (Platform.OS === 'ios') {
     return (
       <GestureHandlerRootView style={{ flex: 1 }}>
         <GestureDetector
-          gesture={Gesture.Exclusive(
-            swipeLeft,
-            swipeRight,
-            swipeUp,
-            swipeDown,
-            longPress,
-            doubleTap,
-            singleTap
-          )}
+          gesture={combinedGestures}
         >
           <TouchableWithoutFeedback
             style={{ width, height }}
@@ -101,7 +103,7 @@ export function GestureHandler({
   }
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <GestureDetector gesture={Gesture.Exclusive(swipeLeft, swipeRight)}>
+      <GestureDetector gesture={combinedGestures}>
         <View style={{ width, height }}>{children}</View>
       </GestureDetector>
     </GestureHandlerRootView>
