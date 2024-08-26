@@ -467,4 +467,9 @@ export interface ReaderProps {
    * Default is false
    */
   keepScrollOffsetOnLocationChange?: boolean;
+
+  /**
+   * Default is 1600
+   */
+  charactersPerLocation?: number;
 }

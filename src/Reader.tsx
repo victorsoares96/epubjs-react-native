@@ -3,7 +3,7 @@ import { Platform } from 'react-native';
 import { LoadingFile } from './utils/LoadingFile';
 import type { ReaderProps } from './types';
 import { View } from './View';
-import { useInjectWebVieWVariables } from './hooks/useInjectWebviewVariables';
+import { useInjectWebViewVariables } from './hooks/useInjectWebviewVariables';
 import { ReaderContext, defaultTheme as initialTheme } from './context';
 import { isURL } from './utils/isURL';
 import { getSourceType } from './utils/getSourceType';
@@ -31,6 +31,7 @@ export function Reader({
   snap,
   spread,
   fullsize,
+  charactersPerLocation,
   ...rest
 }: ReaderProps) {
   const {
@@ -46,7 +47,7 @@ export function Reader({
   const allowPopups = onPressExternalLink ? true : rest.allowPopups || false;
 
   const { setIsLoading, isLoading } = useContext(ReaderContext);
-  const { injectWebVieWVariables } = useInjectWebVieWVariables();
+  const { injectWebViewVariables } = useInjectWebViewVariables();
   const [template, setTemplate] = useState<string | null>(null);
   const [templateUrl, setTemplateUrl] = useState<string | null>(null);
   const [allowedUris, setAllowedUris] = useState<string | null>(null);
@@ -86,7 +87,7 @@ export function Reader({
           }
           if (sourceType === SourceType.BASE64) {
             setTemplate(
-              injectWebVieWVariables({
+              injectWebViewVariables({
                 jszip: jszipFileUri,
                 epubjs: epubjsFileUri,
                 type: SourceType.BASE64,
@@ -101,13 +102,14 @@ export function Reader({
                 snap,
                 spread,
                 fullsize,
+                charactersPerLocation,
               })
             );
 
             setIsLoading(false);
           } else {
             setTemplate(
-              injectWebVieWVariables({
+              injectWebViewVariables({
                 jszip: jszipFileUri,
                 epubjs: epubjsFileUri,
                 type: SourceType.BINARY,
@@ -122,6 +124,7 @@ export function Reader({
                 snap,
                 spread,
                 fullsize,
+                charactersPerLocation,
               })
             );
 
@@ -138,7 +141,7 @@ export function Reader({
 
           if (sourceType === SourceType.OPF || sourceType === SourceType.EPUB) {
             setTemplate(
-              injectWebVieWVariables({
+              injectWebViewVariables({
                 jszip: jszipFileUri,
                 epubjs: epubjsFileUri,
                 type: sourceType,
@@ -153,6 +156,7 @@ export function Reader({
                 snap,
                 spread,
                 fullsize,
+                charactersPerLocation,
               })
             );
 
@@ -165,7 +169,7 @@ export function Reader({
             setAllowedUris(`${bookFileUri},${jszipFileUri},${epubjsFileUri}`);
 
             setTemplate(
-              injectWebVieWVariables({
+              injectWebViewVariables({
                 jszip: jszipFileUri,
                 epubjs: epubjsFileUri,
                 type: sourceType,
@@ -180,6 +184,7 @@ export function Reader({
                 snap,
                 spread,
                 fullsize,
+                charactersPerLocation,
               })
             );
 
@@ -197,7 +202,7 @@ export function Reader({
     downloadFile,
     enableSelection,
     initialLocations,
-    injectWebVieWVariables,
+    injectWebViewVariables,
     setIsLoading,
     src,
     // ! Causing unknown loop
