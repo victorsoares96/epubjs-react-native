@@ -78,8 +78,8 @@ export default `
         allowPopups: allowPopups,
         allowScriptedContent: allowScriptedContent
       });
-
-      window.ReactNativeWebView.postMessage(JSON.stringify({ type: "onStarted" }));
+     const reactNativeWebview = window.ReactNativeWebView !== undefined && window.ReactNativeWebView!== null ? window.ReactNativeWebView: window;
+      reactNativeWebview.postMessage(JSON.stringify({ type: "onStarted" }));
 
       function flatten(chapters) {
         return [].concat.apply([], chapters.map((chapter) => [].concat.apply([chapter], flatten(chapter.subitems))));
@@ -165,7 +165,7 @@ export default `
           }
 
           book.locations.generate(1600).then(function () {
-            window.ReactNativeWebView.postMessage(JSON.stringify({
+            reactNativeWebview.postMessage(JSON.stringify({
               type: "onLocationsReady",
               epubKey: book.key(),
               locations: book.locations.save(),
@@ -181,7 +181,7 @@ export default `
           displayed.then(function () {
             var currentLocation = rendition.currentLocation();
 
-            window.ReactNativeWebView.postMessage(JSON.stringify({
+            reactNativeWebview.postMessage(JSON.stringify({
               type: "onReady",
               totalLocations: book.locations.total,
               currentLocation: currentLocation,
@@ -194,7 +194,7 @@ export default `
           .then(async (url) => {
             var reader = new FileReader();
             reader.onload = (res) => {
-              window.ReactNativeWebView.postMessage(
+              reactNativeWebview.postMessage(
                 JSON.stringify({
                   type: "meta",
                   metadata: {
@@ -212,7 +212,7 @@ export default `
             reader.readAsDataURL(await fetch(url).then((res) => res.blob()));
           })
           .catch(() => {
-            window.ReactNativeWebView.postMessage(
+            reactNativeWebview.postMessage(
               JSON.stringify({
                 type: "meta",
                 metadata: {
@@ -229,7 +229,7 @@ export default `
           });
 
           book.loaded.navigation.then(function (item) {
-            window.ReactNativeWebView.postMessage(JSON.stringify({
+            reactNativeWebview.postMessage(JSON.stringify({
               type: 'onNavigationLoaded',
               toc: item.toc,
               landmarks: item.landmarks
@@ -237,7 +237,7 @@ export default `
           });
         })
         .catch(function (err) {
-          window.ReactNativeWebView.postMessage(JSON.stringify({
+          reactNativeWebview.postMessage(JSON.stringify({
           type: "onDisplayError",
           reason: reason
         }));
@@ -253,7 +253,7 @@ export default `
         var percentage = Math.floor(percent * 100);
         var chapter = getChapter(location);
 
-        window.ReactNativeWebView.postMessage(JSON.stringify({
+        reactNativeWebview.postMessage(JSON.stringify({
           type: "onLocationChange",
           totalLocations: book.locations.total,
           currentLocation: location,
@@ -262,27 +262,27 @@ export default `
         }));
 
         if (location.atStart) {
-          window.ReactNativeWebView.postMessage(JSON.stringify({
+          reactNativeWebview.postMessage(JSON.stringify({
             type: "onBeginning",
           }));
         }
 
         if (location.atEnd) {
-          window.ReactNativeWebView.postMessage(JSON.stringify({
+          reactNativeWebview.postMessage(JSON.stringify({
             type: "onFinish",
           }));
         }
       });
 
       rendition.on("orientationchange", function (orientation) {
-        window.ReactNativeWebView.postMessage(JSON.stringify({
+        reactNativeWebview.postMessage(JSON.stringify({
           type: 'onOrientationChange',
           orientation: orientation
         }));
       });
 
       rendition.on("rendered", function (section) {
-        window.ReactNativeWebView.postMessage(JSON.stringify({
+        reactNativeWebview.postMessage(JSON.stringify({
           type: 'onRendered',
           section: section,
           currentSection: book.navigation.get(section.href),
@@ -290,7 +290,7 @@ export default `
       });
 
       rendition.on("layout", function (layout) {
-        window.ReactNativeWebView.postMessage(JSON.stringify({
+        reactNativeWebview.postMessage(JSON.stringify({
           type: 'onLayout',
           layout: layout,
         }));
@@ -299,7 +299,7 @@ export default `
       rendition.on("selected", function (cfiRange, contents) {
         book.getRange(cfiRange).then(function (range) {
           if (range) {
-            window.ReactNativeWebView.postMessage(JSON.stringify({
+            reactNativeWebview.postMessage(JSON.stringify({
               type: 'onSelected',
               cfiRange: cfiRange,
               text: range.toString(),
@@ -313,7 +313,7 @@ export default `
         const annotation = annotations.find(item => item.cfiRange === cfiRange);
 
         if (annotation) {
-          window.ReactNativeWebView.postMessage(JSON.stringify({
+          reactNativeWebview.postMessage(JSON.stringify({
             type: 'onPressAnnotation',
             annotation: ${webViewJavaScriptFunctions.mapObjectToAnnotation('annotation')}
           }));
@@ -321,7 +321,7 @@ export default `
       });
 
       rendition.on("resized", function (layout) {
-        window.ReactNativeWebView.postMessage(JSON.stringify({
+        reactNativeWebview.postMessage(JSON.stringify({
           type: 'onResized',
           layout: layout,
         }));
