@@ -274,11 +274,8 @@ export interface ReaderProps {
    * @param {any} section
    * @param {any} currentSection
    * @returns {void} void
-   *
-   * @deprecated use **onChangeSection** instead
    */
   onRendered?: (section: any, currentSection: any) => void;
-  onChangeSection?: (section: Section | null) => void;
   /**
    * Called when book layout is change
    * @param {string} layout
@@ -470,9 +467,4 @@ export interface ReaderProps {
    * Default is false
    */
   keepScrollOffsetOnLocationChange?: boolean;
-
-  /**
-   * Default is 1600
-   */
-  charactersPerLocation?: number;
 }

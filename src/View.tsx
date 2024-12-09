@@ -76,7 +76,6 @@ export function View({
   waitForLocationsReady = false,
   keepScrollOffsetOnLocationChange,
   flow,
-  onChangeSection = () => {},
 }: ViewProps) {
   const {
     registerBook,
@@ -99,7 +98,6 @@ export function View({
     removeSelection,
     setAnnotations,
     setInitialAnnotations,
-    section,
     setSection,
     setToc,
     setLandmarks,
@@ -206,10 +204,6 @@ export function View({
       setProgress(progress);
       setSection(currentSection);
 
-      if (section?.href !== currentSection?.href) {
-        onChangeSection(currentSection);
-      }
-
       handleChangeIsBookmarked(bookmarks, currentLocation);
 
       if (currentLocation.atStart) setAtStart(true);
@@ -276,9 +270,9 @@ export function View({
     }
 
     if (type === 'onRendered') {
-      const { currentSection } = parsedEvent;
+      const { section, currentSection } = parsedEvent;
 
-      return onRendered(parsedEvent.section, currentSection);
+      return onRendered(section, currentSection);
     }
 
     if (type === 'onLayout') {
