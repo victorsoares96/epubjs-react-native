@@ -8,6 +8,9 @@
     ],
     "ios": {
       "bundleIdentifier": "com.jvjv33.example-bare"
+    },
+    "android": {
+      "package": "com.jvjv33.examplebare"
     }
   },
   "ios": {

@@ -1,4 +1,4 @@
-package com.examplebare
+package com.jvjv33.examplebare
 
 import android.os.Build
 import android.os.Bundle
