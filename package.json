@@ -67,7 +67,7 @@
     "@types/react-test-renderer": "18.3.0",
     "@typescript-eslint/eslint-plugin": "7.11.0",
     "@typescript-eslint/parser": "7.11.0",
-    "commitizen": "4.3.0",
+    "commitizen": "4.3.1",
     "commitizen-emoji": "1.0.5",
     "eslint": "8.57.0",
     "eslint-config-airbnb": "19.0.4",
