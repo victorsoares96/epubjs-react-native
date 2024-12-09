@@ -75,7 +75,8 @@ export function onChangeAnnotations(
   annotations = 'Object.values(rendition.annotations._annotations)'
 ) {
   return `
-    window.ReactNativeWebView.postMessage(JSON.stringify({
+    const reactNativeWebview = window.ReactNativeWebView !== undefined && window.ReactNativeWebView!== null ? window.ReactNativeWebView: window;
+    reactNativeWebview.postMessage(JSON.stringify({
       type: 'onChangeAnnotations',
       annotations: ${mapArrayObjectsToAnnotations(annotations)}
     }));
@@ -106,7 +107,8 @@ export function addAnnotation(
     const noEmit = ${noEmit};
 
     if (!noEmit) {
-      window.ReactNativeWebView.postMessage(JSON.stringify({
+     const reactNativeWebview = window.ReactNativeWebView !== undefined && window.ReactNativeWebView!== null ? window.ReactNativeWebView: window;
+     reactNativeWebview.postMessage(JSON.stringify({
         type: 'onAddAnnotation',
         annotation: ${mapObjectToAnnotation('annotation')}
       }));
@@ -155,7 +157,8 @@ export function addAnnotationByTagId(
           const noEmit = ${noEmit};
 
           if (!noEmit) {
-            window.ReactNativeWebView.postMessage(JSON.stringify({
+            const reactNativeWebview = window.ReactNativeWebView !== undefined && window.ReactNativeWebView!== null ? window.ReactNativeWebView: window;
+            reactNativeWebview.postMessage(JSON.stringify({
               type: 'onAddAnnotation',
               annotation: ${mapObjectToAnnotation('annotation')}
             }));
