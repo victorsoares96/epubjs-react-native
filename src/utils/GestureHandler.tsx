@@ -33,26 +33,36 @@ export function GestureHandler({
   onLongPress,
   children,
 }: Props) {
-  const singleTap = Gesture.Tap().maxDuration(250).onStart(onSingleTap);
+  const singleTap = Gesture.Tap()
+    .runOnJS(true)
+    .maxDuration(250)
+    .onStart(onSingleTap);
 
   const doubleTap = Gesture.Tap()
+    .runOnJS(true)
     .maxDuration(250)
     .numberOfTaps(2)
     .onStart(onDoubleTap);
 
-  const longPress = Gesture.LongPress().onStart(onLongPress);
+  const longPress = Gesture.LongPress().runOnJS(true).onStart(onLongPress);
 
   const swipeLeft = Gesture.Fling()
+    .runOnJS(true)
     .direction(I18nManager.isRTL ? Directions.RIGHT : Directions.LEFT)
     .onStart(onSwipeLeft);
 
   const swipeRight = Gesture.Fling()
+    .runOnJS(true)
     .direction(I18nManager.isRTL ? Directions.LEFT : Directions.RIGHT)
     .onStart(onSwipeRight);
 
-  const swipeUp = Gesture.Fling().direction(Directions.UP).onStart(onSwipeUp);
+  const swipeUp = Gesture.Fling()
+    .runOnJS(true)
+    .direction(Directions.UP)
+    .onStart(onSwipeUp);
 
   const swipeDown = Gesture.Fling()
+    .runOnJS(true)
     .direction(Directions.DOWN)
     .onStart(onSwipeDown);
 

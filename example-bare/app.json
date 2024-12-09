@@ -5,7 +5,10 @@
     "version": "1.0.0",
     "assetBundlePatterns": [
       "**/*"
-    ]
+    ],
+    "ios": {
+      "bundleIdentifier": "com.jvjv33.example-bare"
+    }
   },
   "ios": {
     "infoPlist": {
