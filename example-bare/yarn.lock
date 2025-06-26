@@ -846,7 +846,7 @@
   resolved "https://registry.yarnpkg.com/@epubjs-react-native/core/-/core-1.4.5.tgz#06f6f5d4f5400b6c95f76a7607e6b67257ac2d63"
   integrity sha512-Tmt3Z/82/bI6Cb+ao6qCbouuKmk4Ahy0SAHgEY88xIRdN0XlpN/7dfJ/n+XrNBhzjCtFnJW0uqA5htsFyo2c3Q==
 
-"@epubjs-react-native/file-system@1.1.4":
+"@epubjs-react-native/file-system@latest":
   version "1.1.4"
   resolved "https://registry.yarnpkg.com/@epubjs-react-native/file-system/-/file-system-1.1.4.tgz#83e62c4ffab6f92fec39e7ab89199ff796272e94"
   integrity sha512-hk0Qbt3KrQsHpeHVtIrM4sKEnlvIFlL3VOoFD7pdT8iZorL5666yU10FKvO6MIb963aa7S1EimKrdeXr6uiLtQ==
@@ -5711,9 +5711,9 @@ use-latest-callback@^0.2.1:
   integrity sha512-7vI3fBuyRcP91pazVboc4qu+6ZqM8izPWX9k7cRnT8hbD5svslcknsh3S9BUhaK11OmgTV4oWZZVSeQAiV53SQ==
 
 usehooks-ts@^3.1.0:
-  version "3.1.0"
-  resolved "https://registry.yarnpkg.com/usehooks-ts/-/usehooks-ts-3.1.0.tgz#156119f36efc85f1b1952616c02580f140950eca"
-  integrity sha512-bBIa7yUyPhE1BCc0GmR96VU/15l/9gP1Ch5mYdLcFBaFGQsdmXkvjV0TtOqW1yUd6VjIwDunm+flSciCQXujiw==
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/usehooks-ts/-/usehooks-ts-3.1.1.tgz#0bb7f38f36f8219ee4509cc5e944ae610fb97656"
+  integrity sha512-I4diPp9Cq6ieSUH2wu+fDAVQO43xwtulo+fKEidHUwZPnYImbtkTjzIJYcDcJqxgmX31GVqNFURodvcgHcW0pA==
   dependencies:
     lodash.debounce "^4.0.8"
 
