@@ -1366,9 +1366,9 @@
   integrity sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==
 
 "@react-native-community/slider@^4.5.2":
-  version "4.5.5"
-  resolved "https://registry.yarnpkg.com/@react-native-community/slider/-/slider-4.5.5.tgz#d70fc5870477760033769bbd6625d57e7d7678b2"
-  integrity sha512-x2N415pg4ZxIltArOKczPwn7JEYh+1OxQ4+hTnafomnMsqs65HZuEWcX+Ch8c5r8V83DiunuQUf5hWGWlw8hQQ==
+  version "4.5.7"
+  resolved "https://registry.yarnpkg.com/@react-native-community/slider/-/slider-4.5.7.tgz#523178779f302aa162b0d57211842f81522e8ece"
+  integrity sha512-WMDDZjNF2Bd8M8TrSqKf5xhM9ikdfCHtSPur64Ow3bB/OVrKufUQZ59NmYdNZNeGPvcHHTsafuYTY8zfZfbchQ==
 
 "@react-native/assets-registry@0.76.3":
   version "0.76.3"
