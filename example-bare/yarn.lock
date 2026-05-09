@@ -846,7 +846,7 @@
   resolved "https://registry.yarnpkg.com/@epubjs-react-native/core/-/core-1.4.5.tgz#06f6f5d4f5400b6c95f76a7607e6b67257ac2d63"
   integrity sha512-Tmt3Z/82/bI6Cb+ao6qCbouuKmk4Ahy0SAHgEY88xIRdN0XlpN/7dfJ/n+XrNBhzjCtFnJW0uqA5htsFyo2c3Q==
 
-"@epubjs-react-native/file-system@1.1.4":
+"@epubjs-react-native/file-system@latest":
   version "1.1.4"
   resolved "https://registry.yarnpkg.com/@epubjs-react-native/file-system/-/file-system-1.1.4.tgz#83e62c4ffab6f92fec39e7ab89199ff796272e94"
   integrity sha512-hk0Qbt3KrQsHpeHVtIrM4sKEnlvIFlL3VOoFD7pdT8iZorL5666yU10FKvO6MIb963aa7S1EimKrdeXr6uiLtQ==
@@ -1175,10 +1175,10 @@
     find-up "^5.0.0"
     js-yaml "^4.1.0"
 
-"@gorhom/bottom-sheet@^4":
-  version "4.6.4"
-  resolved "https://registry.yarnpkg.com/@gorhom/bottom-sheet/-/bottom-sheet-4.6.4.tgz#387d0f0f21e3470eb8575498cb81ce96f5108e79"
-  integrity sha512-0itLMblLBvepE065w3a60S030c2rNUsGshPC7wbWDm31VyqoaU2xjzh/ojH62YIJOcobBr5QoC30IxBBKDGovQ==
+"@gorhom/bottom-sheet@^5.0.0":
+  version "5.2.14"
+  resolved "https://registry.yarnpkg.com/@gorhom/bottom-sheet/-/bottom-sheet-5.2.14.tgz#2b74ad9293b0ad40518487c6dcd151cadd5b3de3"
+  integrity sha512-uLQFlDjp9z+jrOFcMSEldPqL5JdaXL3vXOh+juhwoNvXgTsEorJLjHTugXu+YccAG/0KJnShzKCrb71MHBsvJg==
   dependencies:
     "@gorhom/portal" "1.0.14"
     invariant "^2.2.4"

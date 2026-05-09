@@ -4,7 +4,7 @@
     "@epubjs-react-native/core": "latest",
     "@epubjs-react-native/expo-file-system": "latest",
     "@expo/vector-icons": "^14.0.0",
-    "@gorhom/bottom-sheet": "^4",
+    "@gorhom/bottom-sheet": "^5.0.0",
     "@react-native-community/slider": "^4.5.2",
     "@react-navigation/native": "^6.1.15",
     "@react-navigation/native-stack": "^6.9.24",
