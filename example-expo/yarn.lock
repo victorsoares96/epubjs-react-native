@@ -827,9 +827,9 @@
     hoist-non-react-statics "^3.3.0"
 
 "@dr.pogodin/react-native-fs@^2.30.3":
-  version "2.30.3"
-  resolved "https://registry.yarnpkg.com/@dr.pogodin/react-native-fs/-/react-native-fs-2.30.3.tgz#9b02f603642159ec50412fc176f6a9dde59ac51d"
-  integrity sha512-EphKBv07CFwyJubP5xLm39TUB2g1BXkyGAf8HtRbXM7WQLKqMsU6CLgQojQJNQPH1cWOnkHYiGnw6flf0PXHWA==
+  version "2.40.2"
+  resolved "https://registry.yarnpkg.com/@dr.pogodin/react-native-fs/-/react-native-fs-2.40.2.tgz#cd8ea21e78fd6146b2487537121355cf863e9170"
+  integrity sha512-UitoZGxMvcaka22kiVsX7Z7qtqKHpm6a5o4EJGnMdtHfjUEHS2ubE74UXjg0j8HK1ihTimSY8/E1P075kz90jw==
   dependencies:
     buffer "^6.0.3"
     http-status-codes "^2.3.0"
