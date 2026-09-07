@@ -24,7 +24,7 @@ function AnnotationForm({ annotation, selection, onClose }: Props) {
   useEffect(() => {
     if (annotation) {
       setObservation(annotation.data?.observation);
-      setColor(annotation.styles?.color || '');
+      setColor(annotation.styles?.color || COLORS[0]);
     }
 
     return () => {

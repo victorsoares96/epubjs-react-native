@@ -113,6 +113,10 @@ export function addAnnotation(
         annotation: ${mapObjectToAnnotation('annotation')}
       }));
     }
+
+    if (typeof bindEpubAnnotationTouches === 'function') {
+      bindEpubAnnotationTouches();
+    }
   `;
 }
 

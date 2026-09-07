@@ -1,0 +1,19 @@
+{
+  "expo": {
+    "name": "example-expo",
+    "slug": "example-expo",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "platforms": ["ios", "android"],
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "bundleIdentifier": "com.epubjs.exampleexpo",
+      "infoPlist": {
+        "LSSupportsOpeningDocumentsInPlace": true
+      }
+    },
+    "android": {
+      "package": "com.epubjs.exampleexpo"
+    }
+  }
+}

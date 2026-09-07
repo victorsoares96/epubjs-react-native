@@ -281,7 +281,37 @@ export default `
         }));
       });
 
+      function bindEpubAnnotationTouches() {
+        try {
+          var views = rendition.views();
+          if (!views || !views.forEach) return;
+          views.forEach(function (view) {
+            ['highlights', 'underlines', 'marks'].forEach(function (key) {
+              var group = view[key];
+              if (!group) return;
+              Object.keys(group).forEach(function (cfi) {
+                var item = group[cfi];
+                var el = item && item.element;
+                if (!el || el.getAttribute('data-rn-touch-bound') === '1') return;
+                el.setAttribute('data-rn-touch-bound', '1');
+                el.style.pointerEvents = 'auto';
+                el.addEventListener('touchend', function (ev) {
+                  ev.stopPropagation();
+                  if (typeof el.click === 'function') {
+                    el.click();
+                    return;
+                  }
+                  el.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+                });
+              });
+            });
+          });
+        } catch (error) {}
+      }
+      window.bindEpubAnnotationTouches = bindEpubAnnotationTouches;
+
       rendition.on("rendered", function (section) {
+        bindEpubAnnotationTouches();
         reactNativeWebview.postMessage(JSON.stringify({
           type: 'onRendered',
           section: section,

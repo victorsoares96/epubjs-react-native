@@ -9,6 +9,8 @@ import {
   useColorScheme,
 } from 'react-native';
 import { MD3DarkTheme, MD3LightTheme, PaperProvider } from 'react-native-paper';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import {
   SafeAreaProvider,
   useSafeAreaInsets,
@@ -181,11 +183,13 @@ function Examples() {
 export default function App() {
   const colorScheme = useColorScheme();
   return (
-    <PaperProvider
-      theme={colorScheme === 'dark' ? MD3DarkTheme : MD3LightTheme}
-    >
-      <SafeAreaProvider>
-        <NavigationContainer>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <PaperProvider
+        theme={colorScheme === 'dark' ? MD3DarkTheme : MD3LightTheme}
+      >
+        <SafeAreaProvider>
+          <BottomSheetModalProvider>
+            <NavigationContainer>
           <Navigator initialRouteName="Examples">
             <Screen
               name="Examples"
@@ -204,6 +208,7 @@ export default function App() {
                     'TableOfContents',
                     'JavascriptInjection',
                     'Search',
+                    'Annotations',
                     'CustomThemes',
                     'FullExample',
                   ].includes(route),
@@ -212,8 +217,10 @@ export default function App() {
               />
             ))}
           </Navigator>
-        </NavigationContainer>
-      </SafeAreaProvider>
-    </PaperProvider>
+            </NavigationContainer>
+          </BottomSheetModalProvider>
+        </SafeAreaProvider>
+      </PaperProvider>
+    </GestureHandlerRootView>
   );
 }
