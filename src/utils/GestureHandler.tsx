@@ -33,15 +33,23 @@ export function GestureHandler({
 	onLongPress,
 	children,
 }: Props) {
-	const singleTap = Gesture.Tap().runOnJS(true).maxDuration(250).onStart(onSingleTap)
+	const singleTap = Gesture.Tap()
+		.runOnJS(true)
+		.maxDuration(250)
+		.cancelsTouchesInView(false)
+		.onStart(onSingleTap)
 
 	const doubleTap = Gesture.Tap()
 		.runOnJS(true)
 		.maxDuration(250)
 		.numberOfTaps(2)
+		.cancelsTouchesInView(false)
 		.onStart(onDoubleTap)
 
-	const longPress = Gesture.LongPress().runOnJS(true).onStart(onLongPress)
+	const longPress = Gesture.LongPress()
+		.runOnJS(true)
+		.cancelsTouchesInView(false)
+		.onStart(onLongPress)
 
 	const swipeLeft = Gesture.Fling()
 		.runOnJS(true)

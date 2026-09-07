@@ -210,12 +210,15 @@ function Component() {
         selection={selection}
         selectedAnnotation={selectedAnnotation}
         annotations={annotations}
+        onPressAnnotation={(annotation) => {
+          goToLocation(annotation.cfiRange);
+          annotationsListRef.current?.dismiss();
+        }}
         onClose={() => {
+          if (tempMark) removeAnnotation(tempMark);
           setTempMark(null);
           setSelection(null);
           setSelectedAnnotation(undefined);
-          if (tempMark) removeAnnotation(tempMark);
-          annotationsListRef.current?.dismiss();
         }}
       />
 

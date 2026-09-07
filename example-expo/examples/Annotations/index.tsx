@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useWindowDimensions } from 'react-native';
+import { useWindowDimensions, View } from 'react-native';
 import {
   Annotation,
   Reader,
@@ -8,15 +8,18 @@ import {
 } from '@epubjs-react-native/core';
 import { useFileSystem } from '@epubjs-react-native/expo-file-system';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { COLORS } from './AnnotationForm';
 import { AnnotationsList } from './AnnotationsList';
+import { Header } from './Header';
 import { Selection } from './utils';
 
 function Book() {
   const { width, height } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
 
-  const { addAnnotation, removeAnnotation, annotations } = useReader();
+  const { addAnnotation, removeAnnotation, annotations, goToLocation } =
+    useReader();
   const [selection, setSelection] = React.useState<Selection | null>(null);
   const [selectedAnnotation, setSelectedAnnotation] = React.useState<
     Annotation | undefined
@@ -24,12 +27,32 @@ function Book() {
   const [tempMark, setTempMark] = React.useState<Annotation | null>(null);
 
   const annotationsListRef = React.useRef<BottomSheetModal>(null);
+
+  const handleListDismiss = React.useCallback(() => {
+    if (tempMark) removeAnnotation(tempMark);
+    setTempMark(null);
+    setSelection(null);
+    setSelectedAnnotation(undefined);
+  }, [removeAnnotation, tempMark]);
+
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    <View
+      style={{
+        flex: 1,
+        paddingTop: insets.top,
+        paddingBottom: insets.bottom,
+        paddingLeft: insets.left,
+        paddingRight: insets.right,
+      }}
+    >
+      <Header
+        onPressAnnotations={() => annotationsListRef.current?.present()}
+      />
+
       <Reader
         src="https://s3.amazonaws.com/moby-dick/OPS/package.opf"
         width={width}
-        height={height * 0.85}
+        height={height * 0.8}
         fileSystem={useFileSystem}
         initialLocation="introduction_001.xhtml"
         initialAnnotations={[
@@ -110,15 +133,13 @@ function Book() {
         selection={selection}
         selectedAnnotation={selectedAnnotation}
         annotations={annotations}
-        onClose={() => {
-          setTempMark(null);
-          setSelection(null);
-          setSelectedAnnotation(undefined);
-          if (tempMark) removeAnnotation(tempMark);
+        onPressAnnotation={(annotation) => {
+          goToLocation(annotation.cfiRange);
           annotationsListRef.current?.dismiss();
         }}
+        onClose={handleListDismiss}
       />
-    </GestureHandlerRootView>
+    </View>
   );
 }
 

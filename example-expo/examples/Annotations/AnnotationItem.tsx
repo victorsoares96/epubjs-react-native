@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import React from 'react';
-import { BottomSheetView, TouchableOpacity } from '@gorhom/bottom-sheet';
+import { Pressable } from 'react-native-gesture-handler';
 import { Annotation, useReader } from '@epubjs-react-native/core';
 import { StyleSheet, View } from 'react-native';
 import { IconButton, MD3Colors, Text } from 'react-native-paper';
@@ -8,28 +8,44 @@ import { contrast } from '../FullExample/utils';
 
 interface Props {
   annotation: Annotation;
+  isSelected?: boolean;
   onPressAnnotation: (annotation: Annotation) => void;
   onRemoveAnnotation: (annotation: Annotation) => void;
 }
 
 function AnnotationItem({
   annotation,
+  isSelected,
   onPressAnnotation,
   onRemoveAnnotation,
 }: Props) {
   const { theme } = useReader();
   return (
-    <BottomSheetView key={annotation.cfiRange} style={styles.container}>
-      <View style={styles.row}>
+    <View
+      style={[
+        styles.container,
+        isSelected && {
+          backgroundColor: 'rgba(151, 151, 151, 0.2)',
+          borderRadius: 8,
+        },
+      ]}
+    >
+      <Pressable
+        style={styles.row}
+        onPress={() => onPressAnnotation(annotation)}
+      >
         <View
           style={{
             ...styles.color,
-            backgroundColor: annotation.styles?.color,
-            borderColor: contrast[theme.body.background],
+            backgroundColor: annotation.styles?.color || '#CBA135',
+            borderColor: isSelected
+              ? MD3Colors.primary50
+              : contrast[theme.body.background],
+            borderWidth: isSelected ? 2 : 1,
           }}
         />
 
-        <TouchableOpacity onPress={() => onPressAnnotation(annotation)}>
+        <View>
           {annotation.type === 'highlight' && (
             <Text
               style={{
@@ -37,7 +53,7 @@ function AnnotationItem({
                 color: contrast[theme.body.background],
               }}
             >
-              {annotation.cfiRange}
+              {annotation.type}
             </Text>
           )}
 
@@ -61,8 +77,8 @@ function AnnotationItem({
           >
             &quot;{annotation.cfiRangeText}&quot;
           </Text>
-        </TouchableOpacity>
-      </View>
+        </View>
+      </Pressable>
 
       <IconButton
         icon="trash-can-outline"
@@ -70,7 +86,7 @@ function AnnotationItem({
         size={20}
         onPress={() => onRemoveAnnotation(annotation)}
       />
-    </BottomSheetView>
+    </View>
   );
 }
 
@@ -80,8 +96,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     marginVertical: 5,
+    paddingVertical: 4,
+    paddingHorizontal: 4,
   },
   row: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
   },
@@ -96,6 +115,7 @@ const styles = StyleSheet.create({
   cfiRange: {
     fontWeight: '600',
     marginLeft: 5,
+    textTransform: 'capitalize',
   },
   cfiRangeText: {
     fontStyle: 'italic',

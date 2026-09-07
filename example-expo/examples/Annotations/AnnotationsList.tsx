@@ -5,7 +5,6 @@ import { useReader, Annotation } from '@epubjs-react-native/core';
 import {
   BottomSheetFlatList,
   BottomSheetModal,
-  BottomSheetModalProvider,
 } from '@gorhom/bottom-sheet';
 import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
 import { Button, Text } from 'react-native-paper';
@@ -18,25 +17,35 @@ interface Props {
   selection: Selection | null;
   selectedAnnotation?: Annotation;
   annotations: Annotation[];
+  onPressAnnotation: (annotation: Annotation) => void;
   onClose: () => void;
 }
 export type Ref = BottomSheetModalMethods;
 
 export const AnnotationsList = forwardRef<Ref, Props>(
-  ({ selection, selectedAnnotation, annotations, onClose }, ref) => {
-    const { theme, removeAnnotation, goToLocation } = useReader();
+  (
+    { selection, selectedAnnotation, annotations, onPressAnnotation, onClose },
+    ref
+  ) => {
+    const { theme, removeAnnotation } = useReader();
 
     const snapPoints = React.useMemo(() => ['50%', '75%', '100%'], []);
 
+    const dismiss = React.useCallback(() => {
+      if (ref && typeof ref !== 'function') {
+        ref.current?.dismiss();
+      }
+    }, [ref]);
+
     const renderItem = React.useCallback(
-      // eslint-disable-next-line react/no-unused-prop-types
       ({ item }: { item: Annotation }) => (
         <AnnotationItem
           annotation={item}
-          onPressAnnotation={(annotation) => {
-            goToLocation(annotation.cfiRange);
-            onClose();
-          }}
+          isSelected={
+            selectedAnnotation?.cfiRange === item.cfiRange &&
+            selectedAnnotation?.type === item.type
+          }
+          onPressAnnotation={onPressAnnotation}
           onRemoveAnnotation={(annotation) => {
             /**
              * Required for the "add note" scenario, as an "underline" and "mark" type annotation is created in it and both work as one...
@@ -52,11 +61,17 @@ export const AnnotationsList = forwardRef<Ref, Props>(
             } else {
               removeAnnotation(annotation);
             }
-            onClose();
+            dismiss();
           }}
         />
       ),
-      [annotations, goToLocation, onClose, removeAnnotation]
+      [
+        annotations,
+        dismiss,
+        onPressAnnotation,
+        removeAnnotation,
+        selectedAnnotation,
+      ]
     );
 
     const header = React.useCallback(
@@ -73,7 +88,7 @@ export const AnnotationsList = forwardRef<Ref, Props>(
             <Button
               mode="text"
               textColor={contrast[theme.body.background]}
-              onPress={onClose}
+              onPress={dismiss}
             >
               Close
             </Button>
@@ -83,43 +98,44 @@ export const AnnotationsList = forwardRef<Ref, Props>(
             <AnnotationForm
               annotation={selectedAnnotation}
               selection={selection}
-              onClose={onClose}
+              onClose={dismiss}
             />
           )}
         </View>
       ),
-      [onClose, selectedAnnotation, selection, theme.body.background]
+      [dismiss, selectedAnnotation, selection, theme.body.background]
     );
 
     return (
-      <BottomSheetModalProvider>
-        <BottomSheetModal
-          ref={ref}
-          index={0}
-          snapPoints={snapPoints}
-          enablePanDownToClose
-          style={{
-            ...styles.container,
-            backgroundColor: theme.body.background,
-          }}
-          handleStyle={{ backgroundColor: theme.body.background }}
-          backgroundStyle={{ backgroundColor: theme.body.background }}
-          onDismiss={onClose}
-        >
-          <BottomSheetFlatList<Annotation>
-            data={annotations.filter(
-              (annotation) =>
-                !annotation?.data?.isTemp && annotation.type !== 'mark'
-            )}
-            showsVerticalScrollIndicator={false}
-            keyExtractor={(item) => item.cfiRange}
-            renderItem={renderItem}
-            ListHeaderComponent={header}
-            style={{ width: '100%' }}
-            maxToRenderPerBatch={20}
-          />
-        </BottomSheetModal>
-      </BottomSheetModalProvider>
+      <BottomSheetModal
+        ref={ref}
+        index={0}
+        snapPoints={snapPoints}
+        enablePanDownToClose
+        enableContentPanningGesture={false}
+        style={{
+          ...styles.container,
+          backgroundColor: theme.body.background,
+        }}
+        handleStyle={{ backgroundColor: theme.body.background }}
+        backgroundStyle={{ backgroundColor: theme.body.background }}
+        onDismiss={onClose}
+      >
+        <BottomSheetFlatList<Annotation>
+          data={annotations.filter(
+            (annotation) =>
+              !annotation?.data?.isTemp && annotation.type !== 'mark'
+          )}
+          showsVerticalScrollIndicator={false}
+          keyExtractor={(item, index) =>
+            `${item.type}-${item.cfiRange}-${index}`
+          }
+          renderItem={renderItem}
+          ListHeaderComponent={header}
+          style={{ width: '100%' }}
+          maxToRenderPerBatch={20}
+        />
+      </BottomSheetModal>
     );
   }
 );
@@ -136,13 +152,5 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginTop: 10,
-  },
-  input: {
-    width: '100%',
-    borderRadius: 10,
-    fontSize: 16,
-    lineHeight: 20,
-    padding: 8,
-    backgroundColor: 'rgba(151, 151, 151, 0.25)',
   },
 });

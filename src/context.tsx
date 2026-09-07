@@ -1090,6 +1090,9 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
           type: 'onSetInitialAnnotations',
           annotations: ${webViewInjectFunctions.mapArrayObjectsToAnnotations('JSON.parse(initialAnnotations)')}
         }));
+        if (typeof bindEpubAnnotationTouches === 'function') {
+          bindEpubAnnotationTouches();
+        }
       `
     );
   }, []);
