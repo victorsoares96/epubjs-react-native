@@ -827,9 +827,9 @@
     hoist-non-react-statics "^3.3.0"
 
 "@dr.pogodin/react-native-fs@^2.30.3":
-  version "2.30.3"
-  resolved "https://registry.yarnpkg.com/@dr.pogodin/react-native-fs/-/react-native-fs-2.30.3.tgz#9b02f603642159ec50412fc176f6a9dde59ac51d"
-  integrity sha512-EphKBv07CFwyJubP5xLm39TUB2g1BXkyGAf8HtRbXM7WQLKqMsU6CLgQojQJNQPH1cWOnkHYiGnw6flf0PXHWA==
+  version "2.40.2"
+  resolved "https://registry.yarnpkg.com/@dr.pogodin/react-native-fs/-/react-native-fs-2.40.2.tgz#cd8ea21e78fd6146b2487537121355cf863e9170"
+  integrity sha512-UitoZGxMvcaka22kiVsX7Z7qtqKHpm6a5o4EJGnMdtHfjUEHS2ubE74UXjg0j8HK1ihTimSY8/E1P075kz90jw==
   dependencies:
     buffer "^6.0.3"
     http-status-codes "^2.3.0"
@@ -846,7 +846,7 @@
   resolved "https://registry.yarnpkg.com/@epubjs-react-native/core/-/core-1.4.5.tgz#06f6f5d4f5400b6c95f76a7607e6b67257ac2d63"
   integrity sha512-Tmt3Z/82/bI6Cb+ao6qCbouuKmk4Ahy0SAHgEY88xIRdN0XlpN/7dfJ/n+XrNBhzjCtFnJW0uqA5htsFyo2c3Q==
 
-"@epubjs-react-native/file-system@1.1.4":
+"@epubjs-react-native/file-system@latest":
   version "1.1.4"
   resolved "https://registry.yarnpkg.com/@epubjs-react-native/file-system/-/file-system-1.1.4.tgz#83e62c4ffab6f92fec39e7ab89199ff796272e94"
   integrity sha512-hk0Qbt3KrQsHpeHVtIrM4sKEnlvIFlL3VOoFD7pdT8iZorL5666yU10FKvO6MIb963aa7S1EimKrdeXr6uiLtQ==
