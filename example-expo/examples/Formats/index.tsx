@@ -75,6 +75,7 @@ export function Formats() {
 
       <ReaderProvider>
         <Reader
+          key={src}
           src={src}
           width={width}
           height={height * 0.7}
