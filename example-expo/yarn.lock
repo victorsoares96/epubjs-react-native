@@ -2299,9 +2299,7 @@ expo-server@^57.0.3:
   integrity sha512-aK+LdKzauHSGmsOStZtyxdzv0zWssCkxTw3m4QuOhfDSJsZaMRTd9O41d8ixU/QfELTbaJ0oRNcF7JFV/7O9YQ==
 
 expo@~57.0.20:
-  version "57.0.20"
-  resolved "https://registry.yarnpkg.com/expo/-/expo-57.0.20.tgz#e370c81e23024dac4d98187ad650227ee46109e9"
-  integrity sha512-H57GWLLpNPrltsrjvx6ROsMecoFQza7h9OzujUjBsaY+aDL+bj3GsZaH3T5v5B96R7txuidUwjUh5q5hi3qttg==
+  version "57.0.21"
   dependencies:
     "@babel/runtime" "^7.20.0"
     "@expo/cli" "^57.0.22"
