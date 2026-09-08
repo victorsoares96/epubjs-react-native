@@ -7628,7 +7628,7 @@ react-native-builder-bob@0.23.2:
     which "^2.0.2"
     yargs "^17.5.1"
 
-react-native-gesture-handler@2.32.0:
+react-native-gesture-handler@^2.12.0:
   version "2.32.0"
   resolved "https://registry.yarnpkg.com/react-native-gesture-handler/-/react-native-gesture-handler-2.32.0.tgz#59b8658a4e1586ce6fb0ca0053ac80f6acf7f882"
   integrity sha512-uYIMOKlKENORq2SABE+jIjbPU+h5I/sQKcq2v16zRq848nwEp1fWRVwML4QWqijc8UcXJC25o54S8GQd4Mf2OA==
