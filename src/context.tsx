@@ -869,35 +869,54 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
           JSON.stringify({ type: 'onSearch', results: [] })
         );
       } else {
-         Promise.all(
+        Promise.all(
           book.spine.spineItems.map(async (item) => {
-            const wasLoaded = !!item.document;
+            const views = rendition.views();
+            let isDisplayed = false;
+            if (views && views.forEach) {
+              views.forEach(function (view) {
+                if (
+                  view &&
+                  view.displayed &&
+                  view.section &&
+                  view.section.index === item.index
+                ) {
+                  isDisplayed = true;
+                }
+              });
+            }
 
-            if(!wasLoaded) {
+            if (!isDisplayed) {
               await item.load(book.load.bind(book));
             }
-              
-            let results = item.find(term.trim());
-            const locationHref = item.href;
 
-            let [match] = flatten(book.navigation.toc)
-            .filter((chapter, index) => {
-                return book.canonical(chapter.href).includes(locationHref)
-            }, null);
+            try {
+              if (!item.document) {
+                return [];
+              }
 
-            if (results.length > 0) {
-              results = results.map(result => ({ ...result, section: { ...match, index: book.navigation.toc.findIndex(elem => elem.id === match?.id) } }));
+              let results = item.find(term.trim());
+              const locationHref = item.href;
 
-              if (chapterId) {
-                results = results.filter(result => result.section.id === chapterId);
+              let [match] = flatten(book.navigation.toc)
+              .filter((chapter, index) => {
+                  return book.canonical(chapter.href).includes(locationHref)
+              }, null);
+
+              if (results.length > 0) {
+                results = results.map(result => ({ ...result, section: { ...match, index: book.navigation.toc.findIndex(elem => elem.id === match?.id) } }));
+
+                if (chapterId) {
+                  results = results.filter(result => result.section.id === chapterId);
+                }
+              }
+
+              return results;
+            } finally {
+              if (!isDisplayed) {
+                item.unload();
               }
             }
-
-            if(!wasLoaded){
-              item.unload();
-            }
-
-            return results;
           })
         ).then((results) => {
           const items = [].concat.apply([], results);
