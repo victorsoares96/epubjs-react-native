@@ -2373,6 +2373,54 @@
     "@typescript-eslint/types" "8.17.0"
     eslint-visitor-keys "^4.2.0"
 
+"@typescript/native-preview-darwin-arm64@7.0.0-dev.20260707.2":
+  version "7.0.0-dev.20260707.2"
+  resolved "https://registry.yarnpkg.com/@typescript/native-preview-darwin-arm64/-/native-preview-darwin-arm64-7.0.0-dev.20260707.2.tgz#2a15a65cf2d4701225ec0f94453e126407d57a2e"
+  integrity sha512-wny2pgKjGbiZtnOIHVa3tXC1UfDqxNEFzyPGmiqybedG8hipG2Nfp0l5UxbaKCjkLacUpH/W5bP2hBOMVhCOzg==
+
+"@typescript/native-preview-darwin-x64@7.0.0-dev.20260707.2":
+  version "7.0.0-dev.20260707.2"
+  resolved "https://registry.yarnpkg.com/@typescript/native-preview-darwin-x64/-/native-preview-darwin-x64-7.0.0-dev.20260707.2.tgz#468bc5a3697925d757091d8f2314b2c1d08573a6"
+  integrity sha512-Afc7M5zOwo+GpfcYwz5Z8HMB2tPVsui7nNIqEuuFB73MPdVqNn/Wmpe4tP4MRri0AtJnJknoHBaTJ/VDAp/Jhw==
+
+"@typescript/native-preview-linux-arm64@7.0.0-dev.20260707.2":
+  version "7.0.0-dev.20260707.2"
+  resolved "https://registry.yarnpkg.com/@typescript/native-preview-linux-arm64/-/native-preview-linux-arm64-7.0.0-dev.20260707.2.tgz#702cdd2775ee98692dd368c3602bc1e25da88737"
+  integrity sha512-iITBa2WjjTI5N9t5l7Z4KoOSI+2zBlhbvFzsD/f8qX8QoKjz/Y4DPyBDgezYi8nkqjjksbgSOJ3/ykzhwrB9cg==
+
+"@typescript/native-preview-linux-arm@7.0.0-dev.20260707.2":
+  version "7.0.0-dev.20260707.2"
+  resolved "https://registry.yarnpkg.com/@typescript/native-preview-linux-arm/-/native-preview-linux-arm-7.0.0-dev.20260707.2.tgz#602fc487e9fc13d007aa8850470ae317830c8169"
+  integrity sha512-hJm/UOqZTr9FHmR7uNm8VGX4oKtfWk0Jem0zPeJFNC8ckGUfSBueyiEYMZB+XmRc1aG4x1E46y3CplP4CLHvGQ==
+
+"@typescript/native-preview-linux-x64@7.0.0-dev.20260707.2":
+  version "7.0.0-dev.20260707.2"
+  resolved "https://registry.yarnpkg.com/@typescript/native-preview-linux-x64/-/native-preview-linux-x64-7.0.0-dev.20260707.2.tgz#ae20d54c927cdf3658d7fa7ad390239e1baf7ce3"
+  integrity sha512-du0dzi6y97Po5vDNdPJTyyijHCpaS22JLRnKZEJXBDaO9gCIymOv/5QQokFRuOlQm0bWl3i9PF4OVdGP6uAOQA==
+
+"@typescript/native-preview-win32-arm64@7.0.0-dev.20260707.2":
+  version "7.0.0-dev.20260707.2"
+  resolved "https://registry.yarnpkg.com/@typescript/native-preview-win32-arm64/-/native-preview-win32-arm64-7.0.0-dev.20260707.2.tgz#649e2bd865d10601b87611f511b4fdb7754cb306"
+  integrity sha512-SsAwfhyHJ1akgBc+99z4+hwdbHsdWaKB8EwCNIMA6JfSLMeUjffrYvxu+vfMyxVtOVOz7RrRXRoiDiu4a2sCtg==
+
+"@typescript/native-preview-win32-x64@7.0.0-dev.20260707.2":
+  version "7.0.0-dev.20260707.2"
+  resolved "https://registry.yarnpkg.com/@typescript/native-preview-win32-x64/-/native-preview-win32-x64-7.0.0-dev.20260707.2.tgz#111929ee3876a759e10eb5da7e26ba24d8de423e"
+  integrity sha512-DL4u27stv0fo71sVhOzHSwE+YMZsbBijVI+kg5dLDLilSH79WFTJ8RSQ46vJrCMt+Gjlv/JOZP1PuLJDfioYeQ==
+
+"@typescript/native-preview@^7.0.0-dev.20260301.1":
+  version "7.0.0-dev.20260707.2"
+  resolved "https://registry.yarnpkg.com/@typescript/native-preview/-/native-preview-7.0.0-dev.20260707.2.tgz#1e7c9a6f4706baad83f28676f5f08ca4ca0b9b33"
+  integrity sha512-oUGp+Rep/hqMhPunyinsALUwSlzHINSxitifPiSaeqoKOKD2OlR9NE3TaPqwsl4NlGslsOSUXI1JotWQzpYCPg==
+  optionalDependencies:
+    "@typescript/native-preview-darwin-arm64" "7.0.0-dev.20260707.2"
+    "@typescript/native-preview-darwin-x64" "7.0.0-dev.20260707.2"
+    "@typescript/native-preview-linux-arm" "7.0.0-dev.20260707.2"
+    "@typescript/native-preview-linux-arm64" "7.0.0-dev.20260707.2"
+    "@typescript/native-preview-linux-x64" "7.0.0-dev.20260707.2"
+    "@typescript/native-preview-win32-arm64" "7.0.0-dev.20260707.2"
+    "@typescript/native-preview-win32-x64" "7.0.0-dev.20260707.2"
+
 "@ungap/structured-clone@^1.2.0":
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/@ungap/structured-clone/-/structured-clone-1.2.1.tgz#28fa185f67daaf7b7a1a8c1d445132c5d979f8bd"
@@ -7170,11 +7218,12 @@ react-native-gesture-handler@^2.12.0:
     invariant "^2.2.4"
     prop-types "^15.7.2"
 
-react-native-webview@13.11.1:
-  version "13.11.1"
-  resolved "https://registry.yarnpkg.com/react-native-webview/-/react-native-webview-13.11.1.tgz#833c4e7bb1a6a8c8548c3320ac5c05a4c228acd9"
-  integrity sha512-6RVwqOJmNBqlYQg87ev3P7OMlgbf6s/u7VtdPhwa8yxDhXDbGXDDdEjtGtUhqGhe5X8QvWEMkOIDbDNQusdlMQ==
+react-native-webview@13.17.0:
+  version "13.17.0"
+  resolved "https://registry.yarnpkg.com/react-native-webview/-/react-native-webview-13.17.0.tgz#6bd42fa92b8c91536e9759b3697dbf805243f824"
+  integrity sha512-nu0OCC4xa9K5nihup2l2eDlOtQZ4mgMf0LN0EuP0/0JsLtqmMjGihIEO3NZ/rDHZ8uErORYUTp73naVeH0tG1g==
   dependencies:
+    "@typescript/native-preview" "^7.0.0-dev.20260301.1"
     escape-string-regexp "^4.0.0"
     invariant "2.2.4"
 
