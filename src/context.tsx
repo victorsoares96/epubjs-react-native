@@ -869,28 +869,35 @@ function ReaderProvider({ children }: { children: React.ReactNode }) {
           JSON.stringify({ type: 'onSearch', results: [] })
         );
       } else {
-        Promise.all(
-          book.spine.spineItems.map((item) => {
-            return item.load(book.load.bind(book)).then(() => {
-              let results = item.find(term.trim());
-              const locationHref = item.href;
+         Promise.all(
+          book.spine.spineItems.map(async (item) => {
+            const wasLoaded = !!item.document;
 
-              let [match] = flatten(book.navigation.toc)
-              .filter((chapter, index) => {
-                  return book.canonical(chapter.href).includes(locationHref)
-              }, null);
+            if(!wasLoaded) {
+              await item.load(book.load.bind(book));
+            }
+              
+            let results = item.find(term.trim());
+            const locationHref = item.href;
 
-              if (results.length > 0) {
-                results = results.map(result => ({ ...result, section: { ...match, index: book.navigation.toc.findIndex(elem => elem.id === match?.id) } }));
+            let [match] = flatten(book.navigation.toc)
+            .filter((chapter, index) => {
+                return book.canonical(chapter.href).includes(locationHref)
+            }, null);
 
-                if (chapterId) {
-                  results = results.filter(result => result.section.id === chapterId);
-                }
+            if (results.length > 0) {
+              results = results.map(result => ({ ...result, section: { ...match, index: book.navigation.toc.findIndex(elem => elem.id === match?.id) } }));
+
+              if (chapterId) {
+                results = results.filter(result => result.section.id === chapterId);
               }
+            }
 
+            if(!wasLoaded){
               item.unload();
-              return Promise.resolve(results);
-            });
+            }
+
+            return results;
           })
         ).then((results) => {
           const items = [].concat.apply([], results);
