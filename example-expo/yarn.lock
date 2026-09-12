@@ -2248,19 +2248,13 @@ expo-constants@~57.0.17:
     "@expo/env" "~2.4.3"
 
 expo-document-picker@~57.0.1:
-  version "57.0.1"
-  resolved "https://registry.yarnpkg.com/expo-document-picker/-/expo-document-picker-57.0.1.tgz#c5a2bd3c431fcce1f3cf5b98661500f08d5b3285"
-  integrity sha512-qBwM5oxDZ3I9kwFD3pUE1oK/WNv9artoEKO6UpqhQgNRr0XA1ALRVWYjkF4+ge9lUNDRehjTm/jenINkzqg84g==
+  version "57.0.2"
 
 expo-file-system@~57.0.6:
-  version "57.0.6"
-  resolved "https://registry.yarnpkg.com/expo-file-system/-/expo-file-system-57.0.6.tgz#83cb02ad19dff1b23c8e48d5435e04c51791f2a9"
-  integrity sha512-pm8PMYEW6BnVOCBJ7df9FcDmQtE1tqImuYphlfYe1ipQRLYtdCayRczJcbKIsnB3mqEyp4gC2gWmMbsAsAOjVg==
+  version "57.0.7"
 
 expo-font@^57.0.3, expo-font@~57.0.3:
-  version "57.0.3"
-  resolved "https://registry.yarnpkg.com/expo-font/-/expo-font-57.0.3.tgz#b8fcc4a574a39d8b57949132190bf10995e0cff3"
-  integrity sha512-kiVUnc2A8vAvO2FfDJTsQa5BwmY+PAkof/1wRb5MOkcX1jtiaSTwz9gCUAyscMBFLundZDmZrLy1P7LZVC+NvA==
+  version "57.0.4"
   dependencies:
     fontfaceobserver "^2.1.0"
 
@@ -2299,9 +2293,7 @@ expo-server@^57.0.3:
   integrity sha512-aK+LdKzauHSGmsOStZtyxdzv0zWssCkxTw3m4QuOhfDSJsZaMRTd9O41d8ixU/QfELTbaJ0oRNcF7JFV/7O9YQ==
 
 expo@~57.0.20:
-  version "57.0.20"
-  resolved "https://registry.yarnpkg.com/expo/-/expo-57.0.20.tgz#e370c81e23024dac4d98187ad650227ee46109e9"
-  integrity sha512-H57GWLLpNPrltsrjvx6ROsMecoFQza7h9OzujUjBsaY+aDL+bj3GsZaH3T5v5B96R7txuidUwjUh5q5hi3qttg==
+  version "57.0.22"
   dependencies:
     "@babel/runtime" "^7.20.0"
     "@expo/cli" "^57.0.22"
