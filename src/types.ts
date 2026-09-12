@@ -426,6 +426,9 @@ export interface ReaderProps {
   /**
    * An array of objects which will be shown when selecting text. An empty array will suppress the menu.
    * These will appear after a long press to select text.
+   *
+   * On iOS, items are rendered in a React Native overlay so the menu can reappear
+   * when the selection changes. Android keeps the native WebView menu.
    * @platform ios, android
    */
   menuItems?: Array<{

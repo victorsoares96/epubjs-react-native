@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { Dimensions, View as RNView } from 'react-native';
+import { Dimensions, Platform, View as RNView } from 'react-native';
 import { WebView } from 'react-native-webview';
 import type {
   ShouldStartLoadRequest,
@@ -10,6 +10,10 @@ import type { Bookmark, ReaderProps } from './types';
 import { OpeningBook } from './utils/OpeningBook';
 import INTERNAL_EVENTS from './utils/internalEvents.util';
 import { GestureHandler } from './utils/GestureHandler';
+import { SelectionMenu } from './utils/SelectionMenu';
+import { SELECTION_MENU_BRIDGE_SCRIPT } from './utils/selectionMenuBridge';
+import type { SelectionRect } from './utils/getSelectionMenuPosition';
+import { shouldUseIosSelectionOverlay } from './utils/shouldUseIosSelectionOverlay';
 
 export type ViewProps = Omit<ReaderProps, 'src' | 'fileSystem'> & {
   templateUri: string;
@@ -116,6 +120,25 @@ export function View({
     cfiRange: string;
     cfiRangeText: string;
   }>({ cfiRange: '', cfiRangeText: '' });
+  const selectedTextRef = useRef(selectedText);
+  selectedTextRef.current = selectedText;
+  const useIosSelectionMenu = shouldUseIosSelectionOverlay(
+    Platform.OS,
+    menuItems
+  );
+  const [selectionRect, setSelectionRect] = useState<SelectionRect | null>(
+    null
+  );
+  const [isSelectionMenuVisible, setIsSelectionMenuVisible] = useState(false);
+  const [viewport, setViewport] = useState({
+    width: typeof width === 'number' ? width : 0,
+    height: typeof height === 'number' ? height : 0,
+  });
+
+  const injectSelectionMenuBridge = () => {
+    if (!useIosSelectionMenu) return;
+    book.current?.injectJavaScript(SELECTION_MENU_BRIDGE_SCRIPT);
+  };
 
   useEffect(() => {
     setFlow(flow || 'auto');
@@ -183,6 +206,8 @@ export function View({
         book.current?.injectJavaScript(injectedJavascript);
       }
 
+      injectSelectionMenuBridge();
+
       return onReady(totalLocations, currentLocation, progress);
     }
 
@@ -212,6 +237,7 @@ export function View({
       }
 
       handleChangeIsBookmarked(bookmarks, currentLocation);
+      setIsSelectionMenuVisible(false);
 
       if (currentLocation.atStart) setAtStart(true);
       else if (currentLocation.atEnd) setAtEnd(true);
@@ -252,10 +278,19 @@ export function View({
     }
 
     if (type === 'onSelected') {
-      const { cfiRange, text } = parsedEvent;
+      const { cfiRange, text, rect } = parsedEvent;
 
       setSelectedText({ cfiRange, cfiRangeText: text });
+      if (useIosSelectionMenu && text) {
+        setSelectionRect(rect ?? null);
+        setIsSelectionMenuVisible(true);
+      }
       return onSelected(text, cfiRange);
+    }
+
+    if (type === 'onSelectionCleared') {
+      setIsSelectionMenuVisible(false);
+      return () => {};
     }
 
     if (type === 'onOrientationChange') {
@@ -278,6 +313,7 @@ export function View({
 
     if (type === 'onRendered') {
       const { currentSection } = parsedEvent;
+      injectSelectionMenuBridge();
 
       return onRendered(parsedEvent.section, currentSection);
     }
@@ -362,6 +398,23 @@ export function View({
     return () => {};
   };
 
+  const runMenuItemAction = (label: string) => {
+    menuItems?.forEach((item) => {
+      if (label === item.label) {
+        const removeSelectionMenu = item.action(
+          selectedTextRef.current.cfiRange,
+          selectedTextRef.current.cfiRangeText
+        );
+
+        setIsSelectionMenuVisible(false);
+
+        if (removeSelectionMenu) {
+          removeSelection();
+        }
+      }
+    });
+  };
+
   const handleOnCustomMenuSelection = (event: {
     nativeEvent: {
       label: string;
@@ -369,18 +422,7 @@ export function View({
       selectedText: string;
     };
   }) => {
-    menuItems?.forEach((item) => {
-      if (event.nativeEvent.label === item.label) {
-        const removeSelectionMenu = item.action(
-          selectedText.cfiRange,
-          selectedText.cfiRangeText
-        );
-
-        if (removeSelectionMenu) {
-          removeSelection();
-        }
-      }
-    });
+    runMenuItemAction(event.nativeEvent.label);
   };
 
   const handleOnShouldStartLoadWithRequest = (
@@ -415,94 +457,121 @@ export function View({
   }, [registerBook]);
 
   return (
-    <GestureHandler
-      width={width}
-      height={height}
-      onSingleTap={() => {
-        onPress();
-        onSingleTap();
-      }}
-      onDoubleTap={() => {
-        onDoublePress();
-        onDoubleTap();
-      }}
-      onLongPress={onLongPress}
-      onSwipeLeft={() => {
-        if (enableSwipe) {
-          goNext({
-            keepScrollOffset: keepScrollOffsetOnLocationChange,
-          });
-          onSwipeLeft();
-        }
-      }}
-      onSwipeRight={() => {
-        if (enableSwipe) {
-          goPrevious({
-            keepScrollOffset: keepScrollOffsetOnLocationChange,
-          });
-          onSwipeRight();
-        }
-      }}
-      onSwipeUp={() => {
-        if (enableSwipe) {
-          onSwipeUp();
-        }
-      }}
-      onSwipeDown={() => {
-        if (enableSwipe) {
-          onSwipeDown();
-        }
+    <RNView
+      style={{ width, height }}
+      onLayout={(event) => {
+        const { width: nextWidth, height: nextHeight } =
+          event.nativeEvent.layout;
+        setViewport((current) =>
+          current.width === nextWidth && current.height === nextHeight
+            ? current
+            : { width: nextWidth, height: nextHeight }
+        );
       }}
     >
-      {isRendering && (
-        <RNView
-          style={{
-            ...openingBookComponentContainerStyle,
-            position: 'absolute',
-            zIndex: 2,
-          }}
-        >
-          {renderOpeningBookComponent()}
-        </RNView>
-      )}
-
-      <WebView
-        ref={book}
-        source={{ uri: templateUri }}
-        showsVerticalScrollIndicator={false}
-        showsHorizontalScrollIndicator={false}
-        textInteractionEnabled={!!enableSelection}
-        allowsLinkPreview={false}
-        dataDetectorTypes="none"
-        javaScriptEnabled
-        originWhitelist={['*']}
-        scrollEnabled={false}
-        mixedContentMode="compatibility"
-        onMessage={onMessage}
-        menuItems={menuItems?.map((item, key) => ({
-          label: item.label,
-          key: key.toString(),
-        }))}
-        onCustomMenuSelection={handleOnCustomMenuSelection}
-        allowingReadAccessToURL={allowedUris}
-        allowUniversalAccessFromFileURLs
-        allowFileAccessFromFileURLs
-        allowFileAccess
-        javaScriptCanOpenWindowsAutomatically
-        onOpenWindow={(event) => {
-          event.preventDefault();
-
-          if (onPressExternalLink) {
-            onPressExternalLink(event.nativeEvent.targetUrl);
+      <GestureHandler
+        width={width}
+        height={height}
+        onSingleTap={() => {
+          onPress();
+          onSingleTap();
+        }}
+        onDoubleTap={() => {
+          onDoublePress();
+          onDoubleTap();
+        }}
+        onLongPress={onLongPress}
+        onSwipeLeft={() => {
+          if (enableSwipe) {
+            goNext({
+              keepScrollOffset: keepScrollOffsetOnLocationChange,
+            });
+            onSwipeLeft();
           }
         }}
-        onShouldStartLoadWithRequest={handleOnShouldStartLoadWithRequest}
-        style={{
-          width,
-          backgroundColor: theme.body.background,
-          height,
+        onSwipeRight={() => {
+          if (enableSwipe) {
+            goPrevious({
+              keepScrollOffset: keepScrollOffsetOnLocationChange,
+            });
+            onSwipeRight();
+          }
         }}
-      />
-    </GestureHandler>
+        onSwipeUp={() => {
+          if (enableSwipe) {
+            onSwipeUp();
+          }
+        }}
+        onSwipeDown={() => {
+          if (enableSwipe) {
+            onSwipeDown();
+          }
+        }}
+      >
+        {isRendering && (
+          <RNView
+            style={{
+              ...openingBookComponentContainerStyle,
+              position: 'absolute',
+              zIndex: 2,
+            }}
+          >
+            {renderOpeningBookComponent()}
+          </RNView>
+        )}
+
+        <WebView
+          ref={book}
+          source={{ uri: templateUri }}
+          showsVerticalScrollIndicator={false}
+          showsHorizontalScrollIndicator={false}
+          textInteractionEnabled={!!enableSelection}
+          allowsLinkPreview={false}
+          dataDetectorTypes="none"
+          javaScriptEnabled
+          originWhitelist={['*']}
+          scrollEnabled={false}
+          mixedContentMode="compatibility"
+          onMessage={onMessage}
+          menuItems={
+            useIosSelectionMenu
+              ? []
+              : menuItems?.map((item, key) => ({
+                  label: item.label,
+                  key: key.toString(),
+                }))
+          }
+          onCustomMenuSelection={
+            useIosSelectionMenu ? undefined : handleOnCustomMenuSelection
+          }
+          allowingReadAccessToURL={allowedUris}
+          allowUniversalAccessFromFileURLs
+          allowFileAccessFromFileURLs
+          allowFileAccess
+          javaScriptCanOpenWindowsAutomatically
+          onOpenWindow={(event) => {
+            event.preventDefault();
+
+            if (onPressExternalLink) {
+              onPressExternalLink(event.nativeEvent.targetUrl);
+            }
+          }}
+          onShouldStartLoadWithRequest={handleOnShouldStartLoadWithRequest}
+          style={{
+            width,
+            backgroundColor: theme.body.background,
+            height,
+          }}
+        />
+      </GestureHandler>
+      {useIosSelectionMenu && isSelectionMenuVisible && menuItems && (
+        <SelectionMenu
+          items={menuItems}
+          selection={selectionRect}
+          viewport={viewport}
+          onPressItem={runMenuItemAction}
+        />
+      )}
+    </RNView>
   );
 }

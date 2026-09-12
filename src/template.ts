@@ -326,13 +326,70 @@ export default `
         }));
       });
 
+      function getSelectionRectInWebView(contents, range) {
+        if (!range) return null;
+
+        var rects = range.getClientRects();
+        var top = Infinity;
+        var left = Infinity;
+        var right = -Infinity;
+        var bottom = -Infinity;
+        var i;
+        var rect;
+
+        if (rects && rects.length) {
+          for (i = 0; i < rects.length; i++) {
+            rect = rects[i];
+            if (!rect.width && !rect.height) continue;
+            top = Math.min(top, rect.top);
+            left = Math.min(left, rect.left);
+            right = Math.max(right, rect.right);
+            bottom = Math.max(bottom, rect.bottom);
+          }
+        }
+
+        if (!isFinite(top)) {
+          rect = range.getBoundingClientRect();
+          if (!rect || (!rect.width && !rect.height)) return null;
+          top = rect.top;
+          left = rect.left;
+          right = rect.right;
+          bottom = rect.bottom;
+        }
+
+        var offsetX = 0;
+        var offsetY = 0;
+        try {
+          var win = contents && contents.window;
+          while (win && win !== window) {
+            var frame = win.frameElement;
+            if (!frame) break;
+            var frameRect = frame.getBoundingClientRect();
+            offsetX += frameRect.left;
+            offsetY += frameRect.top;
+            win = win.parent;
+          }
+        } catch (error) {}
+
+        return {
+          x: left + offsetX,
+          y: top + offsetY,
+          width: right - left,
+          height: bottom - top
+        };
+      }
+      window.getSelectionRectInWebView = getSelectionRectInWebView;
+
       rendition.on("selected", function (cfiRange, contents) {
         book.getRange(cfiRange).then(function (range) {
           if (range) {
+            var sel = contents && contents.window && contents.window.getSelection();
+            var liveRange = sel && sel.rangeCount > 0 ? sel.getRangeAt(0) : range;
             reactNativeWebview.postMessage(JSON.stringify({
               type: 'onSelected',
               cfiRange: cfiRange,
               text: range.toString(),
+              rect: getSelectionRectInWebView(contents, liveRange)
             }));
           }
         });
