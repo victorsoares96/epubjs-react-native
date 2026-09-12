@@ -42,6 +42,7 @@ export function View({
   width,
   height,
   initialLocation,
+  enableSelection = false,
   enableSwipe = true,
   onSwipeLeft = () => {},
   onSwipeRight = () => {},
@@ -469,6 +470,10 @@ export function View({
         ref={book}
         source={{ uri: templateUri }}
         showsVerticalScrollIndicator={false}
+        showsHorizontalScrollIndicator={false}
+        textInteractionEnabled={!!enableSelection}
+        allowsLinkPreview={false}
+        dataDetectorTypes="none"
         javaScriptEnabled
         originWhitelist={['*']}
         scrollEnabled={false}
