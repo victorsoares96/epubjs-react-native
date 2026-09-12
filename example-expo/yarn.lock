@@ -3681,9 +3681,7 @@ react-native-screens@~4.26.0:
     warn-once "^0.1.0"
 
 react-native-vector-icons@^10.0.3:
-  version "10.2.0"
-  resolved "https://registry.yarnpkg.com/react-native-vector-icons/-/react-native-vector-icons-10.2.0.tgz#f438f2ca16f7d6be658fd6ec8f0d2b7e2132b91c"
-  integrity sha512-n5HGcxUuVaTf9QJPs/W22xQpC2Z9u0nb0KgLPnVltP8vdUvOp6+R26gF55kilP/fV4eL4vsAHUqUjewppJMBOQ==
+  version "10.3.0"
   dependencies:
     prop-types "^15.7.2"
     yargs "^16.1.1"
