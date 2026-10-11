@@ -4,8 +4,17 @@
     "slug": "example-expo",
     "version": "1.0.0",
     "orientation": "portrait",
-    "platforms": ["ios", "android"],
-    "assetBundlePatterns": ["**/*"],
+    "platforms": [
+      "ios",
+      "android"
+    ],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "plugins": [
+      "../plugin/withSuppressIosSelectionMenu",
+      "expo-font"
+    ],
     "ios": {
       "bundleIdentifier": "com.epubjs.exampleexpo",
       "infoPlist": {

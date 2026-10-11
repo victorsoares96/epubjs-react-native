@@ -13,6 +13,7 @@ import { GestureHandler } from './utils/GestureHandler';
 import { SelectionMenu } from './utils/SelectionMenu';
 import { SELECTION_MENU_BRIDGE_SCRIPT } from './utils/selectionMenuBridge';
 import type { SelectionRect } from './utils/getSelectionMenuPosition';
+import { getNativeWebViewMenuProps } from './utils/getNativeWebViewMenuProps';
 import { shouldUseIosSelectionOverlay } from './utils/shouldUseIosSelectionOverlay';
 
 export type ViewProps = Omit<ReaderProps, 'src' | 'fileSystem'> & {
@@ -533,14 +534,7 @@ export function View({
           scrollEnabled={false}
           mixedContentMode="compatibility"
           onMessage={onMessage}
-          menuItems={
-            useIosSelectionMenu
-              ? []
-              : menuItems?.map((item, key) => ({
-                  label: item.label,
-                  key: key.toString(),
-                }))
-          }
+          {...getNativeWebViewMenuProps(Platform.OS, menuItems)}
           onCustomMenuSelection={
             useIosSelectionMenu ? undefined : handleOnCustomMenuSelection
           }

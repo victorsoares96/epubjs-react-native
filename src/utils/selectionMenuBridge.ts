@@ -13,7 +13,10 @@ export const SELECTION_MENU_BRIDGE_SCRIPT = `
 
     rendition.themes.default({
       'body': {
-        '-webkit-touch-callout': 'none'
+        '-webkit-touch-callout': 'none !important'
+      },
+      '*': {
+        '-webkit-touch-callout': 'none !important'
       }
     });
 
@@ -50,6 +53,21 @@ export const SELECTION_MENU_BRIDGE_SCRIPT = `
 
       if (contents.document.documentElement && contents.document.documentElement.style) {
         contents.document.documentElement.style.webkitTouchCallout = 'none';
+      }
+      if (contents.document.body && contents.document.body.style) {
+        contents.document.body.style.webkitTouchCallout = 'none';
+      }
+
+      var style = contents.document.getElementById('rn-selection-menu-suppress');
+      if (!style) {
+        style = contents.document.createElement('style');
+        style.id = 'rn-selection-menu-suppress';
+        style.appendChild(
+          contents.document.createTextNode(
+            'html,body,*{-webkit-touch-callout:none !important;}'
+          )
+        );
+        (contents.document.head || contents.document.documentElement).appendChild(style);
       }
 
       contents.document.addEventListener('contextmenu', function (event) {

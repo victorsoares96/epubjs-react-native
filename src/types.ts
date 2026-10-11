@@ -429,6 +429,10 @@ export interface ReaderProps {
    *
    * On iOS, items are rendered in a React Native overlay so the menu can reappear
    * when the selection changes. Android keeps the native WebView menu.
+   *
+   * Hiding the iOS system menu (Look Up / Translate / Search Web / Share) requires
+   * a development build with the package Expo plugin. Expo Go cannot apply that
+   * native WebView patch.
    * @platform ios, android
    */
   menuItems?: Array<{

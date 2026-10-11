@@ -12,6 +12,8 @@
     "android",
     "ios",
     "cpp",
+    "plugin",
+    "app.plugin.js",
     "epubjs-react-native.podspec",
     "!lib/typescript/example",
     "!android/build",
@@ -57,6 +59,9 @@
   "publishConfig": {
     "registry": "https://registry.npmjs.org/",
     "access": "public"
+  },
+  "expo": {
+    "plugins": ["./app.plugin.js"]
   },
   "devDependencies": {
     "@react-native-community/eslint-config": "3.2.0",
