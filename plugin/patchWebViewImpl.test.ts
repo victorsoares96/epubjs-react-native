@@ -24,6 +24,9 @@ describe('patchWebViewImpl', () => {
     expect(patched).toContain('self.suppressMenuItems.count > 0');
     expect(patched).toContain('UIMenuShare');
     expect(patched).toContain('UIMenuStandardEdit');
+    expect(patched.indexOf('[super buildMenuWithBuilder:builder]')).toBeLessThan(
+      patched.indexOf('UIMenuShare')
+    );
     fs.unlinkSync(file);
   });
 });

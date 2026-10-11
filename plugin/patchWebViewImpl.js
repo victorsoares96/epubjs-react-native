@@ -6,6 +6,7 @@ const BUILD_MENU_SIGNATURE =
 const PATCHED_MARKER = 'self.suppressMenuItems.count > 0';
 
 const PATCHED_METHOD = `- (void)buildMenuWithBuilder:(id<UIMenuBuilder>)builder API_AVAILABLE(ios(13.0))  {
+    [super buildMenuWithBuilder:builder];
     if (@available(iOS 16.0, *)) {
       if(self.menuItems || self.suppressMenuItems.count > 0){
         [builder removeMenuForIdentifier:UIMenuLookup];
@@ -14,7 +15,6 @@ const PATCHED_METHOD = `- (void)buildMenuWithBuilder:(id<UIMenuBuilder>)builder 
         [builder removeMenuForIdentifier:UIMenuReplace];
       }
     }
-    [super buildMenuWithBuilder:builder];
 }`;
 
 function patchWebViewImpl(filePath) {

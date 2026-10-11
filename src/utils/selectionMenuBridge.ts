@@ -74,6 +74,13 @@ export const SELECTION_MENU_BRIDGE_SCRIPT = `
         event.preventDefault();
       });
 
+      contents.document.addEventListener('selectionchange', function () {
+        var sel = contents.window.getSelection();
+        if (!sel || sel.rangeCount === 0 || sel.isCollapsed) {
+          reactNativeWebview.postMessage(JSON.stringify({ type: 'onSelectionCleared' }));
+        }
+      });
+
       contents.document.addEventListener('touchend', function () {
         setTimeout(function () {
           postSelection(contents);
