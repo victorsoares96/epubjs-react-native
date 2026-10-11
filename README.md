@@ -128,7 +128,7 @@ export default function App() {
 | `allowScriptedContent`       | `boolean`     | Allow run scripted content on sandbox. *Default is false on Android and true in iOS* |
 | `allowPopups`                | `boolean`     | Epubjs is rendering the epub-content inside and iframe which defaults to sandbox="allow-same-origin", to enable opening links or running javascript in an epub, you will need to pass this param. |
 | `onPressExternalLink`        | `function`    | Function that is invoked when external link is pressed. When used, the `allowPopups` property is automatically enabled |
-| `menuItems`                  | `array`       | An array of objects which will be shown when selecting text. An empty array will suppress the menu.                    |
+| `menuItems`                  | `array`       | An array of objects which will be shown when selecting text. An empty array will suppress the menu. See [Annotations](docs/EXAMPLES.md#annotations). |
 | `onAddAnnotation`            | `function`    | Function that is invoked when annotation is added in book.                                                             |
 | `onChangeAnnotations`        | `function`    | Function that is invoked when annotations array is modified.                                                           |
 | `onPressAnnotation`          | `function`    | Function that is invoked when annotation is pressed.                                                                   |
