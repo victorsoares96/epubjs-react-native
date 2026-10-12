@@ -15,7 +15,7 @@ const ORIGINAL = `- (void)buildMenuWithBuilder:(id<UIMenuBuilder>)builder API_AV
 
 describe('patchWebViewImpl', () => {
   it('strips iOS 16+ lookup/share/edit menus when suppressMenuItems is set', () => {
-    const file = path.join(os.tmpdir(), `RNCWebViewImpl-${Date.now()}.m`);
+    const file = path.join(os.tmpdir(), `RNCWebViewImpl-${Date.now()}-ok.m`);
     fs.writeFileSync(file, `header\n${ORIGINAL}\nfooter\n`);
 
     expect(patchWebViewImpl(file)).toBe(true);
@@ -27,6 +27,22 @@ describe('patchWebViewImpl', () => {
     expect(patched.indexOf('[super buildMenuWithBuilder:builder]')).toBeLessThan(
       patched.indexOf('UIMenuShare')
     );
+    expect(patchWebViewImpl(file)).toBe(true);
+    expect(fs.readFileSync(file, 'utf8').match(/UIMenuShare/g)).toHaveLength(1);
+    fs.unlinkSync(file);
+  });
+
+  it('fails when RNCWebViewImpl.m is missing', () => {
+    const file = path.join(os.tmpdir(), `missing-${Date.now()}.m`);
+
+    expect(() => patchWebViewImpl(file)).toThrow(/was not found/);
+  });
+
+  it('fails when this WebView version has no buildMenuWithBuilder method', () => {
+    const file = path.join(os.tmpdir(), `RNCWebViewImpl-${Date.now()}-unknown.m`);
+    fs.writeFileSync(file, '/* unrelated webview source */\n');
+
+    expect(() => patchWebViewImpl(file)).toThrow(/not supported/);
     fs.unlinkSync(file);
   });
 });

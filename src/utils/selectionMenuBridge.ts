@@ -1,7 +1,7 @@
 /**
  * Injected into the book WebView on iOS when custom menuItems are present.
- * Suppresses the native callout and re-emits selection so the RN overlay can
- * reappear after handle drags and taps on an existing selection.
+ * Suppresses the native callout and posts onSelectionMenu so the RN overlay can
+ * reappear after handle drags and taps. That event does not call onSelected.
  */
 export const SELECTION_MENU_BRIDGE_SCRIPT = `
 (function () {
@@ -37,7 +37,7 @@ export const SELECTION_MENU_BRIDGE_SCRIPT = `
       }
 
       reactNativeWebview.postMessage(JSON.stringify({
-        type: 'onSelected',
+        type: 'onSelectionMenu',
         cfiRange: cfiRange,
         text: range.toString(),
         rect: rect

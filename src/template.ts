@@ -384,6 +384,7 @@ export default `
         book.getRange(cfiRange).then(function (range) {
           if (range) {
             var sel = contents && contents.window && contents.window.getSelection();
+            if (sel && (sel.rangeCount === 0 || sel.isCollapsed)) return;
             var liveRange = sel && sel.rangeCount > 0 ? sel.getRangeAt(0) : range;
             reactNativeWebview.postMessage(JSON.stringify({
               type: 'onSelected',

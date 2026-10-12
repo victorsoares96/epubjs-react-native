@@ -7,6 +7,9 @@
     "jest.config.ts",
     "jest.setup.ts",
     "src/__tests__/**",
-    "src/mocks/**"
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx",
+    "src/mocks/**",
+    "plugin"
   ]
 }

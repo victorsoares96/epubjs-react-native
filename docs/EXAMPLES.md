@@ -98,12 +98,14 @@ Return `false` from `action` if you want to keep the current selection. Load pre
 
 ###### iOS selection menu
 
-| Setup | Custom `menuItems` | System menu (Look Up / Translate / Share) |
-| ----- | ------------------ | ----------------------------------------- |
+| Setup | Custom `menuItems` | System menu |
+| ----- | ------------------ | ----------- |
 | Android | Native WebView menu | Not applicable |
 | iOS in Expo Go | Overlay works | Still visible |
 | iOS development / production build **without** the plugin | Overlay works | Still visible |
 | iOS development / production build **with** the plugin | Overlay works | Hidden |
+
+With the plugin, the native build removes the whole system menu: Look Up, Translate, Search Web, Share, Copy, Cut, Paste, and Select. The overlay does not put those actions back. Add a `menuItems` entry when readers should still be able to copy.
 
 Add the plugin only when you use `menuItems` on iOS and want a single custom menu:
 

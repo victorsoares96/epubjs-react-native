@@ -289,6 +289,20 @@ export function View({
       return onSelected(text, cfiRange);
     }
 
+    if (type === 'onSelectionMenu') {
+      const { cfiRange, text, rect } = parsedEvent;
+
+      if (!text) {
+        setIsSelectionMenuVisible(false);
+        return;
+      }
+
+      setSelectedText({ cfiRange, cfiRangeText: text });
+      setSelectionRect(rect ?? null);
+      setIsSelectionMenuVisible(true);
+      return;
+    }
+
     if (type === 'onSelectionCleared') {
       setIsSelectionMenuVisible(false);
       return () => {};
