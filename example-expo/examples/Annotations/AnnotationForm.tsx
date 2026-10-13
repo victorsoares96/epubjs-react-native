@@ -3,8 +3,8 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import React, { useEffect } from 'react';
 import { Annotation, useReader } from '@epubjs-react-native/core';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { BottomSheetTextInput } from '@gorhom/bottom-sheet';
+import { StyleSheet, Text, View } from 'react-native';
+import { BottomSheetTextInput, TouchableOpacity } from '@gorhom/bottom-sheet';
 import { contrast } from '../FullExample/utils';
 
 interface Props {
