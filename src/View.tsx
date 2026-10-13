@@ -539,10 +539,14 @@ export function View({
           ref={book}
           source={{ uri: templateUri }}
           showsVerticalScrollIndicator={false}
-          showsHorizontalScrollIndicator={false}
-          textInteractionEnabled={!!enableSelection}
-          allowsLinkPreview={false}
-          dataDetectorTypes="none"
+          {...(Platform.OS === 'ios'
+            ? {
+                showsHorizontalScrollIndicator: false,
+                textInteractionEnabled: !!enableSelection,
+                allowsLinkPreview: false,
+                dataDetectorTypes: 'none' as const,
+              }
+            : {})}
           javaScriptEnabled
           originWhitelist={['*']}
           scrollEnabled={false}
