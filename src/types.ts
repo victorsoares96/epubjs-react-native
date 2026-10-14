@@ -426,6 +426,14 @@ export interface ReaderProps {
   /**
    * An array of objects which will be shown when selecting text. An empty array will suppress the menu.
    * These will appear after a long press to select text.
+   *
+   * On iOS, items are rendered in a React Native overlay so the menu can reappear
+   * when the selection changes. Android keeps the native WebView menu.
+   *
+   * Hiding the iOS system menu requires a development build with the package Expo
+   * plugin. The patch removes Look Up, Translate, Search Web, Share, Copy, Cut,
+   * Paste, and Select. Add a menu item when readers should still be able to copy.
+   * Expo Go cannot apply that native WebView patch.
    * @platform ios, android
    */
   menuItems?: Array<{

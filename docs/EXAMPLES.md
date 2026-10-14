@@ -46,8 +46,80 @@ Search terms in the book
 
 <img src="./annotations.gif">
 
-Some use cases for text markup
+Text markup uses `menuItems` on `<Reader>` and `addAnnotation` from `useReader()`. On iOS the custom items render in a React Native overlay, so the menu shows again after the user adjusts the selection handles or taps the selection. Android keeps the native WebView menu.
+
+This overlay fixes [#352](https://github.com/victorsoares96/epubjs-react-native/issues/352) (same report in [#343](https://github.com/victorsoares96/epubjs-react-native/issues/343)): after iOS 16 the native WebView menu did not reappear when the selection changed.
+
+```tsx
+import { Reader, useReader } from '@epubjs-react-native/core';
+// import { useFileSystem } from '@epubjs-react-native/file-system'; // Bare React Native
+// import { useFileSystem } from '@epubjs-react-native/expo-file-system'; // Expo
+
+function Book() {
+  const { addAnnotation } = useReader();
+
+  return (
+    <Reader
+      src="https://s3.amazonaws.com/moby-dick/OPS/package.opf"
+      fileSystem={useFileSystem}
+      menuItems={[
+        {
+          label: 'Highlight',
+          action: (cfiRange) => {
+            addAnnotation('highlight', cfiRange, undefined, { color: '#23CE6B' });
+            return true; // clear the selection after the action
+          },
+        },
+        {
+          label: 'Add Note',
+          action: (cfiRange, text) => {
+            addAnnotation('highlight', cfiRange, { note: text });
+            return true;
+          },
+        },
+      ]}
+      onAddAnnotation={(annotation) => {
+        console.log('added', annotation);
+      }}
+      onPressAnnotation={(annotation) => {
+        console.log('pressed', annotation);
+      }}
+      onChangeAnnotations={(next) => {
+        console.log('annotations', next);
+      }}
+    />
+  );
+}
+```
+
+Return `false` from `action` if you want to keep the current selection. Load previously saved marks with `initialAnnotations` and read the current list from `annotations` on `useReader()`.
+
 [View example](../example-expo/examples/Annotations/index.tsx)
+
+###### iOS selection menu
+
+| Setup | Custom `menuItems` | System menu |
+| ----- | ------------------ | ----------- |
+| Android | Native WebView menu | Not applicable |
+| iOS in Expo Go | Overlay works | Still visible |
+| iOS development / production build **without** the plugin | Overlay works | Still visible |
+| iOS development / production build **with** the plugin | Overlay works | Hidden |
+
+With the plugin, the native build removes the whole system menu: Look Up, Translate, Search Web, Share, Copy, Cut, Paste, and Select. The overlay does not put those actions back. Add a `menuItems` entry when readers should still be able to copy.
+
+Add the plugin only when you use `menuItems` on iOS and want a single custom menu:
+
+```json
+{
+  "expo": {
+    "plugins": ["@epubjs-react-native/core"]
+  }
+}
+```
+
+Rebuild the native app after adding it. Expo Go cannot apply this WebView patch. Reading books without `menuItems` does not need the plugin.
+
+Bare React Native projects do not run Expo config plugins; apply the equivalent `react-native-webview` menu suppression in native iOS and rebuild.
 
 ##### Bookmarks
 

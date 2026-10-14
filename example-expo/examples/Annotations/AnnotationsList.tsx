@@ -5,6 +5,7 @@ import { useReader, Annotation } from '@epubjs-react-native/core';
 import {
   BottomSheetFlatList,
   BottomSheetModal,
+  BottomSheetModalProvider,
 } from '@gorhom/bottom-sheet';
 import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
 import { Button, Text } from 'react-native-paper';
@@ -107,35 +108,37 @@ export const AnnotationsList = forwardRef<Ref, Props>(
     );
 
     return (
-      <BottomSheetModal
-        ref={ref}
-        index={0}
-        snapPoints={snapPoints}
-        enablePanDownToClose
-        enableContentPanningGesture={false}
-        style={{
-          ...styles.container,
-          backgroundColor: theme.body.background,
-        }}
-        handleStyle={{ backgroundColor: theme.body.background }}
-        backgroundStyle={{ backgroundColor: theme.body.background }}
-        onDismiss={onClose}
-      >
-        <BottomSheetFlatList<Annotation>
-          data={annotations.filter(
-            (annotation) =>
-              !annotation?.data?.isTemp && annotation.type !== 'mark'
-          )}
-          showsVerticalScrollIndicator={false}
-          keyExtractor={(item, index) =>
-            `${item.type}-${item.cfiRange}-${index}`
-          }
-          renderItem={renderItem}
-          ListHeaderComponent={header}
-          style={{ width: '100%' }}
-          maxToRenderPerBatch={20}
-        />
-      </BottomSheetModal>
+      <BottomSheetModalProvider>
+        <BottomSheetModal
+          ref={ref}
+          index={0}
+          snapPoints={snapPoints}
+          enablePanDownToClose
+          enableContentPanningGesture={false}
+          style={{
+            ...styles.container,
+            backgroundColor: theme.body.background,
+          }}
+          handleStyle={{ backgroundColor: theme.body.background }}
+          backgroundStyle={{ backgroundColor: theme.body.background }}
+          onDismiss={onClose}
+        >
+          <BottomSheetFlatList<Annotation>
+            data={annotations.filter(
+              (annotation) =>
+                !annotation?.data?.isTemp && annotation.type !== 'mark'
+            )}
+            showsVerticalScrollIndicator={false}
+            keyExtractor={(item, index) =>
+              `${item.type}-${item.cfiRange}-${index}`
+            }
+            renderItem={renderItem}
+            ListHeaderComponent={header}
+            style={{ width: '100%' }}
+            maxToRenderPerBatch={20}
+          />
+        </BottomSheetModal>
+      </BottomSheetModalProvider>
     );
   }
 );

@@ -6,6 +6,9 @@
     "assetBundlePatterns": [
       "**/*"
     ],
+    "plugins": [
+      "../plugin/withSuppressIosSelectionMenu"
+    ],
     "ios": {
       "bundleIdentifier": "com.jvjv33.example-bare"
     },
