@@ -294,13 +294,13 @@ export function View({
 
       if (!text) {
         setIsSelectionMenuVisible(false);
-        return;
+        return () => {};
       }
 
       setSelectedText({ cfiRange, cfiRangeText: text });
       setSelectionRect(rect ?? null);
       setIsSelectionMenuVisible(true);
-      return;
+      return () => {};
     }
 
     if (type === 'onSelectionCleared') {
