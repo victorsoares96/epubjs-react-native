@@ -52,6 +52,20 @@ target 'examplebare' do
       :ccache_enabled => podfile_properties['apple.ccacheEnabled'] == 'true',
     )
 
+    # @dr.pogodin/react-native-fs < 2.40.1 does not link UniformTypeIdentifiers.
+    # Dynamic use_frameworks! then fails with undefined _OBJC_CLASS_$_UTType.
+    installer.pods_project.targets.each do |target|
+      next unless target.name == 'ReactNativeFs'
+
+      target.build_configurations.each do |build_config|
+        flags = build_config.build_settings['OTHER_LDFLAGS'] || ['$(inherited)']
+        flags = flags.split if flags.is_a?(String)
+        next if flags.any? { |flag| flag.include?('UniformTypeIdentifiers') }
+
+        build_config.build_settings['OTHER_LDFLAGS'] = flags + ['-framework', 'UniformTypeIdentifiers']
+      end
+    end
+
     # This is necessary for Xcode 14, because it signs resource bundles by default
     # when building for devices.
     installer.target_installation_results.pod_target_installation_results

@@ -17,17 +17,39 @@ follow these steps below based on the type of project you want to apply this lib
 #### Bare Installation
 
 ```sh
-npm install @epubjs-react-native/file-system react-native-fs react-native-webview react-native-gesture-handler
+npm install @epubjs-react-native/file-system @dr.pogodin/react-native-fs react-native-webview react-native-gesture-handler
 ```
 
 ```sh
-yarn add @epubjs-react-native/file-system react-native-fs react-native-webview react-native-gesture-handler
+yarn add @epubjs-react-native/file-system @dr.pogodin/react-native-fs react-native-webview react-native-gesture-handler
+```
+
+`@dr.pogodin/react-native-fs` must be **2.40.1 or newer**. That release links `UniformTypeIdentifiers`. With `use_frameworks! :linkage => :dynamic`, older versions fail the iOS link:
+
+```text
+Undefined symbol: _OBJC_CLASS_$_UTType
+```
+
+Remove the unmaintained `react-native-fs` package if it is still installed. If you cannot upgrade yet, link the missing framework from the Podfile `post_install`:
+
+```ruby
+installer.pods_project.targets.each do |target|
+  next unless target.name == 'ReactNativeFs'
+
+  target.build_configurations.each do |build_config|
+    flags = build_config.build_settings['OTHER_LDFLAGS'] || ['$(inherited)']
+    flags = flags.split if flags.is_a?(String)
+    next if flags.any? { |flag| flag.include?('UniformTypeIdentifiers') }
+
+    build_config.build_settings['OTHER_LDFLAGS'] = flags + ['-framework', 'UniformTypeIdentifiers']
+  end
+end
 ```
 
 #### Expo Installation
 
 ```sh
-npx expo install @epubjs-react-native/expo-file-system react-native-fs react-native-webview react-native-gesture-handler
+npx expo install @epubjs-react-native/expo-file-system react-native-webview react-native-gesture-handler
 ```
 
 #### If you develop for iOS use this command for install CocoaPods deps (if you use an expo managed project you don't need this)
