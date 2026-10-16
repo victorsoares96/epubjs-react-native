@@ -17,18 +17,30 @@ follow these steps below based on the type of project you want to apply this lib
 #### Bare Installation
 
 ```sh
-npm install @epubjs-react-native/file-system react-native-fs react-native-webview react-native-gesture-handler
+npm install @epubjs-react-native/file-system @dr.pogodin/react-native-fs react-native-webview react-native-gesture-handler
 ```
 
 ```sh
-yarn add @epubjs-react-native/file-system react-native-fs react-native-webview react-native-gesture-handler
+yarn add @epubjs-react-native/file-system @dr.pogodin/react-native-fs react-native-webview react-native-gesture-handler
 ```
+
+`@epubjs-react-native/file-system` imports [`@dr.pogodin/react-native-fs`](https://github.com/birdofpreyru/react-native-fs). If `react-native-fs` is still listed in the project, remove it, install the package above, then rebuild the native app. On iOS, run `npx pod-install` and launch the app again.
+
+Skipping that rebuild crashes on launch:
+
+```text
+Invariant Violation: TurboModuleRegistry.getEnforcing(...): 'ReactNativeFs' could not be found.
+```
+
+The file-system package then fails to evaluate, which shows up as `Cannot read property 'useFileSystem' of undefined`.
 
 #### Expo Installation
 
 ```sh
-npx expo install @epubjs-react-native/expo-file-system react-native-fs react-native-webview react-native-gesture-handler
+npx expo install @epubjs-react-native/expo-file-system react-native-webview react-native-gesture-handler
 ```
+
+Expo projects use `@epubjs-react-native/expo-file-system`. Leave `react-native-fs` and `@dr.pogodin/react-native-fs` out of this install.
 
 #### If you develop for iOS use this command for install CocoaPods deps (if you use an expo managed project you don't need this)
 
@@ -77,8 +89,8 @@ import * as React from 'react';
 
 import { SafeAreaView } from 'react-native';
 import { Reader, useReader } from '@epubjs-react-native/core';
-// import { useFileSystem } from '@epubjs-react-native/file-system'; // for Bare React Native project
-// import { useFileSystem } from '@epubjs-react-native/expo-file-system'; // for Expo project
+import { useFileSystem } from '@epubjs-react-native/file-system';
+// Expo: import { useFileSystem } from '@epubjs-react-native/expo-file-system';
 
 export default function App() {
   const { goToLocation } = useReader();
