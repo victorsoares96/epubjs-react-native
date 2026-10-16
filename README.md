@@ -24,7 +24,13 @@ npm install @epubjs-react-native/file-system @dr.pogodin/react-native-fs react-n
 yarn add @epubjs-react-native/file-system @dr.pogodin/react-native-fs react-native-webview react-native-gesture-handler
 ```
 
-`@epubjs-react-native/file-system` imports [`@dr.pogodin/react-native-fs`](https://github.com/birdofpreyru/react-native-fs). If `react-native-fs` is still listed in the project, remove it, install the package above, then rebuild the native app. On iOS, run `npx pod-install` and launch the app again.
+`@epubjs-react-native/file-system` imports [`@dr.pogodin/react-native-fs`](https://github.com/birdofpreyru/react-native-fs) **2.40.1 or newer**. That release links `UniformTypeIdentifiers`. With `use_frameworks! :linkage => :dynamic`, older versions fail the iOS link:
+
+```text
+Undefined symbol: _OBJC_CLASS_$_UTType
+```
+
+If `react-native-fs` is still listed in the project, remove it, install the package above, then rebuild the native app. On iOS, run `npx pod-install` and launch the app again.
 
 Skipping that rebuild crashes on launch:
 
@@ -33,6 +39,22 @@ Invariant Violation: TurboModuleRegistry.getEnforcing(...): 'ReactNativeFs' coul
 ```
 
 The file-system package then fails to evaluate, which shows up as `Cannot read property 'useFileSystem' of undefined`.
+
+If you cannot upgrade `@dr.pogodin/react-native-fs` to 2.40.1 yet, link the missing framework from the Podfile `post_install`:
+
+```ruby
+installer.pods_project.targets.each do |target|
+  next unless target.name == 'ReactNativeFs'
+
+  target.build_configurations.each do |build_config|
+    flags = build_config.build_settings['OTHER_LDFLAGS'] || ['$(inherited)']
+    flags = flags.split if flags.is_a?(String)
+    next if flags.any? { |flag| flag.include?('UniformTypeIdentifiers') }
+
+    build_config.build_settings['OTHER_LDFLAGS'] = flags + ['-framework', 'UniformTypeIdentifiers']
+  end
+end
+```
 
 #### Expo Installation
 
