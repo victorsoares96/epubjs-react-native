@@ -11,6 +11,7 @@ const pinnedPackages = [
   'react-native-reanimated',
   'react-native-gesture-handler',
   'react-native-worklets',
+  'expo-file-system',
 ];
 
 config.resolver.extraNodeModules = Object.fromEntries(
