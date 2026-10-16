@@ -12,8 +12,8 @@
     "expo-document-picker": "~57.0.3",
     "expo-file-system": "~57.0.7",
     "expo-font": "~57.0.4",
-    "react": "19.2.3",
-    "react-dom": "19.2.3",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
     "react-native": "0.86.3",
     "react-native-gesture-handler": "~2.32.0",
     "react-native-paper": "^5.12.3",
@@ -28,7 +28,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.29.0",
-    "@types/react": "~19.2.10",
+    "@types/react": "~19.3.0",
     "typescript": "~6.0.3"
   },
   "scripts": {
