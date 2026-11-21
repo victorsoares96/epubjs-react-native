@@ -1543,9 +1543,9 @@
   integrity sha512-+Fj43pSMwJs4KRrH/938Uf+uAELIgVBmQzg/q1YG10djyfA3TnrU8N8XzqCh/okZdszqBQTZf96idMfE5lnwTA==
 
 "@tsconfig/react-native@^3.0.3":
-  version "3.0.5"
-  resolved "https://registry.yarnpkg.com/@tsconfig/react-native/-/react-native-3.0.5.tgz#c4971b1eca2e8cdf7b0d25f40193a782039c1abd"
-  integrity sha512-0+pmYzHccvwWpFz2Tv5AJxp6UroLALmAy+SX34tKlwaCie1mNbtCv6uOJp7x8pKchgNA9/n6BGrx7uLQvw8p9A==
+  version "3.0.10"
+  resolved "https://registry.yarnpkg.com/@tsconfig/react-native/-/react-native-3.0.10.tgz#67f901e6890ef7ceb014b196c63f86596174dbf7"
+  integrity sha512-7vJ+Ow3L4s1GJJyX58fsBbGp+9yXeYVifUQqWDhCjaoO260zToHZK2YYGi62phYxnGUAuuLL5kxBpP8JUmD2Jg==
 
 "@types/hammerjs@^2.0.36":
   version "2.0.46"
