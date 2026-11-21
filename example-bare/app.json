@@ -7,21 +7,19 @@
       "**/*"
     ],
     "plugins": [
-      "../plugin/withSuppressIosSelectionMenu"
+      "../plugin/withSuppressIosSelectionMenu",
+      "expo-status-bar"
     ],
     "ios": {
-      "bundleIdentifier": "com.jvjv33.example-bare"
+      "bundleIdentifier": "com.jvjv33.example-bare",
+      "infoPlist": {
+        "UISupportsDocumentBrowser": true,
+        "UIFileSharingEnabled": true,
+        "LSSupportsOpeningDocumentsInPlace": true
+      }
     },
     "android": {
       "package": "com.jvjv33.examplebare"
     }
-  },
-  "ios": {
-    "infoPlist": {
-      "UISupportsDocumentBrowser": true,
-      "UIFileSharingEnabled": true,
-      "LSSupportsOpeningDocumentsInPlace": true
-    }
-  },
-  "name": "example-bare"
+  }
 }

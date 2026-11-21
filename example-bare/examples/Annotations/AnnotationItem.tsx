@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import React from 'react';
-import { BottomSheetView, TouchableOpacity } from '@gorhom/bottom-sheet';
+import { BottomSheetView } from '@gorhom/bottom-sheet';
+import { Pressable } from 'react-native-gesture-handler';
 import { Annotation, useReader } from '@epubjs-react-native/core';
 import { StyleSheet, View } from 'react-native';
 import { IconButton, MD3Colors, Text } from 'react-native-paper';
@@ -29,7 +30,7 @@ function AnnotationItem({
           }}
         />
 
-        <TouchableOpacity onPress={() => onPressAnnotation(annotation)}>
+        <Pressable onPress={() => onPressAnnotation(annotation)}>
           {annotation.type === 'highlight' && (
             <Text
               style={{
@@ -61,7 +62,7 @@ function AnnotationItem({
           >
             &quot;{annotation.cfiRangeText}&quot;
           </Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
 
       <IconButton
