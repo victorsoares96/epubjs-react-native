@@ -60,9 +60,7 @@
     semver "^6.3.1"
 
 "@babel/core@^7.29.0":
-  version "7.29.7"
-  resolved "https://registry.yarnpkg.com/@babel/core/-/core-7.29.7.tgz#80c10b17248082968b57a857b91640971f2070f7"
-  integrity sha512-RgHBCvtjbOK2gXSNBNIkNoEc9qoVEtau3hj8gEqKQuL3HZAibKarWFEI3Lfm6EYKkLalOh8eSrj9b+ch9H/VBA==
+  version "7.29.16"
   dependencies:
     "@babel/code-frame" "^7.29.7"
     "@babel/generator" "^7.29.7"
